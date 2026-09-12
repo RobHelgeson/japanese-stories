@@ -154,6 +154,31 @@
       .chip.weak { color: var(--weak); border-color: color-mix(in srgb, var(--weak) 40%, transparent); }
       .chip.new { color: var(--new); border-color: color-mix(in srgb, var(--new) 40%, transparent); }
 
+      .prog {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.55rem;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.72rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      /* display:flex would otherwise beat the UA's [hidden] rule and show an
+         empty bar on every unread story. */
+      .prog[hidden] { display: none; }
+      .prog .track {
+        flex: 1;
+        max-width: 9rem;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--rule);
+        overflow: hidden;
+      }
+      .prog .track i { display: block; height: 100%; background: var(--accent); }
+      .cell.done .prog { color: var(--new); }
+      .cell.done .prog .track i { background: var(--new); }
+
       .keys {
         font-family: -apple-system, system-ui, sans-serif;
         font-size: 0.78rem;
@@ -176,7 +201,7 @@
     <header>
       <h1>物語</h1>
       <span class="spacer"></span>
-      <span>6 編 · 162 ページ · 737 文 · 既知語彙 6502</span>
+      <span>6 編 · 162 ページ · 737 文 · 既知語彙 6502<span id="readtot"></span></span>
     </header>
 
     <main>
@@ -185,7 +210,7 @@
         The order is graded by what the prose asks of you, not by vocabulary. Read down the list.
       </p>
 
-    <div class="cell">
+    <div class="cell" data-slug="tokei-no-oto" data-pages="25">
       <a class="card" href="tokei-no-oto.html">
         <div class="rt">とけいのおと</div>
         <h2>時計の音</h2>
@@ -196,10 +221,11 @@
           <span>430 漢字語</span>
         </div>
         <div class="chips"><span class="chip weak">苦手 修理、手帳、正確、残す、状態、経つ、表、足りる、遅れる、郷愁</span><span class="chip new">新出 振り子、歯車、秒針、部品、針</span></div>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
         <div class="vers"><span>版</span><a class="ver" href="versions/tokei-no-oto.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
-    <div class="cell">
+    <div class="cell" data-slug="maigo-no-tegami" data-pages="16">
       <a class="card" href="maigo-no-tegami.html">
         <div class="rt">まいごのてがみ</div>
         <h2>迷子の手紙</h2>
@@ -210,10 +236,11 @@
           <span>372 漢字語</span>
         </div>
         <div class="chips"><span class="chip weak">苦手 去年、後、後悔、経つ、解釈、訪ねる、返事、配達</span><span class="chip new">新出 便箋、差出人、消印、表札</span></div>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
         <div class="vers"><span>版</span><a class="ver" href="versions/maigo-no-tegami.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
-    <div class="cell">
+    <div class="cell" data-slug="shuden" data-pages="23">
       <a class="card" href="shuden.html">
         <div class="rt">しゅうでん</div>
         <h2>終電</h2>
@@ -224,10 +251,11 @@
           <span>485 漢字語</span>
         </div>
         <div class="chips"><span class="chip weak">苦手 事情、去年、定期券、後悔、改札、放送、書類、案内、正確、渡る、緊張、表、返事、遅れる、過ぎる、遠慮</span><span class="chip new">新出 乗客、明かり、網棚、車掌</span></div>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
         <div class="vers"><span>版</span><a class="ver" href="versions/shuden.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
-    <div class="cell">
+    <div class="cell" data-slug="entotsu-no-kemuri" data-pages="27">
       <a class="card" href="entotsu-no-kemuri.html">
         <div class="rt">えんとつのけむり</div>
         <h2>煙突の煙</h2>
@@ -238,9 +266,10 @@
           <span>508 漢字語</span>
         </div>
         <div class="chips"><span class="chip weak">苦手 工場、残す、渡す、用意、経つ、連絡、過ぎる、遠慮</span><span class="chip new">新出 桶、湯気、湯船、煙突、番台</span></div>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
     </div>
-    <div class="cell">
+    <div class="cell" data-slug="neko-o-sagasu-tantei" data-pages="30">
       <a class="card" href="neko-o-sagasu-tantei.html">
         <div class="rt">ねこをさがすたんてい</div>
         <h2>猫を探す探偵</h2>
@@ -251,10 +280,11 @@
           <span>636 漢字語</span>
         </div>
         <div class="chips"><span class="chip weak">苦手 中身、借りる、内緒、焦る、盗む、経つ、計画、訪ねる、調査、足りる、返事、追いつめる、金額</span><span class="chip new">新出 飼い主、飼う、餌、首輪</span></div>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
         <div class="vers"><span>版</span><a class="ver" href="versions/neko-o-sagasu-tantei.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
-    <div class="cell">
+    <div class="cell" data-slug="shiro-no-kane" data-pages="41">
       <a class="card" href="shiro-no-kane.html">
         <div class="rt">しろのかね</div>
         <h2>城の鐘</h2>
@@ -265,6 +295,7 @@
           <span>818 漢字語</span>
         </div>
         <div class="chips"><span class="chip weak">苦手 お前、修理、年月、当時、後、正確、流す、渡す、状態、策、経つ、表、襲う、計画、起きる、過ぎる</span><span class="chip new">新出 二百段、叫ぶ、従う、段、王、罰、金属、響く</span></div>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
         <div class="vers"><span>版</span><a class="ver" href="versions/shiro-no-kane.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
@@ -287,5 +318,42 @@
       <span class="spacer"></span>
       <span>known-word-reader</span>
     </footer>
+    <script>
+      // Progress is written by the readers into this device's localStorage, so
+      // it cannot be baked in here. Pages serves this page and every reader from
+      // one origin, so the store they write is the store this reads. Wrapped
+      // because a mailed or file:// copy throws on the accessor itself.
+      (function () {
+        var raw;
+        try { raw = localStorage.getItem("japanese-stories:progress"); } catch (e) { return; }
+        if (!raw) return;
+        var all; try { all = JSON.parse(raw); } catch (e) { return; }
+        if (!all || typeof all !== "object") return;
+        var cells = document.querySelectorAll(".cell[data-slug]"), read = 0;
+        for (var i = 0; i < cells.length; i++) {
+          var cell = cells[i], rec = all[cell.dataset.slug];
+          // Anything that is not a record is skipped rather than trusted: a
+          // version field added at the top level later would read as a slug.
+          if (!rec || typeof rec !== "object" || Array.isArray(rec)) continue;
+          var total = Number(cell.dataset.pages);
+          // rec.of is ignored — it is only what the device believed the last
+          // time it read this story.
+          var page = Number(rec.page);
+          if (!total || !isFinite(page) || page < 1) continue;
+          if (page > total) page = total;
+          var finished = rec.done === true || page >= total;
+          var prog = cell.querySelector(".prog");
+          // Floored, because page 1 of 41 rounds to under a pixel and an empty
+          // bar reads as "not started".
+          prog.querySelector("i").style.width =
+            (finished ? 100 : Math.max(4, Math.round((page / total) * 100))) + "%";
+          prog.querySelector(".pct").textContent = finished ? "読了" : page + " / " + total;
+          prog.hidden = false;
+          if (finished) { cell.classList.add("done"); read++; }
+        }
+        if (read) document.getElementById("readtot").textContent =
+          " · 読了 " + read + "/" + cells.length;
+      })();
+    </script>
   </body>
 </html>
