@@ -1,0 +1,17 @@
+{
+  "_comment": "Ichiran commits to one parse and sometimes picks a wrong reading for an ambiguous token. Keys are exact token surfaces; the value is the reading to force. Only add a key whose reading is unambiguous across every story here — build.py prints each override that fires, so a wrong entry shows up at build time. Found by scanning `readings.py` output over all built stories.",
+  "中": "なか",
+  "下": "した",
+  "空": "そら",
+  "風": "かぜ",
+  "街": "まち",
+  "その上": "そのうえ",
+  "二十年": "にじゅうねん",
+  "青山": "あおやま",
+  "行った": "いった",
+  "行って": "いって",
+  "打たれて": "うたれて",
+  "罰": "ばつ",
+  "人": "ひと",
+  "皆": "みな"
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>__TITLE__</title>
+    <style>
+__READER_CSS__
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="btn" href="index.html">目次</a>
+      <h1 id="title"></h1>
+      <span class="spacer"></span>
+      <button id="furi" aria-pressed="false">ふりがな</button>
+      <button id="trans" aria-pressed="false">訳</button>
+      <button id="mean" aria-pressed="false">意味</button>
+    </header>
+    <div id="bar"><div></div></div>
+
+    <main><div id="page"></div><details id="after" hidden></details></main>
+
+    <div id="gloss"></div>
+
+    <footer>
+      <button id="prev">← 前</button>
+      <span id="count"></span>
+      <span class="spacer"></span>
+      <span id="note"></span>
+      <span class="spacer"></span>
+      <button id="next">次 →</button>
+    </footer>
+
+    <script>
+__READER_JS__
+    </script>
+  </body>
+</html>

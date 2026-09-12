@@ -1,0 +1,28 @@
+{
+  "_comment": "Words approved by hand for use even though they have not reached the 21-day interval in Anki. These are NOT known words — build.py marks every occurrence so the reader shows their furigana by default and underlines them. Each entry records which story needed it and why, so this list stays a deliberate short list rather than a second vocabulary.",
+  "_approved": "2026-09-07",
+  "時計の音": {
+    "文字盤": "watch dial — 表 was standing in for it",
+    "秒針": "second hand — 秒が進んでいた was the weakest phrase in the set"
+  },
+  "迷子の手紙": {
+    "差出人": "sender — 送った人 was the circumlocution"
+  },
+  "終電": {
+    "明かり": "lights (ambient) — 照明 is installed/stage lighting, wrong for a street"
+  },
+  "猫を探す探偵": {
+    "飼う": "to keep (an animal)",
+    "飼い主": "owner of an animal — 一緒に暮らしている人 was the biggest single loss in the drafts",
+    "餌": "animal food — 猫の食べ物 was the circumlocution",
+    "首輪": "collar — 首に赤い紐 was the circumlocution"
+  },
+  "城の鐘": {
+    "王": "king — 王様 is nursery-tale, 国王 is serviceable but 王 is the register the story wants",
+    "従う": "to obey — the captain's creed depends on it",
+    "罰": "punishment",
+    "叫ぶ": "to shout — the king's shout at the climax",
+    "段": "counter for steps — 二百段 is the concrete detail 階段は長くて replaced",
+    "二百段": "Ichiran parses this as one token, so 段 alone never matches — listed so the reader still marks it"
+  }
+}

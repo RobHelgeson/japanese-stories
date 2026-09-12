@@ -1,0 +1,169 @@
+      :root {
+        --paper: #faf7f0;
+        --ink: #22201c;
+        --muted: #8a8377;
+        --rule: #e2dcd0;
+        --accent: #7a5c2e;
+        --weak: #b4562a;
+        --new: #2f7d6a;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --paper: #16151a;
+          --ink: #e8e4dc;
+          --muted: #8b8578;
+          --rule: #2c2a31;
+          --accent: #d3b075;
+          --weak: #e0895e;
+          --new: #6cc5ab;
+        }
+      }
+      * { box-sizing: border-box; }
+      /* The page itself never scrolls. Header, progress bar and footer are
+         fixed height, and only <main> scrolls, so the controls and the page
+         counter stay put however long a page runs. dvh rather than vh because
+         iOS counts the collapsing toolbar into vh and cuts the footer off. */
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+      }
+      header, footer {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.9rem 1.5rem;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.85rem;
+        color: var(--muted);
+        flex-shrink: 0;
+      }
+      header { border-bottom: 1px solid var(--rule); }
+      footer { border-top: 1px solid var(--rule); }
+      h1 { font-size: 1rem; margin: 0; color: var(--ink); font-weight: 600; }
+      .spacer { flex: 1; }
+      button {
+        font: inherit;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 0.35rem 0.8rem;
+        cursor: pointer;
+      }
+      button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+      button:disabled { opacity: 0.35; cursor: default; }
+      button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+      /* Styled as a button but an anchor, so it works with no JS and offers a
+         real target for open-in-new-tab. */
+      a.btn {
+        font: inherit;
+        color: var(--muted);
+        text-decoration: none;
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 0.35rem 0.8rem;
+      }
+      a.btn:hover { border-color: var(--accent); color: var(--accent); }
+
+      /* min-height:0 lets a flex child actually scroll instead of growing, and
+         `safe center` keeps a page taller than the viewport from having its top
+         clipped, which plain centring does to an overflowing flex container. */
+      main {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: safe center;
+        padding: 3rem 1.5rem;
+      }
+      #page {
+        width: 100%;
+        max-width: 34rem;
+        margin-inline: auto;
+        font-size: clamp(1.55rem, 1.15rem + 1.5vw, 2.15rem);
+        /* Ruby is always laid out, only its opacity changes — hovering a word
+           must not reflow the paragraph under the cursor. */
+        line-height: 2.6;
+      }
+      #page p { margin: 0 0 1.1rem; }
+      /* A sentence with a translation available gets no permanent marking —
+         the affordance is the 訳 button; a marker on every line would compete
+         with the leech and new-word underlines that carry real information. */
+      #page p.has-en { cursor: pointer; }
+      .en {
+        display: none;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.52em;
+        line-height: 1.5;
+        color: var(--muted);
+        margin-top: -0.6em;
+        padding-left: 0.9em;
+        border-left: 2px solid var(--rule);
+      }
+      p.show-en .en, body.all-en .en { display: block; }
+      ruby { ruby-position: over; }
+      rt {
+        font-size: 0.44em;
+        color: var(--accent);
+        opacity: 0;
+        transition: opacity 0.12s ease;
+        user-select: none;
+      }
+      .w { cursor: help; border-radius: 3px; }
+      .w:hover rt, .w.pin rt, body.all rt { opacity: 1; }
+      .w:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+      .w.pin { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+      .w.weak { text-decoration: underline dotted var(--weak) 1.5px; text-underline-offset: 0.28em; }
+      /* Approved stretch vocabulary: not yet learned, so the reading
+         is shown unconditionally rather than waiting for a hover. */
+      .w.new { text-decoration: underline solid var(--new) 1.5px; text-underline-offset: 0.28em; }
+      .w.new rt { opacity: 1; color: var(--new); }
+      #gloss {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 4.2rem;
+        max-width: 30rem;
+        padding: 0.5rem 0.85rem;
+        background: var(--ink);
+        color: var(--paper);
+        border-radius: 7px;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.82rem;
+        line-height: 1.45;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.12s ease;
+      }
+      #gloss.on { opacity: 0.96; }
+      #count { font-variant-numeric: tabular-nums; }
+      #bar { height: 2px; background: var(--rule); flex-shrink: 0; }
+      /* Full-spoiler note, last page only, collapsed until asked for. The
+         stories state nothing thematic themselves, so this is the handhold. */
+      #after {
+        margin: 2.5rem auto 0;
+        width: 100%;
+        max-width: 34rem;
+        flex-shrink: 0;
+        border-top: 1px solid var(--rule);
+        padding-top: 1rem;
+        font-size: 0.94rem;
+        line-height: 1.75;
+      }
+      #after summary {
+        cursor: pointer;
+        color: var(--accent);
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+      }
+      #after p { margin: 0.9rem 0 0; }
+      #after ruby rt { font-size: 0.5em; opacity: 0.75; }
+      #bar div { height: 100%; background: var(--accent); transition: width 0.2s ease; }

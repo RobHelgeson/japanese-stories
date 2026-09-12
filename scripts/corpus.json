@@ -1,0 +1,148 @@
+{
+  "_comment": "Reading order, level, and per-story stretch vocabulary. Replaces the hardcoded ORDER list in index.py, which does not survive a growing corpus. Levels are defined once and stories declare one, so a new story slots into an existing rung rather than inventing another. Construction names here must match the keys in stats.py's GRAMMAR_PATTERNS.",
+
+  "budgets": {
+    "_comment": "Rates, not counts, so they scale with story length. A fixed '5+ occurrences per new word' would have spent 5.7% of the shortest story's content tokens on two words, which reads as engineered. Occurrence minimum is therefore a rate too. The mandatory requirement is qualitative and not checkable here: a new word's FIRST occurrence must sit in a sentence that frames its meaning.",
+    "new_words_per_100_tokens": 1.0,
+    "leech_seeds_per_100_tokens": 1.5,
+    "min_occurrences": "max(2, round(tokens / 150))",
+    "min_repeated_share": 0.4,
+    "min_sentence_stdev": 6.0,
+    "_subordination": "stats.py measures subordinate_share — the share of sentences carrying a subordinate clause (連用形 chain, relative clause, or one of the ladder's own subordinators). It is reported and NOT gated, pending calibration. Baseline across the five on 2026-09-11: 時計の音 44.8, 迷子の手紙 51.2, 終電 48.9, 猫を探す探偵 53.5, 城の鐘 53.4. It is the measure min_sentence_stdev was standing in for: a stdev floor can be satisfied by a run-on string of nouns, which is what 'buying variance long-only' produced, and pct_over_30 shows that story plainly at 20.2 against 6.8-8.6 for the rest.",
+    "_metrics": "min_repeated_share is the fraction of content tokens belonging to words that appear 3+ times, i.e. how much of what you read is vocabulary you meet again. It replaced a hapax-rate gate, which was set at 50% by guesswork and is unreachable: measured across the corpus, hapax runs 57% to 79%, and the floor belongs to the longest story rather than the tightest. Hapax also punishes verb variety, because every distinct verb is another word seen once. The 0.4 floor is calibrated against the corpus: 城の鐘 62%, 猫を探す探偵 54%, 迷子の手紙 44%, and it correctly flags the two weakest, 終電 at 31% and 時計の音 v1 at 30%. min_sentence_stdev 6.0 is likewise the best observed value (迷子の手紙 6.5) rather than an invented one."
+  },
+
+  "defaults": {
+    "_comment": "What a story is briefed to be when nothing is said. Resolution order is explicit argument, then this block; every parameter has a default so a bare invocation works. Defaults live here rather than in AUTHORING.md prose because a default nothing reads is a suggestion. `pages` is the unit because it is what the reader shows; tokens are derived, and every rate budget scales from tokens. null means derive from `budgets` at story length.",
+    "level": 3,
+    "pages": 25,
+    "page_tolerance": 0.1,
+    "tokens_per_page": 20,
+    "register": "quiet-realism",
+    "new_words": null,
+    "leech_seeds": null,
+    "repeats": null,
+    "grammar_focus": [],
+    "dialogue": null
+  },
+
+  "registers": {
+    "_comment": "Five object-centred, quiet, past-tense stories closing on a concrete image is a house style that fell out of the recycling requirement rather than a decision anyone made. Naming it makes it a choice. Two of the alternatives already exist in the corpus as undeclared one-offs. Register changes voice and structure; it never relaxes the narrow-domain rule, because the object at the centre is the recycling engine.",
+    "quiet-realism": "the default and the current five: one concrete object at the centre, close narration, ends on an image rather than a claim",
+    "folktale": "城の鐘: nested time frames, a told-to-you voice, the turn stated once in dialogue",
+    "procedural": "猫を探す探偵: a clue planted early and paid off late, the reader able to reach the answer from facts already on the page",
+    "comic": "none yet"
+  },
+
+  "levels": {
+    "_comment": "A level is a rung, not a checklist. `min_present` is how many of the level's own constructions a story must actually use; the rest are available, not required. `min_carried` is the fraction of every LOWER level's constructions the story should still exercise, which is what makes it a ladder rather than five disjoint sets. Level 5 deliberately has a low min_present: a few marked N2 forms inside otherwise-N3 prose is the 'flirting with N2' band, and requiring all of them would be the wall this is meant to avoid.",
+    "1": {
+      "name": "N5/N4 core",
+      "constructions": ["ている", "たい", "ことができる", "てから", "まえに"],
+      "min_present": 2
+    },
+    "2": {
+      "name": "N4/N3 conditionals and hearsay",
+      "constructions": ["ば cond", "たら cond", "なら cond", "ながら", "のに", "ので/ため", "ようだ/ような", "らしい", "そう(様態/伝聞)"],
+      "min_present": 5
+    },
+    "3": {
+      "name": "N3 voice",
+      "constructions": ["passive", "causative", "てしまう", "ておく", "ばかり", "はず", "ところ", "けれど"],
+      "min_present": 5
+    },
+    "4": {
+      "name": "N3 solid",
+      "constructions": ["causative-passive", "ほど/くらい", "わけ", "ずに/ないで", "まま", "すぎる"],
+      "min_present": 4
+    },
+    "5": {
+      "name": "N3 to N2 edge, sparse",
+      "constructions": ["とおり", "一方で", "にとって", "において", "ものの", "として"],
+      "min_present": 3
+    }
+  },
+
+  "min_carried": 0.6,
+
+  "stories": [
+    {
+      "slug": "tokei-no-oto",
+      "title": "時計の音",
+      "level": 1,
+      "versions": ["v1"],
+      "_new_words": "Declared here rather than in approved-words.json, which stays a short global list of permanent allowances. These are per-story teaching words: all four are the story's own subject matter, so they recur without the prose working at it. check.py does not flag them because the particle-splitting fallback accepts 部品 as 部+品 and 歯車 as 歯+車, so they have to be declared to be marked.",
+      "new_words": {
+        "部品": "watch parts — framed by the drawer of sorted boxes before it is ever used alone",
+        "歯車": "gear — framed as the contents of the smallest box, too small to hold in the fingers",
+        "針": "hand of a watch — framed as three of them, then named long, short and 秒針, which is already known",
+        "振り子": "pendulum — framed by the wall of shop clocks all swinging at the same speed"
+      }
+    },
+    {
+      "slug": "maigo-no-tegami",
+      "title": "迷子の手紙",
+      "level": 2,
+      "versions": ["v1"],
+      "new_words": {
+        "便箋": "letter paper — framed as 折った便箋が一枚だけ入っていた with the blank lower half described next; recurs as the son's sheet, hers, and the reply's",
+        "消印": "postmark — framed by 切手の上には、町の名前と日にちが、小さな丸の中に押してあった before it is named; later dates the son's wait and identifies the reply's origin",
+        "表札": "nameplate — framed as 戸の横に掛かっている表札には、私の名字が入っている, which is the right-address/wrong-name premise made physical. Passes check.py via the 表+札 fallback, so it must be declared to be marked"
+      }
+    },
+    {
+      "slug": "shuden",
+      "title": "終電",
+      "level": 3,
+      "versions": ["v1"],
+      "_feature": "Untagged two-person dialogue. 40 of 41 quoted lines carry no attribution and the train conversation is 100% untagged, with speakers held by register: he is long and over-polite, she answers in four to eight characters. The single kept attribution is the manager's remembered line on page 4, so the reader sees one tagged line before the mode changes. Longest untagged run is 10, against 3 and 4 in the stories either side.",
+      "new_words": {
+        "網棚": "luggage rack — framed as 席の上には荷物を乗せる網棚があって; it is the object of the first exchange and the closing image of that thread",
+        "車掌": "conductor — framed by 制服を着た車掌が、切符を確かめながら, where the uniform and the tickets fix the meaning; carries the commuter-pass beat",
+        "乗客": "passenger — framed beside the already-known 客 and given a count, 乗客が四人しかいなくて; tracks the train emptying"
+      }
+    },
+    {
+      "slug": "entotsu-no-kemuri",
+      "title": "煙突の煙",
+      "level": 3,
+      "versions": [],
+      "_note": "The first story written through the two-gate flow: brief resolved and confirmed before drafting, premise and afterword written in English before any Japanese existed.",
+      "_premise": "A woman returns for a week to clear her late father's apartment and goes to the neighbourhood bathhouse every evening of its last week. The owner has been keeping the water hot past closing for three months, waiting for a regular who came late from the factory. That regular was her father, and nobody told the owner he had died. Beats, each joined by だから or しかし: (1) clearing the apartment, chimney visible from the window / (2) as a child, the smoke going out meant he was on his way home / (3) first evening, closing Sunday, almost no customers / (4) the owner does not recognise her and says nothing / (5) PLANT: one 桶 kept aside, upside down, never handed out / (6) she says nothing and keeps returning to look for it / (7) the smoke keeps going up after closing, every night / (8) she asks; he says he is waiting for a regular from the factory / (9) TURN: she works out who, and that she never told him / (10) she tells him; he turns the 桶 over and fills it; from the window the smoke stops early for the first time.",
+      "brief": {
+        "pages": 25,
+        "register": "quiet-realism",
+        "new_words": 5,
+        "leech_seeds": 8
+      },
+      "new_words": {
+        "湯気": "steam — framed p5 by 湯気で鏡が白くなっていて、何も映らなかった, so the mirrors showing nothing carries the meaning before the word is explained. Recurs over the bath, off the refilled 桶 at the turn, and under the ceiling on the last night",
+        "桶": "washing bucket — framed p7 as the thing handed across the 番台 with the soap, then described old with a blackened bottom. The upside-down one is the story's plant and its payoff, so it repeats without the prose reaching",
+        "番台": "the raised attendant's desk — framed p6 by 入り口の上にあって、そこからは男の方も女の方もよく見える, which is the whole point of the object. It is where the owner is in every scene he appears in",
+        "煙突": "chimney — framed p2 from the window as 細くて、高くて、町のどの建物よりも上に立っている before it does any work. Carries the signalling thread: the childhood memory, the smoke after closing, and the last line",
+        "湯船": "the bath itself, as against washing — framed p9 by 体を洗ってから、湯船に入った and immediately by being too hot to get into. Recurs at the close, where she does not stop"
+      }
+    },
+    {
+      "slug": "neko-o-sagasu-tantei",
+      "title": "猫を探す探偵",
+      "level": 4,
+      "versions": ["v1"],
+      "_feature": "A plot held across 30 pages: the boxes clue is planted on page 7 and not recalled until page 20, and the reader is expected to reach the answer from facts already on the page. This story is also the one exception to the no-thesis rule; it is allowed to state its closing claim outright.",
+      "_new_words": "This story's four teaching words predate the per-story mechanism and still live in approved-words.json, where they are marked correctly. Left there rather than moved, to avoid churn; new stories should declare theirs here instead.",
+      "new_words": {}
+    },
+    {
+      "slug": "shiro-no-kane",
+      "title": "城の鐘",
+      "level": 5,
+      "versions": ["v1"],
+      "_feature": "Nested time frames: a story told in the past about a casting forty years earlier. The distinction everything turns on is stated exactly once, in dialogue, on page 11. Level 5 is the sparse N2 edge, four such forms used once each.",
+      "_note": "王, 従う, 罰, 叫ぶ and 段/二百段 predate the per-story mechanism and remain in approved-words.json. 段 is the weakest of them as a teaching word: two of its six occurrences sit inside 二百段, which Ichiran parses as a single token, so the reader marks the unit rather than teaching the counter.",
+      "new_words": {
+        "響く": "to resound, carry — a bell story needs the verb. Framed p7 by explicit contrast: 形の良い鐘は打った後も音が長く響き、悪い鐘は音がすぐに死ぬ. Recurs at the king's death, the princess's bad bell, the palm on the tower bell, and the apprentice's strike",
+        "金属": "metal — framed p3 by melting and heat, 金属を溶かす日だけ、部屋は地獄のように熱くなった, then poured, cooled, and made thin at the top. Accepted by check.py via the 金+属 fallback, so it must be declared to be marked"
+      }
+    }
+  ]
+}
