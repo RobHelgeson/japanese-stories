@@ -277,6 +277,9 @@ def main():
 
     data = {
         "title": title,
+        # Read tracking keys on this. The title is not stable enough — a version
+        # build shares its parent's title, which would merge their progress.
+        "slug": args.story.stem,
         "afterword": afterword,
         "pages": built,
         "stats": {
