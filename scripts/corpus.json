@@ -143,6 +143,32 @@
         "響く": "to resound, carry — a bell story needs the verb. Framed p7 by explicit contrast: 形の良い鐘は打った後も音が長く響き、悪い鐘は音がすぐに死ぬ. Recurs at the king's death, the princess's bad bell, the palm on the tower bell, and the apprentice's strike",
         "金属": "metal — framed p3 by melting and heat, 金属を溶かす日だけ、部屋は地獄のように熱くなった, then poured, cooled, and made thin at the top. Accepted by check.py via the 金+属 fallback, so it must be declared to be marked"
       }
+    },
+    {
+      "slug": "ikanakatta-hito-no-chizu",
+      "title": "行かなかった人の地図",
+      "level": 5,
+      "versions": [],
+      "_feature": "The longest story in the corpus and the first with a supernatural element. folktale register carries the magic for free: the 主 on the pass is furniture, nobody explains it, and it costs nothing from the new-word budget because 主, 姿, 影, 声, 問う, 通す are all known. The 主 scene also gives the にとって focus a structural home, asking all three travellers the same question.",
+      "_note": "grammar_focus にとって was chosen because the construction and the theme are the same thing: one object meaning something different to each person who holds it, and it lands on seven separate pages. 地図のとおりに is the other repeated frame and carries とおり. MISSES ITS PAGE BRIEF: 48 pages against 40 briefed, +20%. Recorded rather than corrected. The brief was the thing that was wrong: a twelve-beat structure with a six-page set piece in the middle does not fit in 40 pages, and 40 was picked off the requested 30-50 range before the beat sheet existed. Gate 1 should follow Gate 2 in length-setting, or the page number should be revisited once the beats are known.",
+      "_premise": "梓's grandfather spent fifty years drawing one map, of a mountain road he never walked, copied from his father's telling. Dying, he asks her to go and see whether the tree at the end of it is still standing. She hires 甚平, an old guide who crosses those mountains without maps, and every landmark on the paper turns out to be wrong. Beats, each joined by だから or しかし: (1) the dying grandfather asks her to check the tree / (2) 甚平 reads the map once and says the bridge is in the wrong place / (3) three days in, every landmark matches and 蓮 stops laughing / (4) PLANT: no bridge at the river, and four small 印 beside it on the map that she cannot explain / (5) the detour along the 岸 and up to the 峠 / (6) the 主 asks each of them what they came to do; 梓's answer is her grandfather's, not her own / (7) at the 崖 the road is missing, 蓮 says an old man drew a road out of stories, and 甚平 finds the road under the slide / (8) the village on the map is empty, no 足跡 / (9) TURN, once, in dialogue: 千代 remembers the bridge falling the year of the great snow, seventy-five years ago, five years before the grandfather was born / (10) PAYOFF: the 印 are counts of how many times his father told of each landmark, so the map is scaled to memory rather than distance / (11) the tree is there, and the sea, which on the map is one straight blue line / (12) home: he does not ask about the tree, he asks whether the sea was blue.",
+      "brief": {
+        "pages": 40,
+        "register": "folktale",
+        "new_words": 8,
+        "leech_seeds": 12,
+        "grammar_focus": ["にとって"]
+      },
+      "new_words": {
+        "印": "mark — the story's own subject matter and its plant. Framed p3 by どの目印のそばにも、小さな印が並んでいた, which fixes it against the already-known 目印 it sits beside. Recurs at the bridge, the village, the rock and the tree, and is what the turn is made of",
+        "頼る": "to rely on — framed p1 by the villagers who will not use the map, then sharpened p9 in 蓮's challenge, 行ったことのない人が描いた地図に頼るんですか, where the object of the reliance is the whole question of the story. Recurs whenever the map is trusted or set aside",
+        "導く": "to lead, guide — framed p7 as what 梓 must find someone to do, and again p26 by 甚平's answer to the 主, この二人を北へ導くために来た, beside the already-known 案内 in the same breath. The guide's own word for what he does",
+        "峠": "mountain pass — framed p17 by explicit definition after 甚平 draws the route in the dirt, 峠というのは、山と山の間の、一番低いところである. The setting of the 主 scene and the middle third of the journey",
+        "崖": "cliff — framed p30 by definition, 崖とは、岩が真っ直ぐに立っているところである, immediately after the map shows a road beneath one. Carries the buried-road beat that proves the map is early rather than false",
+        "岩": "rock, boulder — framed p13 as the first landmark that matches, 岩は真ん中から二つに割れていて、割れ目に草が生えていた. Recurs as the split rock, the rock slope of the climb, and the slide at the 崖",
+        "岸": "riverbank — framed p13 by 岸には草が生えているだけで、何も立っていなかった, the absence of the bridge fixing what a bank is. The detour is three days of walking it",
+        "足跡": "footprint — framed p18 by 甚平 reading animal tracks in the earth, then p33 by its own absence and then stated plainly, 人が歩けば足跡が残る. Marks the empty village, and the party's own are the last image before the climb"
+      }
     }
   ]
 }

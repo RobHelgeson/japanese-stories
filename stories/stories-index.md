@@ -12,14 +12,15 @@ Every sentence has an English translation. `訳` or `t` shows them all; clicking
 
 The set is graded by level and by how much work the prose asks of you, not by vocabulary — every story draws on the same known-word set. Read down the table.
 
-| Story                                             | Lvl | Pages | Sentences | Kanji words | Leech | New words                    |
-| ------------------------------------------------- | --- | ----- | --------- | ----------- | ----- | ---------------------------- |
-| [時計の音](../docs/tokei-no-oto.html)             | 1   | 25    | 105       | 430         | 10    | 部品、歯車、針、振り子       |
-| [迷子の手紙](../docs/maigo-no-tegami.html)        | 2   | 16    | 82        | 372         | 8     | 便箋、消印、表札、差出人     |
-| [終電](../docs/shuden.html)                       | 3   | 23    | 133       | 485         | 16    | 網棚、車掌、乗客、明かり     |
-| [煙突の煙](../docs/entotsu-no-kemuri.html)        | 3   | 27    | 114       | 508         | 8     | 湯気、桶、番台、煙突、湯船   |
-| [猫を探す探偵](../docs/neko-o-sagasu-tantei.html) | 4   | 30    | 129       | 636         | 13    | 飼い主、飼う、餌、首輪       |
-| [城の鐘](../docs/shiro-no-kane.html)              | 5   | 41    | 174       | 819         | 16    | 響く、金属、王、従う、罰ほか |
+| Story                                                         | Lvl | Pages | Sentences | Kanji words | Leech | New words                    |
+| ------------------------------------------------------------- | --- | ----- | --------- | ----------- | ----- | ---------------------------- |
+| [時計の音](../docs/tokei-no-oto.html)                         | 1   | 25    | 105       | 430         | 10    | 部品、歯車、針、振り子       |
+| [迷子の手紙](../docs/maigo-no-tegami.html)                    | 2   | 16    | 82        | 372         | 8     | 便箋、消印、表札、差出人     |
+| [終電](../docs/shuden.html)                                   | 3   | 23    | 133       | 485         | 16    | 網棚、車掌、乗客、明かり     |
+| [煙突の煙](../docs/entotsu-no-kemuri.html)                    | 3   | 27    | 114       | 508         | 8     | 湯気、桶、番台、煙突、湯船   |
+| [猫を探す探偵](../docs/neko-o-sagasu-tantei.html)             | 4   | 30    | 129       | 636         | 13    | 飼い主、飼う、餌、首輪       |
+| [城の鐘](../docs/shiro-no-kane.html)                          | 5   | 41    | 174       | 819         | 16    | 響く、金属、王、従う、罰ほか |
+| [行かなかった人の地図](../docs/ikanakatta-hito-no-chizu.html) | 5   | 48    | 213       | 1164        | 17    | 印、頼る、導く、峠、崖ほか   |
 
 All five were rewritten against the level ladder on 2026-09-10 and all five pass `python3 stats.py --strict`. The 2026-09-08 drafts are archived under `versions/` and linked from every card on the contents page, so a rewrite can be read against what it replaced. `python3 stats.py --diff <v1> <current>` prints the two side by side.
 
@@ -56,6 +57,7 @@ Spoiler-light, for picking one.
 - **｜猫を探す探偵《ねこをさがすたんてい》** — A cheap detective takes a lost-cat job and finds a child who has a reason.
 - **｜城の鐘《しろのかね》** — A bell-founder's apprentice inherits the secret that the castle's war bell was built to fail, and the new king intends to ring it.
 - **｜煙突の煙《えんとつのけむり》** — A woman clearing her late father's flat spends the last week of the neighbourhood bathhouse there, and works out why the water is still being heated after closing.
+- **｜行かなかった人の地図《いかなかったひとのちず》** — A dying man asks his granddaughter to walk the road he spent fifty years drawing and never once travelled, and everything he drew on it turns out to be wrong.
 
 ## Afterwords
 
@@ -70,6 +72,8 @@ They exist because of a specific mistake. The 2026-09-08 prose pass cut the them
 - **｜城の鐘《しろのかね》** — The master's crime is the plot; the inheritance is the story. Forty years earlier he cast the war bell thin at the top and thick at the bottom so it would crack under a hard strike, and told no one until he was dying. He calls it guilt: 「これは｜罪《つみ》だ」「｜私《わたし》は｜裏切《うらぎ》り｜者《もの》だ」. The apprentice reframes it on the last page as ｜選《えら》ぶ｜権利《けんり》, the right to choose. Everything hangs on one distinction stated once, in dialogue on page 11: ｜強《つよ》く｜打《う》てば｜必《かなら》ず｜割《わ》れる、｜弱《よわ》く｜打《う》てば｜良《よ》い｜音《おと》がする. Every scene after it is somebody deciding how hard to strike. The closing image repeats the opening exactly: a twelve-year-old with no parents, striking a small bell hard, and not being stopped.
 
 - **｜煙突の煙《えんとつのけむり》** — The owner has been heating the water past closing for three months, waiting for a regular who came late from the factory. That regular was her father, and nobody ever told him. She has not told him either, and she has spent the whole week clearing the flat without telling anyone in the neighbourhood she was there. The chimney is how these people used to pass news without speaking: as a child she knew her father was on his way home when the smoke went out, and the same smoke going up after nine is what makes her ask. The upside-down ｜桶《おけ》 on the shelf is the answer sitting in plain view from page 7, kept aside for a man who is not coming. When she finally says it on the last night, the owner does not speak at all. He climbs down, turns the ｜桶《おけ》 the right way up and fills it, which is the first time anything in the story is put right rather than kept waiting. She sets her father's worn-down soap on the ｜番台《ばんだい》 beside it. The closing image is the smoke gone at nine for the first time, seen from the window she watched it from as a child, and this time it means the same thing it always did.
+
+- **｜行かなかった人の地図《いかなかったひとのちず》** — The map is not wrong. It is early. The bridge ｜梓《あずさ》 cannot find fell seventy-five years ago, the year of the great snow, five years before her grandfather was born, which means he never saw it either. He was not drawing the road. He was drawing his father's journey, exactly as it was told to him, and a told journey does not update. The small ｜印《しるし》 beside each landmark, which she has taken for decoration her whole life, are counts: one for every time his father mentioned a thing. Four beside the bridge, seven beside the village, sixty-three beside the tree at the end, which is why the tree is drawn far too large and why none of the distances are true. The map is drawn to the scale of what was remembered rather than what was walked, and that is how it fails at every particular and still arrives. The ｜主《ぬし》 on the ｜峠《とうげ》 asks the question the whole story is made of, and ｜梓《あずさ》's first answer is refused because it is her grandfather's sentence and not hers. The one thing on the paper he could not get right is the sea, a flat blue line, because the sea is the one thing his father had words for and no way to show him. It is also the only thing he ever wanted. He does not ask her about the tree when she comes home.
 
 ## Rebuilding
 
