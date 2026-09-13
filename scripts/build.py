@@ -32,6 +32,7 @@ HERE = Path(__file__).resolve().parent
 TEMPLATE = HERE / "reader.html"
 READER_CSS = HERE / "reader.css"
 READER_JS = HERE / "reader.js"
+SYNC_JS = HERE / "sync.js"
 OVERRIDES = {
     k: v
     for k, v in json.loads((HERE / "readings-overrides.json").read_text(encoding="utf-8")).items()
@@ -173,7 +174,8 @@ def render(title, data):
     return html.replace('"__STORY_DATA__"', blob(data))
 
 
-def render_shell(title, data_href, css_href="reader.css", js_href="reader.js"):
+def render_shell(title, data_href, css_href="reader.css", js_href="reader.js",
+                 sync_href="sync.js"):
     """The linked form: a ~2KB document that pulls in the engine and one story.
 
     Classic <link> and <script src> only. fetch() and type="module" are both
@@ -189,9 +191,14 @@ def render_shell(title, data_href, css_href="reader.css", js_href="reader.js"):
         "    <style>\n__READER_CSS__\n    </style>\n",
         f'    <link rel="stylesheet" href="{css_href}" />\n',
     )
+    # sync.js first, and classic rather than deferred, because reader.js reads
+    # window.Sync during its own bootstrap. Document order is the guarantee —
+    # the same one that already puts the story data ahead of the engine.
     html = html.replace(
         "    <script>\n__READER_JS__\n    </script>\n",
-        f'    <script src="{data_href}"></script>\n    <script src="{js_href}"></script>\n',
+        f'    <script src="{sync_href}"></script>\n'
+        f'    <script src="{data_href}"></script>\n'
+        f'    <script src="{js_href}"></script>\n',
     )
     return html.replace("__TITLE__", title)
 
@@ -211,6 +218,12 @@ def write_engine(out_dir):
         READER_JS.read_text(encoding="utf-8").replace('"__STORY_DATA__"', "window.STORY"),
         encoding="utf-8",
     )
+    # sync.js is written only here, never inlined by render(). That is what
+    # keeps docs/versions/ frozen AND sync-free: an archived draft carries its
+    # own engine and writes progress under its own slug, and pushing a draft's
+    # position to the gist would put a slug on every device that only one of
+    # them has a story for.
+    (out_dir / "sync.js").write_text(SYNC_JS.read_text(encoding="utf-8"), encoding="utf-8")
 
 
 def write_data(path, data):

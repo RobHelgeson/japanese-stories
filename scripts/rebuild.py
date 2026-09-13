@@ -79,7 +79,7 @@ DATA_DEPS = sorted(HERE.glob("*.py")) + [
     HERE / "readings-overrides.json",
 ]
 SHELL_DEPS = [HERE / "reader.html", HERE / "build.py"]
-ENGINE_DEPS = [HERE / "reader.css", HERE / "reader.js", HERE / "build.py"]
+ENGINE_DEPS = [HERE / "reader.css", HERE / "reader.js", HERE / "sync.js", HERE / "build.py"]
 # An archived version is one self-contained file, so every input still collapses
 # into a single set for it.
 VERSION_DEPS = DATA_DEPS + sorted(HERE.glob("reader.*"))
@@ -118,12 +118,12 @@ def main():
     # The shared engine, written before anything links to it. build.write_engine
     # owns the __STORY_DATA__ substitution; re-implementing the one-line replace
     # here would be a second copy of a build contract that could drift silently.
-    engine = args.out / "reader.js"
-    if args.all or stale(engine, ENGINE_DEPS) or stale(args.out / "reader.css", ENGINE_DEPS):
+    engine = [args.out / n for n in ("reader.js", "reader.css", "sync.js")]
+    if args.all or any(stale(p, ENGINE_DEPS) for p in engine):
         build.write_engine(args.out)
-        print("  engine      reader.css · reader.js", flush=True)
+        print("  engine      reader.css · reader.js · sync.js", flush=True)
     else:
-        print("  up to date  reader.css · reader.js", flush=True)
+        print("  up to date  reader.css · reader.js · sync.js", flush=True)
 
     built = 0
     for src, dst, toc, archived in targets(args.src, args.out):

@@ -8,7 +8,7 @@ The constraint is the whole idea. Every story is written against a vocabulary li
 
 ## The reader
 
-A story is a small HTML shell beside a shared `reader.css` and `reader.js`, with its own annotated text in `data/<slug>.js`. Everything is local — classic `<link>` and `<script src>`, no network requests, no modules, no `fetch` — so a story still opens straight off the filesystem; it needs its siblings, so copy the folder rather than the one file.
+A story is a small HTML shell beside a shared `reader.css`, `reader.js` and `sync.js`, with its own annotated text in `data/<slug>.js`. Classic `<link>` and `<script src>`, no modules — so a story still opens straight off the filesystem; it needs its siblings, so copy the folder rather than the one file. The only network request the reader ever makes is the optional progress sync below, and without it nothing is fetched at all.
 
 Stories were self-contained single files until the site was published, which was the right shape for mailing one around and the wrong one to maintain: `reader.css` and `reader.js` were inlined into all eleven readers, so a one-line CSS change rewrote 2.5MB and had to re-segment every story through Ichiran to do it. `docs/versions/` is still built the old way — see [Publishing](#publishing).
 
@@ -38,6 +38,18 @@ Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose use
 
 Preferences and your place in each story are remembered per device.
 
+## Keeping your place
+
+Progress is written to `localStorage` as you read, and that is the working copy. Browsers throw it away, though: WebKit deletes all script-writable storage after seven days of browser use without a visit, and a Home Screen web app starts with a storage container of its own rather than the Safari tab's. Two things address that, and they are meant to be done in this order.
+
+**Connect a gist.** 読書記録の同期 on the contents page takes a GitHub token — fine-grained, **Gists: write**, nothing else — and keeps a copy of your progress in a secret gist. Every device that pastes the same token finds the same gist by filename and shares it; you never carry a gist id around. Per slug the later timestamp wins, so two devices converge without a lock, and a push that would write what is already there is skipped, which keeps the gist's revision list usable as an undo history rather than a log of page turns.
+
+The store is a plain JSON file on github.com, so correcting a bad record is something you can do by hand in the gist editor, with its revision history behind you. `?nosync` disables the whole thing for a load, the way `?nostore` does for `localStorage`.
+
+**Then add it to the Home Screen.** That is what stops the seven-day eviction, because a standalone web app gets its own counter of days of use. Do it after connecting, not before: the install begins with an empty store, so it will read as zero progress until you paste the token into it and let it pull.
+
+編集 on the contents page opens per-story controls — mark 読了 or 未読, move the resume page, clear one story — alongside 書き出し / 読み込み for the whole record as JSON. Import merges by the same rule the gist does, so pasting an older export cannot pull a story backwards. Clearing writes a dated empty record rather than deleting the key, because a deletion merges back to whatever the gist still holds and would undo itself on the next pull.
+
 ## Layout
 
 ```
@@ -46,6 +58,8 @@ stories/          story sources (.txt) and stories-index.md (summaries + afterwo
 docs/             what GitHub Pages serves
   reader.css      one copy, shared by every live story
   reader.js       one copy
+  sync.js         one copy — progress sync, shared with the contents page
+  manifest.webmanifest, icon-*.png     the Home Screen install
   data/<slug>.js  one story's annotated text
   <slug>.html     a ~5KB shell linking the three
   versions/       archived drafts, self-contained and frozen
@@ -70,7 +84,7 @@ A live story is three outputs with three different inputs, and only the first is
 | -------------------- | ------------------------------------------------- | -------------------- |
 | `data/<slug>.js`     | the story `.txt`, the afterword, the `.py` engine | yes                  |
 | `<slug>.html`        | `reader.html`, `build.py`                         | no                   |
-| `reader.css` / `.js` | `reader.css`, `reader.js`, `build.py`             | no                   |
+| `reader.css` / `.js` / `sync.js` | `reader.css`, `reader.js`, `sync.js`, `build.py` | no       |
 
 So editing the reader's styling or behaviour now rewrites two files in about a second, and re-segments nothing.
 

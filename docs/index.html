@@ -3,6 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#faf7f0" />
+    <!-- start_url points here, so this is the page an install opens on. -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>物語 — 目次</title>
     <style>
       :root {
@@ -57,8 +64,11 @@
         background: var(--paper);
       }
       footer { border-top: 1px solid var(--rule); margin-top: auto; }
-      h1 { font-size: 1.1rem; margin: 0; color: var(--ink); font-weight: 600; }
+      h1 { font-size: 1.1rem; margin: 0; color: var(--ink); font-weight: 600; white-space: nowrap; }
       .spacer { flex: 1; }
+      header { gap: 0.6rem; }
+      #totals { min-width: 0; text-align: right; line-height: 1.4; }
+      header .btn { flex: none; }
 
       main {
         flex: 1;
@@ -179,6 +189,87 @@
       .cell.done .prog { color: var(--new); }
       .cell.done .prog .track i { background: var(--new); }
 
+      /* Controls live outside a.card for the same reason .vers does: a button
+         inside an anchor is a tap the anchor eats. Revealed together by the
+         header's 編集 toggle rather than per row, because correcting progress
+         is a thing you sit down to do, not something to trip over mid-scroll. */
+      .manage {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0.4rem 0 0 3.4rem;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.75rem;
+      }
+      .manage[hidden] { display: none; }
+      .manage .mspacer { flex: 1; }
+      .manage .step { display: inline-flex; align-items: center; gap: 0.3rem; }
+      .manage output {
+        min-width: 3.6rem;
+        text-align: center;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      .btn, .manage button, .sync button {
+        font: inherit;
+        white-space: nowrap;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.75rem;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 999px;
+        padding: 0.2rem 0.7rem;
+        /* 44px of touch target without 44px of ink: the visual pill stays small
+           while the hit area clears Apple's minimum on a phone. */
+        min-height: 44px;
+        cursor: pointer;
+      }
+      .manage .step button { min-width: 44px; }
+      .btn:hover, .manage button:hover, .sync button:hover { border-color: var(--accent); color: var(--accent); }
+      .btn[aria-pressed="true"] { background: var(--rule); }
+      .cell.done .manage [data-act="done"] { color: var(--new); border-color: var(--new); }
+
+      .sync {
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 2.2rem;
+        padding-top: 1.3rem;
+        border-top: 1px solid var(--rule);
+      }
+      .sync summary { cursor: pointer; color: var(--accent); }
+      .sync a { color: var(--accent); }
+      .sync a[hidden] { display: none; }
+      .sync .sbody { margin-top: 0.9rem; display: grid; gap: 0.7rem; }
+      .sync .srow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+      .sync input[type="password"] {
+        font: inherit;
+        flex: 1;
+        min-width: 14rem;
+        min-height: 44px;
+        padding: 0 0.6rem;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+      }
+      .sync textarea {
+        font: 0.72rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        width: 100%;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        padding: 0.6rem;
+        resize: vertical;
+      }
+      .sync textarea[hidden] { display: none; }
+      .sync .sstat { margin: 0; }
+      .sync .sstat.bad { color: var(--weak); }
+      .sync .sstat.good { color: var(--new); }
+      .sync p { margin: 0; line-height: 1.65; }
+
       .keys {
         font-family: -apple-system, system-ui, sans-serif;
         font-size: 0.78rem;
@@ -201,7 +292,8 @@
     <header>
       <h1>物語</h1>
       <span class="spacer"></span>
-      <span>7 編 · 210 ページ · 950 文 · 既知語彙 6504<span id="readtot"></span></span>
+      <span id="totals">7 編 · 210 ページ · 950 文 · 既知語彙 6504<span id="readtot"></span></span>
+      <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
     </header>
 
     <main>
@@ -223,6 +315,16 @@
         <div class="chips"><span class="chip weak">苦手 修理、手帳、正確、残す、状態、経つ、表、足りる、遅れる、郷愁</span><span class="chip new">新出 振り子、歯車、秒針、部品、針</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
         <div class="vers"><span>版</span><a class="ver" href="versions/tokei-no-oto.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
     <div class="cell" data-slug="maigo-no-tegami" data-pages="16">
@@ -238,6 +340,16 @@
         <div class="chips"><span class="chip weak">苦手 去年、後、後悔、経つ、解釈、訪ねる、返事、配達</span><span class="chip new">新出 便箋、差出人、消印、表札</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
         <div class="vers"><span>版</span><a class="ver" href="versions/maigo-no-tegami.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
     <div class="cell" data-slug="shuden" data-pages="23">
@@ -253,6 +365,16 @@
         <div class="chips"><span class="chip weak">苦手 事情、去年、定期券、後悔、改札、放送、書類、案内、正確、渡る、緊張、表、返事、遅れる、過ぎる、遠慮</span><span class="chip new">新出 乗客、明かり、網棚、車掌</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
         <div class="vers"><span>版</span><a class="ver" href="versions/shuden.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
     <div class="cell" data-slug="entotsu-no-kemuri" data-pages="27">
@@ -268,6 +390,16 @@
         <div class="chips"><span class="chip weak">苦手 工場、残す、渡す、用意、経つ、連絡、過ぎる、遠慮</span><span class="chip new">新出 桶、湯気、湯船、煙突、番台</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
     </div>
     <div class="cell" data-slug="neko-o-sagasu-tantei" data-pages="30">
       <a class="card" href="neko-o-sagasu-tantei.html">
@@ -282,6 +414,16 @@
         <div class="chips"><span class="chip weak">苦手 中身、借りる、内緒、焦る、盗む、経つ、計画、訪ねる、調査、足りる、返事、追いつめる、金額</span><span class="chip new">新出 飼い主、飼う、餌、首輪</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
         <div class="vers"><span>版</span><a class="ver" href="versions/neko-o-sagasu-tantei.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
     <div class="cell" data-slug="shiro-no-kane" data-pages="41">
@@ -297,6 +439,16 @@
         <div class="chips"><span class="chip weak">苦手 お前、修理、年月、当時、後、正確、流す、渡す、状態、策、経つ、表、襲う、計画、起きる、過ぎる</span><span class="chip new">新出 二百段、叫ぶ、従う、段、王、罰、金属、響く</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
         <div class="vers"><span>版</span><a class="ver" href="versions/shiro-no-kane.v1.html">v1</a><span class="cur">現行</span></div>
     </div>
     <div class="cell" data-slug="ikanakatta-hito-no-chizu" data-pages="48">
@@ -312,6 +464,16 @@
         <div class="chips"><span class="chip weak">苦手 位置、年月、折れる、村、案内、正確、渡る、用意、経つ、経験、迎える、返事、遅れる、過ぎる</span><span class="chip new">新出 印、導く、岩、岸、峠、崖、足跡、頼る</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
     </div>
 
       <p class="keys">
@@ -327,6 +489,36 @@
         Red 傍点 beside a word is a leech: known, but on a card that keeps failing.
         Teal circles with a visible reading is approved but not yet learned.
       </p>
+
+      <details class="sync" id="sync">
+        <summary>読書記録の同期</summary>
+        <div class="sbody">
+          <p>
+            Progress is kept in this browser, and browsers throw that away — WebKit deletes
+            all script-writable storage after seven days without a visit, and a Home Screen
+            web app starts with an empty store of its own. Connecting a GitHub token keeps a
+            copy in a secret gist instead, shared by every device that pastes the same token.
+            The gist is a plain JSON file you can open and correct by hand, and its revision
+            history is the undo.
+          </p>
+          <div class="srow">
+            <input type="password" id="tok" placeholder="GitHub token (Gists: write)"
+                   autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <button id="conn" type="button">接続</button>
+            <button id="disc" type="button">解除</button>
+          </div>
+          <p class="sstat" id="sstat">—</p>
+          <p><a id="glink" href="#" target="_blank" rel="noopener" hidden>gist を開く</a></p>
+          <div class="srow">
+            <button id="exp" type="button">書き出し</button>
+            <button id="imp" type="button">読み込み</button>
+            <span class="mspacer"></span>
+            <button id="wipe" type="button">全消去</button>
+          </div>
+          <textarea id="box" rows="10" spellcheck="false" hidden
+                    aria-label="読書記録の JSON"></textarea>
+        </div>
+      </details>
     </main>
 
     <footer>
@@ -334,45 +526,253 @@
       <span class="spacer"></span>
       <span>known-word-reader</span>
     </footer>
+    <script src="sync.js"></script>
     <script>
       // Progress is written by the readers into this device's localStorage, so
       // it cannot be baked in here. Pages serves this page and every reader from
-      // one origin, so the store they write is the store this reads. Wrapped
-      // because a mailed or file:// copy throws on the accessor itself.
+      // one origin, so the store they write is the store this reads. Everything
+      // is wrapped because a mailed or file:// copy throws on the accessor
+      // itself, and because this page must stay readable with no Sync at all.
       (function () {
-        var raw;
-        try { raw = localStorage.getItem("japanese-stories:progress"); } catch (e) { return; }
-        if (!raw) return;
-        var all; try { all = JSON.parse(raw); } catch (e) { return; }
-        if (!all || typeof all !== "object") return;
-        var cells = document.querySelectorAll(".cell[data-slug]"), read = 0;
-        for (var i = 0; i < cells.length; i++) {
-          var cell = cells[i], rec = all[cell.dataset.slug];
-          // Anything that is not a record is skipped rather than trusted: a
-          // version field added at the top level later would read as a slug.
-          if (!rec || typeof rec !== "object" || Array.isArray(rec)) continue;
-          var total = Number(cell.dataset.pages);
-          // rec.of is ignored — it is only what the device believed the last
-          // time it read this story.
-          var page = Number(rec.page);
-          if (!total || !isFinite(page) || page < 1) continue;
-          if (page > total) page = total;
-          // Whether the story is finished is the reader's verdict, read back,
-          // never re-derived here. Reaching the last authored page is not the
-          // same thing: that page is usually split across screens on a phone,
-          // and `page >= total` painted 読了 with a screen still to go.
-          var finished = rec.done === true;
-          var prog = cell.querySelector(".prog");
-          // Floored, because page 1 of 41 rounds to under a pixel and an empty
-          // bar reads as "not started".
-          prog.querySelector("i").style.width =
-            (finished ? 100 : Math.max(4, Math.round((page / total) * 100))) + "%";
-          prog.querySelector(".pct").textContent = finished ? "読了" : page + " / " + total;
-          prog.hidden = false;
-          if (finished) { cell.classList.add("done"); read++; }
+        var S = window.Sync;
+        var $ = function (id) { return document.getElementById(id); };
+        var cells = [].slice.call(document.querySelectorAll(".cell[data-slug]"));
+        var now = function () { return Date.now(); };
+
+        var read = function () {
+          if (S) return S.local();
+          try { return JSON.parse(localStorage.getItem("japanese-stories:progress")) || {}; }
+          catch (e) { return {}; }
+        };
+
+        // Every mutation goes through here, so the push and the repaint cannot
+        // be forgotten at one call site and not another.
+        var save = function (map) {
+          if (S) { S.saveLocal(map); paint(map); S.push().then(function (r) { paint(r.map); }); return; }
+          try { localStorage.setItem("japanese-stories:progress", JSON.stringify(map)); } catch (e) {}
+          paint(map);
+        };
+
+        var total = function (cell) { return Number(cell.dataset.pages) || 1; };
+
+        function paint(all) {
+          if (!all || typeof all !== "object") all = {};
+          var done = 0;
+          for (var i = 0; i < cells.length; i++) {
+            var cell = cells[i], rec = all[cell.dataset.slug];
+            var prog = cell.querySelector(".prog");
+            var out = cell.querySelector('[data-out="page"]');
+            var mark = cell.querySelector('[data-act="done"]');
+            // Anything that is not a record is skipped rather than trusted: a
+            // version field added at the top level later would read as a slug.
+            var ok = rec && typeof rec === "object" && !Array.isArray(rec);
+            var n = total(cell);
+            // rec.of is ignored — it is only what the device believed the last
+            // time it read this story.
+            var page = ok ? Number(rec.page) : NaN;
+            if (!isFinite(page) || page < 1) page = NaN;
+            else if (page > n) page = n;
+            // Whether the story is finished is the reader's verdict, read back,
+            // never re-derived here. Reaching the last authored page is not the
+            // same thing: that page is usually split across screens on a phone,
+            // and `page >= total` painted 読了 with a screen still to go.
+            var fin = ok && rec.done === true;
+            if (isFinite(page) || fin) {
+              // Floored, because page 1 of 41 rounds to under a pixel and an
+              // empty bar reads as "not started".
+              var pct = fin ? 100 : Math.max(4, Math.round((page / n) * 100));
+              prog.querySelector("i").style.width = pct + "%";
+              prog.querySelector(".pct").textContent =
+                fin ? "読了" : page + " / " + n;
+              prog.hidden = false;
+            } else {
+              prog.hidden = true;
+            }
+            cell.classList.toggle("done", !!fin);
+            if (fin) done++;
+            if (out) out.textContent = isFinite(page) ? page + " / " + n : "—";
+            if (mark) mark.textContent = fin ? "未読" : "読了";
+          }
+          $("readtot").textContent = done ? " · 読了 " + done + "/" + cells.length : "";
         }
-        if (read) document.getElementById("readtot").textContent =
-          " · 読了 " + read + "/" + cells.length;
+
+        // A hand-set record carries `at` so it outranks a stale device on the
+        // merge, and `doneAt` whenever it touches 読了 — that stamp is the only
+        // thing that can take a 読了 away, since reading alone only ever ORs it
+        // on. Fields the reader owns (`sub`, `of`) are left where they are.
+        function edit(slug, fn) {
+          var all = read();
+          var rec = all[slug] && typeof all[slug] === "object" ? all[slug] : {};
+          var next = fn(Object.assign({}, rec));
+          next.at = now();
+          all[slug] = next;
+          save(all);
+        }
+
+        function act(cell, what) {
+          var slug = cell.dataset.slug, n = total(cell);
+          if (what === "clear") {
+            // A tombstone, not a deletion. An absent slug merges to whatever the
+            // gist still holds, so deleting the key would undo itself on the very
+            // next pull. A dated record with no page is what actually travels,
+            // and it paints as unread because paint() keys the bar on `page`.
+            edit(slug, function () {
+              return { sub: 0, of: n, done: false, doneAt: now() };
+            });
+            return;
+          }
+          if (what === "done") {
+            edit(slug, function (r) {
+              var fin = r.done !== true;
+              r.done = fin;
+              r.doneAt = now();
+              // Marking 読了 by hand means the story is behind you, so the
+              // position goes with it rather than being left mid-book.
+              if (fin) { r.page = n; r.sub = 0; }
+              else if (!isFinite(Number(r.page))) { r.page = 1; r.sub = 0; }
+              r.of = n;
+              return r;
+            });
+            return;
+          }
+          var d = what === "inc" ? 1 : -1;
+          edit(slug, function (r) {
+            var p = Number(r.page);
+            if (!isFinite(p)) p = d > 0 ? 1 : n;
+            else p = Math.min(n, Math.max(1, p + d));
+            r.page = p;
+            // The screen index within a page cannot survive a page change, and
+            // the reader clamps it against a split this page cannot know.
+            r.sub = 0;
+            r.of = n;
+            return r;
+          });
+        }
+
+        // One delegated listener rather than a handler per row, so adding a
+        // story adds no wiring.
+        document.querySelector("main").addEventListener("click", function (e) {
+          var btn = e.target.closest ? e.target.closest(".manage button[data-act]") : null;
+          if (!btn) return;
+          var cell = btn.closest(".cell[data-slug]");
+          if (cell) act(cell, btn.dataset.act);
+        });
+
+        $("edit").addEventListener("click", function () {
+          var on = $("edit").getAttribute("aria-pressed") !== "true";
+          $("edit").setAttribute("aria-pressed", on ? "true" : "false");
+          for (var i = 0; i < cells.length; i++) {
+            var row = cells[i].querySelector(".manage");
+            if (row) row.hidden = !on;
+          }
+        });
+
+        paint(read());
+
+        // ------------------------------------------------------------ sync --
+        if (!S) return;
+
+        var stat = $("sstat"), box = $("box");
+        var WORDS = { idle: "未接続", busy: "同期中…", ok: "同期済み",
+                      error: "同期できません", rejected: "トークンが拒否されました",
+                      off: "同期は無効です" };
+
+        function showStatus(s) {
+          var text = s.message || WORDS[s.state] || s.state;
+          if (s.state === "ok" && s.at) {
+            text += " · " + new Date(s.at).toLocaleTimeString();
+          }
+          if (s.state === "idle" && !s.connected) text = WORDS.idle;
+          stat.textContent = text;
+          stat.className = "sstat" + (s.state === "ok" ? " good"
+            : s.state === "error" || s.state === "rejected" ? " bad" : "");
+          $("conn").textContent = s.connected ? "再接続" : "接続";
+          $("disc").hidden = !s.connected;
+          // The store, openable. gist.github.com/<id> resolves without the owner
+          // in the path, so no username has to be stored to build this.
+          var link = $("glink");
+          link.hidden = !s.gist;
+          if (s.gist) link.href = "https://gist.github.com/" + s.gist;
+        }
+
+        S.onChange(showStatus);
+        showStatus(S.status());
+
+        $("conn").addEventListener("click", function () {
+          var t = $("tok").value;
+          if (!t) { $("tok").focus(); return; }
+          S.connect(t).then(function (r) {
+            // The token is in localStorage now; leaving it in a form field as
+            // well only widens where it can be read off a shoulder.
+            $("tok").value = "";
+            paint((r && r.map) || read());
+          }, function () { $("tok").value = ""; });
+        });
+
+        $("disc").addEventListener("click", function () { S.forget(); });
+
+        $("exp").addEventListener("click", function () {
+          box.hidden = false;
+          box.value = JSON.stringify(read(), null, 2);
+          box.focus();
+          box.select();
+          if (navigator.clipboard) navigator.clipboard.writeText(box.value).catch(function () {});
+        });
+
+        // Import merges by the same rule the gist does, so pasting an older
+        // export cannot pull a story backwards. Replacing outright is what the
+        // per-row controls and 全消去 are for.
+        $("imp").addEventListener("click", function () {
+          if (box.hidden) { box.hidden = false; box.value = ""; box.focus(); return; }
+          var incoming;
+          try { incoming = JSON.parse(box.value); } catch (e) {
+            stat.textContent = "JSON が読めません";
+            stat.className = "sstat bad";
+            return;
+          }
+          if (!S.plain(incoming)) {
+            stat.textContent = "JSON がオブジェクトではありません";
+            stat.className = "sstat bad";
+            return;
+          }
+          save(S.merge(read(), incoming.progress && S.plain(incoming.progress)
+            ? incoming.progress : incoming));
+          box.hidden = true;
+        });
+
+        $("wipe").addEventListener("click", function () {
+          // No confirm(): a modal dialog blocks the extension driving this page
+          // in the harness, and the gist's revision history is the real undo.
+          // Two deliberate taps behind a closed <details> is the guard.
+          if ($("wipe").dataset.armed !== "1") {
+            $("wipe").dataset.armed = "1";
+            $("wipe").textContent = "本当に全消去";
+            setTimeout(function () {
+              $("wipe").dataset.armed = "";
+              $("wipe").textContent = "全消去";
+            }, 4000);
+            return;
+          }
+          $("wipe").dataset.armed = "";
+          $("wipe").textContent = "全消去";
+          // Tombstones rather than an empty map: an empty map merges to whatever
+          // the gist still holds and the wipe would undo itself on the next
+          // pull. A dated, page-less record is what actually travels.
+          var all = read(), out = {};
+          for (var k in all) {
+            if (Object.prototype.hasOwnProperty.call(all, k)) {
+              out[k] = { sub: 0, done: false, doneAt: now(), at: now() };
+            }
+          }
+          save(out);
+        });
+
+        // Asking is free where it is honoured and a no-op where it is not.
+        if (navigator.storage && navigator.storage.persist) {
+          navigator.storage.persist().catch(function () {});
+        }
+
+        S.push().then(function (r) { paint(r.map); });
       })();
     </script>
   </body>

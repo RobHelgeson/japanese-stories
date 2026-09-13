@@ -387,7 +387,16 @@
         let slug = "";
         let of = 0;
         let done = false;
+        // When `done` last changed, so the gist merge can resolve two devices
+        // disagreeing about it by recency rather than by OR. Written on the
+        // transition only — re-reading a finished story does not restamp it,
+        // which is what keeps "read to the end on the laptop" from outranking
+        // "I marked that unread on purpose" forever after.
+        let doneAt = 0;
         let rec = null;
+        // Whoever wants to know that the position changed, without Progress
+        // having to know why they care. One subscriber today: the gist push.
+        const marked = new Set();
 
         const flush = Store.defer(() => {
           if (!rec) return;
@@ -410,6 +419,7 @@
           const all = slug ? Store.readJSON("progress") || {} : {};
           const saved = Store.plain(all[slug]) ? all[slug] : null;
           done = !!(saved && saved.done === true);
+          doneAt = saved && isFinite(Number(saved.doneAt)) ? Number(saved.doneAt) : 0;
           let pageIndex = 0;
           let sub = 0;
           if (saved && typeof saved.page === "number" && isFinite(saved.page)) {
@@ -434,7 +444,10 @@
           if (!slug) return;
           const idx = isFinite(pageIndex) ? Math.max(0, Math.round(pageIndex)) : 0;
           const s = isFinite(sub) ? Math.max(0, Math.round(sub)) : 0;
-          if (idx >= of - 1 && s >= (subCount || 1) - 1) done = true;
+          if (idx >= of - 1 && s >= (subCount || 1) - 1 && !done) {
+            done = true;
+            doneAt = Date.now();
+          }
           rec = {
             page: Math.min(of, idx + 1),
             sub: s,
@@ -444,10 +457,25 @@
             done: done,
             at: Date.now(),
           };
+          if (doneAt) rec.doneAt = doneAt;
           flush();
+          for (const fn of marked) {
+            try {
+              fn();
+            } catch (e) {
+              /* a subscriber must not be able to stop progress being written */
+            }
+          }
         };
 
-        return { open, mark };
+        return {
+          open,
+          mark,
+          onMark: (fn) => {
+            marked.add(fn);
+            return () => marked.delete(fn);
+          },
+        };
       })();
 
       // ------------------------------------------------------------ pagebox --
@@ -2271,3 +2299,58 @@
       // pagination too, and none of them is a pref — this is the other half of
       // the relayout path.
       PageBox.onChange(scheduleRelayout);
+
+      // ---------------------------------------------------------------- sync --
+      // localStorage stays the working copy and the gist is the shared one.
+      // Nothing here is on the boot path: the first screen has already painted
+      // from local state by the time any of this runs, and a device that cannot
+      // reach GitHub reads exactly as it did before sync existed.
+      //
+      // Sync.push() rather than Sync.pull() on open, because push is
+      // pull-merge-push and this is the moment to carry up whatever the last
+      // session's final page turn never got out. It returns the same merged map
+      // a pull would.
+      (() => {
+        if (!window.Sync || !DATA.slug) return;
+
+        const stamp = (r) => {
+          const t = r && Number(r.at);
+          return isFinite(t) ? t : -Infinity;
+        };
+        // Captured before the flight, because Sync writes the merged map into
+        // the same storage this would otherwise read back afterwards.
+        const opened = Track.address();
+        const was = stamp(Sync.local()[DATA.slug]);
+
+        const adopt = (r) => {
+          const rec = r && r.map && r.map[DATA.slug];
+          if (!Sync.plain(rec) || stamp(rec) <= was) return;
+          // Local intent wins. If the reader has gone anywhere at all since the
+          // first paint, the remote position is merged into storage and the page
+          // does not move — being dragged out of the sentence you are reading,
+          // because a laptop was left open on page 30, is worse than resuming a
+          // page behind. Comparing addresses rather than counting turns means a
+          // relayout that clamps the address also counts, which errs the safe
+          // way: it declines to move.
+          if (!Paginator.sameAddress(Track.address(), opened)) return;
+          // Ahead is decided by the stamp, never by the page number, so a
+          // deliberate re-read from the start on another device wins over a
+          // further-on position here.
+          Track.goTo(Paginator.addressFromProgress(Progress.open(DATA.slug, DATA.pages.length)), false);
+          Chrome.announce("ほかの端末の続きに移動しました");
+        };
+
+        Sync.push().then(adopt);
+
+        // Four seconds of not turning a page. A reading session is one or two
+        // gist revisions at that rate, which is what keeps the gist's revision
+        // list usable as an undo history rather than a log of page turns.
+        //
+        // Registered through Store.defer so it joins the same flush list
+        // pagehide and visibilitychange already drain: the debounce collapses to
+        // an immediate attempt when the tab goes away. That attempt is
+        // best-effort and often will not finish — it does not have to. The turn
+        // is already in localStorage, and the next open pushes it.
+        const soon = Store.defer(() => { Sync.push(); }, 4000);
+        Progress.onMark(soon);
+      })();

@@ -303,6 +303,28 @@ class Chrome:
             time.sleep(0.05)
         raise SystemExit("page never finished booting")
 
+    # The contents page and the blank reset fixture have no Paginator and no
+    # #track, so the reader-shaped wait above never returns for them.
+    def settle_plain(self):
+        for _ in range(200):
+            try:
+                if self.eval("document.readyState === 'complete'"):
+                    self.eval("new Promise(r => requestAnimationFrame(() => "
+                              "requestAnimationFrame(() => r(1))))", await_promise=True)
+                    return
+            except RuntimeError:
+                pass
+            time.sleep(0.05)
+        raise SystemExit("plain page never finished booting")
+
+    def goto_plain(self, url):
+        self.call("Page.navigate", url=url)
+        self.settle_plain()
+
+    def reload_plain(self):
+        self.call("Page.reload", ignoreCache=False)
+        self.settle_plain()
+
     def eval(self, expr, await_promise=False):
         r = self.call("Runtime.evaluate", expression=expr, returnByValue=True,
                       awaitPromise=await_promise, userGesture=True)
@@ -1349,6 +1371,332 @@ THROW_STORE = r"""
 """
 
 
+# A fake GitHub gist API, installed before any document script runs, so sync.js
+# exercises its real request and merge paths with no network. The reader
+# fixtures are built by build.render(), which inlines the engine and links
+# nothing — so sync.js is injected here too, ahead of the stub's own consumers.
+#
+# window.GIST is the server's state and its log. Tests drive `doc` (what the
+# remote holds), `status` (force one failure) and `delay` (hold a response open
+# long enough to turn a page underneath it), and read `calls` back.
+GIST_STUB = r"""
+(() => {
+  const FILE = "japanese-stories-progress.json";
+  // sessionStorage, not a plain object: the init script re-runs on every
+  // document, so a fresh reload would otherwise reset the server the test just
+  // configured — and half these cases are about what happens ACROSS a reload.
+  // sessionStorage also survives the localStorage.clear() the tests lean on.
+  const KEY = "harness:gist";
+  const load = () => {
+    try { return JSON.parse(sessionStorage.getItem(KEY)) || null; } catch (e) { return null; }
+  };
+  const G = load() || { id: "g1", doc: null, calls: [], status: 0, delay: 0, rev: 1 };
+  const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify(G)); } catch (e) {} };
+  // Which document made a call. The outgoing document gets a pagehide flush on
+  // every reload, and that flush pushes — so a log cleared before a reload still
+  // acquires one request from the page that is leaving. Tests that care which
+  // request came first filter on this rather than on position.
+  const DOC = Math.random().toString(36).slice(2);
+  window.GIST = G;
+  window.GISTsave = save;
+  window.GISTdoc = DOC;
+  save();
+
+  // Only what sync.js actually touches. A real Response would drag in body
+  // stream semantics that have nothing to do with what is under test.
+  const reply = (status, bodyObj, etag) => {
+    const res = {
+      status: status,
+      ok: status >= 200 && status < 300,
+      headers: { get: (k) => (String(k).toLowerCase() === "etag" ? etag || null : null) },
+      json: () => Promise.resolve(bodyObj),
+    };
+    return G.delay ? new Promise((r) => setTimeout(() => r(res), G.delay)) : Promise.resolve(res);
+  };
+
+  const wrap = (map) => ({
+    id: G.id,
+    files: { [FILE]: { content: JSON.stringify({ v: 1, progress: map || {} }, null, 2) } },
+  });
+
+  window.fetch = (url, opts) => {
+    opts = opts || {};
+    const m = opts.method || "GET";
+    const h = opts.headers || {};
+    const sent = opts.body ? JSON.parse(opts.body) : null;
+    G.calls.push({ method: m, url: String(url), doc: DOC,
+                   inm: h["If-None-Match"] || null, body: sent });
+    if (G.status) { const st = G.status; G.status = 0; save(); return reply(st, {}, null); }
+    const etag = 'W/"' + G.rev + '"';
+    if (m === "GET" && String(url).indexOf("/gists?") >= 0) {
+      save();
+      return reply(200, G.doc === null ? [] : [{ id: G.id, files: { [FILE]: {} } }], null);
+    }
+    if (m === "GET") {
+      save();
+      if (h["If-None-Match"] && h["If-None-Match"] === etag) return reply(304, null, etag);
+      return reply(200, wrap(G.doc), etag);
+    }
+    if (m === "POST" || m === "PATCH") {
+      G.doc = JSON.parse(sent.files[FILE].content).progress;
+      G.rev++;
+      save();
+      return reply(m === "POST" ? 201 : 200, wrap(G.doc), 'W/"' + G.rev + '"');
+    }
+    save();
+    return reply(404, {}, null);
+  };
+})();
+"""
+
+
+def sync_stub():
+    """The stub and the real sync.js, as one init script in that order."""
+    return GIST_STUB + "\n" + (REPO / "scripts" / "sync.js").read_text(encoding="utf-8")
+
+
+def gist(br, **fields):
+    """Configure the fake server and persist it across the next reload."""
+    for k, v in fields.items():
+        br.eval(f"window.GIST.{k} = " + json.dumps(v))
+    br.eval("window.GISTsave()")
+
+
+def connect(br, doc=None):
+    """Put the device in the connected state without going through the UI."""
+    gist(br, doc=doc, calls=[], rev=1)
+    br.eval(
+        "localStorage.setItem('japanese-stories:sync',"
+        " JSON.stringify({token: 't', gist: 'g1', etag: ''}))"
+    )
+
+
+def rec(page, at, **kw):
+    r = {"page": page, "sub": 0, "of": 25, "done": False, "at": at}
+    r.update(kw)
+    return r
+
+
+def suite_sync(br, rep, base):
+    ident = br.init_script(sync_stub())
+    try:
+        br.emulate(*PHONE[1:])
+        slug = "tokei-no-oto"
+        br.goto(f"{base}/{slug}.html")
+        br.eval("localStorage.clear()")
+
+        # ---- the merge rule, as a pure function -----------------------------
+        M = "Sync.merge(%s, %s)"
+        older, newer = rec(3, 1000), rec(9, 2000)
+        got = br.eval(M % (json.dumps({slug: older}), json.dumps({slug: newer})))
+        rep.add("sync", "merge-takes-the-later-stamp", got[slug]["page"] == 9, got)
+        got = br.eval(M % (json.dumps({slug: newer}), json.dumps({slug: older})))
+        rep.add("sync", "merge-is-order-independent", got[slug]["page"] == 9, got)
+
+        # Reading only ever turns `done` on, so an unstamped pair ORs: a device
+        # that has not been told a story was finished must not un-finish it.
+        got = br.eval(M % (json.dumps({slug: rec(3, 3000)}),
+                           json.dumps({slug: rec(9, 1000, done=True)})))
+        rep.add("sync", "done-survives-a-newer-unfinished-record",
+                got[slug]["done"] is True and got[slug]["page"] == 3, got)
+
+        # A hand correction carries doneAt, and the later doneAt then decides in
+        # BOTH directions — which is the only thing that can take a 読了 away.
+        got = br.eval(M % (json.dumps({slug: rec(9, 1000, done=True, doneAt=1000)}),
+                           json.dumps({slug: rec(3, 3000, done=False, doneAt=4000)})))
+        rep.add("sync", "a-later-hand-unmark-beats-an-earlier-done",
+                got[slug]["done"] is False, got)
+        got = br.eval(M % (json.dumps({slug: rec(3, 3000, done=False, doneAt=4000)}),
+                           json.dumps({slug: rec(9, 5000, done=True, doneAt=5000)})))
+        rep.add("sync", "a-later-hand-mark-beats-an-earlier-unmark",
+                got[slug]["done"] is True, got)
+
+        got = br.eval(M % (json.dumps({slug: rec(3, 1000)}), json.dumps({"v": 1})))
+        rep.add("sync", "merge-drops-a-non-record-key", "v" not in got, got)
+
+        # ---- boot: the remote is ahead and nothing has been touched ---------
+        connect(br, {slug: rec(9, int(time.time() * 1000) + 60000)})
+        br.reload()
+        br.eval(LIB)
+        br.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
+        s = br.eval("H.snap()")
+        rep.add("sync", "boot-adopts-a-newer-remote-position", s["addr"]["page"] == 8,
+                {"addr": s["addr"]})
+
+        # ---- boot: the reader moved first, so local intent wins -------------
+        connect(br, {slug: rec(20, int(time.time() * 1000) + 60000)})
+        gist(br, delay=1200)
+        br.reload()
+        br.eval(LIB)
+        br.eval("Track.step(1)")
+        br.eval("new Promise(r => setTimeout(r, 1800))", await_promise=True)
+        s = br.eval("H.snap()")
+        rep.add("sync", "a-turned-page-is-not-yanked-by-a-late-pull",
+                s["addr"]["page"] != 19, {"addr": s["addr"]})
+        gist(br, delay=0)
+
+        # ---- a no-op push writes nothing ------------------------------------
+        br.eval("localStorage.clear()")
+        connect(br, None)
+        mine = {slug: rec(4, 1000)}
+        br.eval("localStorage.setItem('japanese-stories:progress'," + json.dumps(json.dumps(mine)) + ")")
+        gist(br, doc=mine, calls=[])
+        br.eval("Sync.push()", await_promise=True)
+        calls = br.eval("window.GIST.calls")
+        rep.add("sync", "an-identical-map-fires-no-PATCH",
+                not any(c["method"] == "PATCH" for c in calls), calls)
+
+        # ---- a push that has something to say does write ---------------------
+        gist(br, calls=[])
+        ahead = {slug: rec(12, 9000)}
+        br.eval("localStorage.setItem('japanese-stories:progress'," + json.dumps(json.dumps(ahead)) + ")")
+        br.eval("Sync.push()", await_promise=True)
+        calls = br.eval("window.GIST.calls")
+        remote = br.eval("window.GIST.doc")
+        rep.add("sync", "a-changed-map-is-PATCHed",
+                any(c["method"] == "PATCH" for c in calls) and remote[slug]["page"] == 12,
+                {"calls": [c["method"] for c in calls], "remote": remote})
+
+        # ---- a stored ETag with a cold cache must not wedge the device ------
+        # The ETag outlives the page and the body it describes does not, so a
+        # conditional first request would 304 into "unchanged from nothing" and,
+        # because the ETag survives that, never sync again.
+        br.eval(
+            "localStorage.setItem('japanese-stories:sync',"
+            " JSON.stringify({token: 't', gist: 'g1', etag: 'W/\"1\"'}))"
+        )
+        br.eval("localStorage.removeItem('japanese-stories:progress')")
+        gist(br, calls=[])
+        br.reload()
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+        first = br.eval(
+            "window.GIST.calls.filter(c => c.method === 'GET' && c.doc === window.GISTdoc)[0] || null")
+        r = br.eval("Sync.pull()", await_promise=True)
+        rep.add("sync", "a-cold-cache-does-not-send-a-stored-ETag",
+                bool(first) and first["inm"] is None, first)
+        rep.add("sync", "and-so-the-remote-still-arrives", r["ok"] is True and bool(r["map"]), r)
+
+        # ---- failure leaves a working reader --------------------------------
+        # The clear has to happen in a document that is then reloaded from a
+        # known position: reloading fires pagehide, and Progress flushes the
+        # OUTGOING page back into the store the line above just emptied.
+        br.goto_plain(f"{base}/blank.html")
+        br.eval("localStorage.clear()")
+        connect(br, {slug: rec(9, 9_000_000_000_000)})
+        gist(br, status=401)
+        br.goto(f"{base}/{slug}.html")
+        br.eval(LIB)
+        br.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
+        s = br.eval("H.snap()")
+        rep.add("sync", "a-401-still-paints-the-reader", s["painted"], s["boxReport"])
+        rep.add("sync", "a-401-does-not-move-the-page", s["addr"]["page"] == 0, {"addr": s["addr"]})
+        br.eval("Track.step(1)")
+        # The turn animates, so the address is still the old one until the snap
+        # settles; reading it straight back tests the scheduler, not the turn.
+        br.eval("new Promise(r => setTimeout(r, 600))", await_promise=True)
+        s2 = br.eval("H.snap()")
+        rep.add("sync", "a-401-does-not-stop-a-page-turn", s2["addr"]["page"] == 1, {"addr": s2["addr"]})
+        rep.add("sync", "a-401-is-reported-as-rejected",
+                br.eval("Sync.status().state") == "rejected", br.eval("Sync.status()"))
+
+        # ---- ?nosync is a reproducible disconnection ------------------------
+        br.goto_plain(f"{base}/blank.html")
+        br.eval("localStorage.clear()")
+        connect(br, {slug: rec(9, 9_000_000_000_000)})
+        gist(br, calls=[])
+        br.goto(f"{base}/{slug}.html?nosync")
+        br.eval(LIB)
+        br.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
+        s = br.eval("H.snap()")
+        rep.add("sync", "nosync-makes-no-requests", br.eval("window.GIST.calls.length") == 0,
+                br.eval("window.GIST.calls"))
+        rep.add("sync", "nosync-leaves-the-position-local", s["addr"]["page"] == 0, {"addr": s["addr"]})
+    finally:
+        br.drop_init_script(ident)
+
+
+def suite_manage(br, rep, base):
+    """The contents page's 編集 controls, against the same fake gist."""
+    ident = br.init_script(sync_stub())
+    try:
+        br.emulate(*PHONE[1:])
+        slug = "tokei-no-oto"
+        br.goto_plain(f"{base}/blank.html")
+        br.eval("localStorage.clear()")
+        connect(br, None)
+        br.goto_plain(f"{base}/index.html")
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+
+        cell = f"document.querySelector('.cell[data-slug=\"{slug}\"]')"
+        rep.add("manage", "controls-start-hidden", br.eval(f"{cell}.querySelector('.manage').hidden"),
+                None)
+        br.eval("document.getElementById('edit').click()")
+        rep.add("manage", "the-edit-toggle-reveals-them",
+                br.eval(f"{cell}.querySelector('.manage').hidden") is False, None)
+
+        # A story with no record at all must be markable, which is the case a
+        # record-patching implementation gets wrong.
+        br.eval(f"{cell}.querySelector('[data-act=\"done\"]').click()")
+        got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+        rep.add("manage", "marking-read-writes-done-and-a-doneAt",
+                got[slug]["done"] is True and got[slug].get("doneAt", 0) > 0, got)
+        rep.add("manage", "marking-read-sends-the-position-to-the-end",
+                got[slug]["page"] == int(br.eval(f"{cell}.dataset.pages")), got)
+        rep.add("manage", "the-row-repaints-as-read",
+                br.eval(f"{cell}.classList.contains('done')"), None)
+
+        br.eval(f"{cell}.querySelector('[data-act=\"done\"]').click()")
+        got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+        rep.add("manage", "un-marking-is-possible-at-all", got[slug]["done"] is False, got)
+
+        br.eval(f"{cell}.querySelector('[data-act=\"dec\"]').click()")
+        got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+        rep.add("manage", "the-stepper-moves-the-page", got[slug]["page"] == 24, got)
+        rep.add("manage", "the-stepper-resets-the-screen-index", got[slug]["sub"] == 0, got)
+
+        # Import is a merge, not a replace: pasting yesterday's export must not
+        # pull a story backwards.
+        stale = {slug: rec(2, 1)}
+        br.eval("document.getElementById('box').value = " + json.dumps(json.dumps(stale)))
+        br.eval("document.getElementById('imp').click()")
+        br.eval("document.getElementById('imp').click()")
+        got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+        rep.add("manage", "import-merges-rather-than-replaces", got[slug]["page"] == 24, got)
+
+        br.eval(f"{cell}.querySelector('[data-act=\"clear\"]').click()")
+        got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+        # A deletion cannot travel — an absent slug merges to whatever the gist
+        # still holds — so a clear leaves a dated, page-less tombstone instead.
+        rep.add("manage", "clearing-one-story-leaves-an-unread-tombstone",
+                slug in got and got[slug].get("page") is None and got[slug]["done"] is False, got)
+        rep.add("manage", "and-the-cleared-row-paints-as-unread",
+                br.eval(f"{cell}.querySelector('.prog').hidden") is True
+                and br.eval(f"{cell}.classList.contains('done')") is False, None)
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+        remote = br.eval("window.GIST.doc") or {}
+        rep.add("manage", "and-the-tombstone-reaches-the-gist",
+                slug in remote and remote[slug].get("page") is None, remote)
+
+        # The store has to be openable. A gist was chosen over a KV namespace
+        # precisely so the record could be read and corrected by hand, and an id
+        # that only ever lives in localStorage cannot be.
+        br.eval("document.getElementById('disc').click()")
+        rep.add("manage", "disconnecting-withdraws-the-gist-link",
+                br.eval("document.getElementById('glink').hidden") is True, None)
+        br.eval("document.getElementById('tok').value = 't'")
+        br.eval("document.getElementById('conn').click()")
+        br.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
+        rep.add("manage", "connecting-surfaces-a-link-to-the-gist",
+                br.eval("document.getElementById('glink').hidden") is False
+                and br.eval("document.getElementById('glink').href")
+                == "https://gist.github.com/g1",
+                br.eval("document.getElementById('glink').href"))
+        rep.add("manage", "and-the-token-does-not-stay-in-the-field",
+                br.eval("document.getElementById('tok').value") == "", None)
+    finally:
+        br.drop_init_script(ident)
+
+
 # ------------------------------------------------------------------ reporting --
 class Report:
     def __init__(self):
@@ -1626,6 +1974,17 @@ def main():
     for slug in SLUGS:
         build_fixture(slug)
     build_fixture("shuden", inject=True)
+    # The contents page as shipped, so suite_manage tests the real markup rather
+    # than a copy of it. Its <script src="sync.js"> 404s in the fixture tree on
+    # purpose — the init script has already defined window.Sync, and letting the
+    # tag resolve would leave two instances of the module racing one store.
+    shutil.copy(REPO / "docs" / "index.html", HERE / "index.html")
+    # Somewhere on the origin with no Progress module. Reloading a reader fires
+    # pagehide, which flushes the outgoing page's position back into the store —
+    # so localStorage.clear() followed by a reload does not clear anything. This
+    # is where a test stands to wipe the store between cases.
+    (HERE / "blank.html").write_text(
+        "<!doctype html><meta charset=utf-8><title>blank</title>\n", encoding="utf-8")
 
     srv = serve()
     br = None
@@ -1643,6 +2002,10 @@ def main():
             suite_persistence(br, rep, base)
             print("\n===== degradation =====")
             suite_degradation(br, rep, base)
+            print("\n===== sync =====")
+            suite_sync(br, rep, base)
+            print("\n===== manage =====")
+            suite_manage(br, rep, base)
         if "--matrix" in args:
             print("\n===== matrix: 4 mode x density, 3 viewports, 22/28/36/40px =====")
             suite_matrix(br, rep)
