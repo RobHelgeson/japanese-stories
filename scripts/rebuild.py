@@ -28,15 +28,21 @@ OUT = HERE.parent / "docs"
 
 
 def targets(src_dir, out_dir):
-    """(source, output) for every current story and archived version, in order."""
+    """(source, output, toc) for every current story and archived version, in order.
+
+    toc is the contents page's href from the reader being written, and this is
+    the only place that knows it: versions go one directory down, so their 目次
+    link has to climb back out. The reader used to infer that from a dot in the
+    slug, which read a filename convention as a layout.
+    """
     out = []
     for story in CORPUS["stories"]:
         slug = story["slug"]
-        out.append((src_dir / f"{slug}.txt", out_dir / f"{slug}.html"))
+        out.append((src_dir / f"{slug}.txt", out_dir / f"{slug}.html", "index.html"))
         for v in story.get("versions", []):
             src = src_dir / "versions" / f"{slug}.{v}.txt"
             if src.exists():
-                out.append((src, out_dir / "versions" / f"{slug}.{v}.html"))
+                out.append((src, out_dir / "versions" / f"{slug}.{v}.html", "../index.html"))
     return out
 
 
@@ -82,7 +88,7 @@ def main():
     index_md = (args.src / "stories-index.md",)
 
     built = 0
-    for src, dst in targets(args.src, args.out):
+    for src, dst, toc in targets(args.src, args.out):
         if not src.exists():
             print(f"missing source: {src}", file=sys.stderr)
             continue
@@ -92,7 +98,7 @@ def main():
             print(f"  up to date  {src.name}", flush=True)
             continue
         dst.parent.mkdir(parents=True, exist_ok=True)
-        cmd = [sys.executable, str(HERE / "build.py"), str(src), "-o", str(dst)]
+        cmd = [sys.executable, str(HERE / "build.py"), str(src), "-o", str(dst), "--toc", toc]
         if args.strict:
             cmd.append("--strict")
         if subprocess.run(cmd, cwd=HERE).returncode:
