@@ -22,6 +22,7 @@ navigation, so persistence and degradation are reachable.
 """
 
 import base64
+import functools
 import http.server
 import json
 import os
@@ -43,10 +44,18 @@ CHROME = os.environ.get(
 )
 REPO = Path(__file__).resolve().parent.parent
 SRC = REPO / "scripts"
+# build.py and stats.py are imported rather than re-implemented: the whole point
+# of this file is to assert what build.py emits, and a second copy of render()'s
+# substitutions here would drift from it silently — a placeholder added to
+# reader.html would ship in every reader and in none of these fixtures.
+sys.path.insert(0, str(SRC))
+import build  # noqa: E402
+import stats  # noqa: E402
+
 # Built fixtures go to a scratch dir, never into the repo: this harness runs
-# against docs/ and must not add files next to what it is measuring.
+# against docs/ and must not add files next to what it is measuring. main()
+# removes it; nothing else in the process may chdir into it.
 HERE = Path(tempfile.mkdtemp(prefix="reader-harness-"))
-ROW = re.compile(r"const DATA = (\{.*?\});\n", re.S)
 PORT = 8917
 DEVPORT = 9757
 
@@ -59,21 +68,18 @@ DESK = ("desktop", 1440, 900, False)
 
 
 # --------------------------------------------------------------------- build --
-# build.py's substitution contracts, asserted rather than assumed: the reader
-# ships by whole-block replacement, so a marker that stopped matching exactly
-# once would be a silent build break rather than an error.
-def build(slug, inject=False):
-    src = (REPO / "docs" / f"{slug}.html").read_text(encoding="utf-8")
-    d = json.loads(ROW.search(src).group(1))
-    d["slug"] = slug
-    if inject:
-        # No corpus token is both 苦手 and 新出, and reader.css declares a
-        # precedence for that case. Synthesise one on the first ruby token of
-        # page 1 so the class the renderer emits is the one under test.
-        mark_both(d)
-    css = (SRC / "reader.css").read_text(encoding="utf-8")
-    js = (SRC / "reader.js").read_text(encoding="utf-8")
-    tpl = (SRC / "reader.html").read_text(encoding="utf-8")
+def check_contracts():
+    """build.py's substitution contracts, asserted rather than assumed.
+
+    The reader ships by whole-block replacement, so a marker that stopped
+    matching exactly once would be a silent build break rather than an error.
+    Asserted here and then handed to build.render() to do the substituting — the
+    harness must never own a second copy of it, or it measures a page build.py
+    does not produce.
+    """
+    css = build.READER_CSS.read_text(encoding="utf-8")
+    js = build.READER_JS.read_text(encoding="utf-8")
+    tpl = build.TEMPLATE.read_text(encoding="utf-8")
 
     contracts = [
         ("    <style>\n__READER_CSS__\n    </style>\n", tpl, "reader.html"),
@@ -89,11 +95,19 @@ def build(slug, inject=False):
     if not js.startswith("      const DATA = "):
         raise SystemExit("build contract broken: reader.js line 1 is no longer the DATA line")
 
-    h = tpl.replace("__READER_CSS__\n", css).replace("__READER_JS__\n", js)
-    h = h.replace("__TITLE__", d["title"])
-    h = h.replace('"__STORY_DATA__"', json.dumps(d, ensure_ascii=False, separators=(",", ":")))
+
+def build_fixture(slug, inject=False):
+    """Re-render a shipped reader against the working-tree engine."""
+    src = (REPO / "docs" / f"{slug}.html").read_text(encoding="utf-8")
+    d = json.loads(stats.ROW.search(src).group(1))
+    d["slug"] = slug
+    if inject:
+        # No corpus token is both 苦手 and 新出, and reader.css declares a
+        # precedence for that case. Synthesise one on the first ruby token of
+        # page 1 so the class the renderer emits is the one under test.
+        mark_both(d)
     name = f"{slug}-inj.html" if inject else f"{slug}.html"
-    (HERE / name).write_text(h, encoding="utf-8")
+    (HERE / name).write_text(build.render(d["title"], d), encoding="utf-8")
     return d
 
 
@@ -110,7 +124,7 @@ def mark_both(d):
 def corpus_has_both():
     hits = []
     for slug in SLUGS:
-        d = json.loads(ROW.search((REPO / "docs" / f"{slug}.html").read_text(encoding="utf-8")).group(1))
+        d = json.loads(stats.ROW.search((REPO / "docs" / f"{slug}.html").read_text(encoding="utf-8")).group(1))
         for page in d["pages"]:
             for sent in page:
                 for tok in sent["toks"]:
@@ -694,8 +708,9 @@ window.H = (() => {
     await sleep(40);
     add("gesture/swipe-opens-no-sheet", !Sheet.isOpen(), { open: Sheet.isOpen() });
 
-    // 7. a stationary press is a tap however long it is held. plan:78 caps a
-    //    tap at 300ms, but the cap discriminates against nothing when the
+    // 7. a stationary press is a tap however long it is held. A duration cap
+    //    was considered and dropped: TAP_SLOP is the whole of the tap/drag
+    //    discrimination, so a cap discriminates against nothing when the
     //    pointer never moved, and a considered press is the normal shape.
     Sheet.dismiss();
     await sleep(300);
@@ -738,6 +753,39 @@ window.H = (() => {
     add("gesture/mouse-click-reaches-disclosure", Sheet.isOpen(), { open: Sheet.isOpen() });
     Sheet.dismiss();
     await sleep(300);
+
+    // 10. a live drag dragged back through its own start point is continuous.
+    //     The slop is subtracted so the page starts from the finger, and it has
+    //     to be the slop the gesture went live with: recomputing it from the
+    //     current dx flips it by 2 * TAP_SLOP as dx crosses zero, which jumped
+    //     the page 16px in one frame and swapped the neighbour being revealed.
+    //     Driven from a middle screen so neither side rubber-bands.
+    await reset();
+    Track.goTo({ page: 5, sub: 0 }, false);
+    await sleep(60);
+    const rest10 = -track().clientWidth;
+    const off = () => tx() - rest10;
+    pev("pointerdown", cx, cy, "touch");
+    await sleep(16);
+    pev("pointermove", cx + 20, cy, "touch");
+    await sleep(24);
+    const live10 = off();
+    pev("pointermove", cx + 1, cy, "touch");
+    await sleep(24);
+    const plus1 = off();
+    pev("pointermove", cx - 1, cy, "touch");
+    await sleep(24);
+    const minus1 = off();
+    pev("pointermove", cx - 20, cy, "touch");
+    await sleep(24);
+    const far10 = off();
+    await release(cx, cy, "touch");
+    // 2px of real travel separates dx = +1 from dx = -1. The defect put
+    // 2 * TAP_SLOP = 16px there, so 4px is slack rather than a tuned bound.
+    add("gesture/drag-is-continuous-through-its-origin",
+        Math.abs(plus1 - minus1) < 4 && plus1 > minus1 && minus1 > far10,
+        { live: px(live10), plus1: px(plus1), minus1: px(minus1), far: px(far10),
+          jump: px(Math.abs(plus1 - minus1)) });
     return out;
   }
 
@@ -749,8 +797,11 @@ window.H = (() => {
     return null;
   }
   // A point inside a .s but outside every .w — punctuation carries no ruby, so
-  // it is a bare text node and the sentence is what the tap lands on.
+  // it is a bare text node and the sentence is what the tap lands on. A node
+  // that has been recycled out of the track has no client rects, so this
+  // returns null for it rather than throwing.
   function bareSpot(s) {
+    if (!s || !s.isConnected) return null;
     for (const n of s.childNodes) {
       if (n.nodeType !== 3 || !n.data.trim()) continue;
       const r = document.createRange();
@@ -762,11 +813,23 @@ window.H = (() => {
     }
     return null;
   }
+  // The track recycles cells and every Prefs change re-splits the screen, so a
+  // sentence found before one can be gone after it. Resolve against the live
+  // screen at the moment of the tap rather than carrying a node across.
+  function liveSentence() {
+    for (const cand of document.querySelectorAll("#track .cell.is-current .s[data-en]")) {
+      const pt = bareSpot(cand);
+      if (pt) return { s: cand, pt };
+    }
+    return null;
+  }
   async function tapAt(pt) {
+    if (!pt) return false;
     pev("pointerdown", pt.x, pt.y, "touch");
     await sleep(20);
     pev("pointerup", pt.x, pt.y, "touch");
     await sleep(60);
+    return true;
   }
 
   async function sheet() {
@@ -814,15 +877,21 @@ window.H = (() => {
     await sleep(300);
     Prefs.setAll({ trans: false, meaning: false });
     await sleep(30);
-    for (const cand of document.querySelectorAll("#track .cell.is-current .s[data-en]")) {
-      if (bareSpot(cand)) { s = cand; break; }
-    }
-    await tapAt(bareSpot(s));
+    // A fixture that has gone missing is a failed row, never a thrown
+    // exception: this runs inside an awaited eval, and throwing here aborts the
+    // whole harness before marks, persistence and degradation ever run.
+    let hit = liveSentence();
+    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "訳-off" } }]);
+    s = hit.s;
+    await tapAt(hit.pt);
     add("sheet/sentence-inert-with-訳-off", !Sheet.isOpen(), { open: Sheet.isOpen() });
 
     Prefs.setAll({ trans: true });
     await sleep(30);
-    await tapAt(bareSpot(s));
+    hit = liveSentence();
+    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "訳-on" } }]);
+    s = hit.s;
+    await tapAt(hit.pt);
     add("sheet/sentence-opens-with-訳-on",
         Sheet.isOpen() && body.textContent === s.dataset.en,
         { open: Sheet.isOpen(), body: body.textContent.slice(0, 60) });
@@ -834,7 +903,10 @@ window.H = (() => {
     await sleep(320);
     add("sheet/dismiss-on-tap-away", !Sheet.isOpen(), { open: Sheet.isOpen() });
 
-    await tapAt(bareSpot(s));
+    hit = liveSentence();
+    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "escape" } }]);
+    s = hit.s;
+    await tapAt(hit.pt);
     const opened = Sheet.isOpen();
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
     await sleep(320);
@@ -1121,8 +1193,20 @@ class Report:
 
 
 def apply_prefs(br, wm, lb, fs, extra=None):
+    """Put the reader in a fully known state, not a partly inherited one.
+
+    Every field is written, not just the three a cell is named after. Prefs
+    persist across navigations on one origin, so writing only writingMode,
+    fontSize and linebreaks let suite_persistence's dark theme, left binding and
+    three armed gates leak into every later suite — including all 288 matrix
+    cells, where a forced left binding meant the 縦書き turn direction, half the
+    matrix, was never exercised at all, and an armed 訳 stopped the chrome ever
+    auto-hiding. The cell label has to name the whole state it ran under.
+    """
     patch = {"writingMode": wm, "fontSize": fs,
-             "linebreaks": {"vertical": bool(lb), "horizontal": bool(lb)}}
+             "linebreaks": {"vertical": bool(lb), "horizontal": bool(lb)},
+             "binding": "auto", "theme": "system",
+             "furigana": False, "trans": False, "meaning": False}
     if extra:
         patch.update(extra)
     br.eval("H.setPrefs(" + json.dumps(patch) + ")")
@@ -1337,15 +1421,16 @@ def suite_degradation(br, rep, base):
 
 # --------------------------------------------------------------------- main --
 def serve():
-    handler = http.server.SimpleHTTPRequestHandler
-    os.chdir(HERE)
-
-    class Quiet(handler):
+    class Quiet(http.server.SimpleHTTPRequestHandler):
         def log_message(self, *a):
             pass
 
+    # directory=, not os.chdir: the handler is the only thing that needs to be
+    # rooted at the fixtures, and a chdir moves the whole interpreter — build.py
+    # and stats.py are imported here and resolve paths of their own.
     socketserver.ThreadingTCPServer.allow_reuse_address = True
-    srv = socketserver.ThreadingTCPServer(("127.0.0.1", PORT), Quiet)
+    srv = socketserver.ThreadingTCPServer(
+        ("127.0.0.1", PORT), functools.partial(Quiet, directory=str(HERE)))
     srv.daemon_threads = True
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv
@@ -1353,9 +1438,10 @@ def serve():
 
 def main():
     args = set(sys.argv[1:])
+    check_contracts()
     for slug in SLUGS:
-        build(slug)
-    build("shuden", inject=True)
+        build_fixture(slug)
+    build_fixture("shuden", inject=True)
 
     srv = serve()
     br = None
@@ -1385,6 +1471,10 @@ def main():
             br.close()
         srv.shutdown()
         srv.server_close()
+        # Chrome.close() already cleans its own profile; the fixtures are the
+        # other ~1.7MB this run leaves behind, once per --table/--matrix
+        # invocation during a tuning session.
+        shutil.rmtree(HERE, ignore_errors=True)
     return 1 if rep.summary() else 0
 
 

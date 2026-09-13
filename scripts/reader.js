@@ -35,15 +35,28 @@
           }
         };
 
+        // Firefox names a full quota NS_ERROR_DOM_QUOTA_REACHED rather than
+        // QuotaExceededError, and the DOMException code differs as well — 22
+        // against 1014 — so both names are matched and the code is not read.
+        const isFull = (e) =>
+          !!e && (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED");
+
         const writeJSON = (key, value) => {
           if (dead) return false;
           try {
             localStorage.setItem(PREFIX + key, JSON.stringify(value));
             return true;
           } catch (e) {
-            // Safari in private browsing reads normally and throws on the first
-            // write, so this is the only place the flag can be raised.
-            dead = true;
+            // A store that refuses to write at all is dead and says so once. A
+            // FULL one is not: it still works, this one value did not fit, and
+            // the next write may well succeed. They are one flag apart and the
+            // difference is the whole session — twelve readers share one origin
+            // and one progress map that is never pruned, so a quota reached
+            // while writing progress would also stop the type size, the writing
+            // mode and the theme persisting, silently, until the tab is closed.
+            // The cost of not latching is one caught exception per attempt on a
+            // store that is permanently full, and both writers are debounced.
+            if (!isFull(e)) dead = true;
             return false;
           }
         };
@@ -94,9 +107,6 @@
           flush,
           listen,
           ok: () => !dead,
-          disable: () => {
-            dead = true;
-          },
         };
       })();
 
@@ -319,12 +329,6 @@
           return set("fontSize", next);
         };
 
-        const reset = () => {
-          rest = {};
-          setAll(defaults());
-          save();
-        };
-
         const subscribe = (fn) => {
           subs.push(fn);
           return () => {
@@ -354,13 +358,9 @@
         snapshot = freeze();
 
         return {
-          V,
           FONT_STEPS,
-          FONT_MIN,
-          FONT_MAX,
           boot,
           subscribe,
-          reset,
           get: () => snapshot,
           set,
           setAll,
@@ -376,12 +376,17 @@
 
       // ----------------------------------------------------------- progress --
       const Progress = (() => {
-        // page is 1-based — the number the reader shows — so done reduces to
-        // page >= of and the record reads correctly in devtools. The contents
-        // page emitted by index.py reads the same record, and this comment and
-        // the one in index.py's TEMPLATE are the two places that convention is
-        // written down. sub stays 0-based: it indexes the screens a page was
-        // split into, and 0 is its value on every page that did not split.
+        // page is 1-based — the number the reader shows — so the record reads
+        // correctly in devtools. sub stays 0-based: it indexes the screens a
+        // page was split into, and 0 is its value on every page that did not
+        // split.
+        //
+        // Whether a story is FINISHED is decided here and nowhere else, and it
+        // is written into the record as `done`. Reaching the last authored page
+        // is not enough — that page may be split across screens, and it usually
+        // is on a phone — so the contents page emitted by index.py reads this
+        // field rather than re-deriving it from page and of. Re-deriving it is
+        // what made a 23-page story read 読了 with a screen still to go.
         let slug = "";
         let of = 0;
         let done = false;
@@ -422,7 +427,7 @@
               sub = Math.max(0, Math.round(saved.sub));
             }
           }
-          return { pageIndex: pageIndex, sub: sub, done: done, restored: pageIndex > 0 || sub > 0 };
+          return { pageIndex: pageIndex, sub: sub };
         };
 
         // subCount is how many screens the authored page's own content produced.
@@ -445,16 +450,7 @@
           flush();
         };
 
-        const clear = () => {
-          done = false;
-          rec = null;
-          if (!slug) return;
-          const all = Store.readJSON("progress") || {};
-          delete all[slug];
-          Store.writeJSON("progress", all);
-        };
-
-        return { open, mark, clear, done: () => done };
+        return { open, mark };
       })();
 
       // ------------------------------------------------------------ pagebox --
@@ -672,7 +668,6 @@
           refresh: () => refresh(false),
           metrics: () => m,
           measureBox: () => probe,
-          clearMeasure: () => { if (probe) probe.textContent = ""; },
           overflows,
           boxSlack,
           selfTest,
@@ -1157,8 +1152,8 @@
           pageEl.append(buildAfter(s.from, s.to));
         }
 
-        // 1-based on the way out, so done reduces to page >= of and index.py's
-        // contents-page script reads the same convention.
+        // Progress stores an authored page index; clamp settles the sub against
+        // the split this geometry actually produces, which storage cannot know.
         const addressFromProgress = (p) => clamp({ page: p.pageIndex, sub: p.sub });
 
         const idle = window.requestIdleCallback
@@ -1175,15 +1170,8 @@
           ensure();
         }
 
-        // VERIFICATION ENTRY POINT ONLY — forces pagination of the whole story.
-        function screenCounts() {
-          const out = [];
-          for (let i = 0; i < total; i++) out.push(textCount(i));
-          return out;
-        }
-
         return {
-          invalidate, screensOf, screenAt, screenCount, textCount, screenCounts,
+          invalidate, screensOf, screenAt, screenCount, textCount,
           clamp, next, prev, first, last, final, isFirst, isLast, isAfter,
           sameAddress, screenLabel, countLabel, renderScreen, addressFromProgress,
           warm, total,
@@ -1541,8 +1529,9 @@
           const p = Prefs.get();
           // An armed 訳/意 changes nothing on the page until something is tapped,
           // so the lit glyph is the only cue that the tap will do anything. The
-          // bar stays up for as long as it carries that state. (Deviation from
-          // plan:67, settled in review: kept deliberately — do not delete it.)
+          // bar stays up for as long as it carries that state, which is why the
+          // bars do not auto-hide unconditionally. Asserted by the harness as
+          // chrome/refuses-to-hide-while-訳-armed — kept deliberately.
           if (p.trans || p.meaning) return;
           // inert on an element holding focus is undefined territory; drop it
           // first. A keypress brings the bars back, so nothing is stranded.
@@ -1748,11 +1737,15 @@
         function init() {
           cache();
           els.title.textContent = DATA.title || "";
-          // docs/versions/ has no contents page of its own; the version builds are
-          // the only slugs carrying a dot.
-          if (DATA.slug && DATA.slug.indexOf(".") !== -1) {
-            els.toc.setAttribute("href", "../index.html");
-          }
+          // Where the contents page sits relative to this file is a fact about
+          // where the file was written, so the tool that chose that — rebuild.py,
+          // which puts version builds one directory down in docs/versions/ —
+          // states it in DATA. Inferring it here from a dot in the slug read a
+          // filename convention as a layout, and broke on both sides: a story
+          // slug containing a dot linked out of docs/, and renaming the archive
+          // form to slug-v1 linked every version build at a sibling that does
+          // not exist.
+          if (DATA.toc) els.toc.setAttribute("href", DATA.toc);
           fillStats();
           bind();
           syncControls();
@@ -1804,11 +1797,17 @@
         let settleToken = 0;
         let settleTimer = 0;
         let suppressClick = false;
-        let mouseDrag = false;
+        let snapDone = null; // the transitionend listener of the snap in flight
         let snapMs = reduced.matches ? 0 : SNAP_MS;
 
         // Reduce Motion is a Control Centre toggle on iOS, so it moves mid-read.
-        reduced.addEventListener("change", (e) => { snapMs = e.matches ? 0 : SNAP_MS; });
+        // Guarded like the prefers-color-scheme listener in Chrome.bind: this
+        // runs while the module body is still evaluating, so on an engine whose
+        // MediaQueryList predates addEventListener an unguarded call throws
+        // before the bootstrap below ever runs and the reader opens blank.
+        if (reduced.addEventListener) {
+          reduced.addEventListener("change", (e) => { snapMs = e.matches ? 0 : SNAP_MS; });
+        }
 
         // Slot 1 is always the screen on view. Which side holds "next" is the
         // whole of the binding difference, so it is one sign and nothing else: a
@@ -1878,8 +1877,21 @@
           Paginator.warm(addr.page - 1);
         }
 
+        // A snap that is interrupted rather than completed fires transitioncancel,
+        // never transitionend, so its listener cannot remove itself. Every path
+        // that ends a snap comes through settle() or starts a new one, so both
+        // drop the outstanding listener here rather than leaving it to be drained
+        // by whichever snap eventually lands — a held arrow key registers one per
+        // key repeat, and they would all fire together on that one.
+        function dropSnapListener() {
+          if (!snapDone) return;
+          track.removeEventListener("transitionend", snapDone);
+          snapDone = null;
+        }
+
         function settle(rel) {
           settleToken++;
+          dropSnapListener();
           clearTimeout(settleTimer);
           pending = null;
           // Clearing the transition before the transform is what stops the reset
@@ -1902,15 +1914,16 @@
           // zero-length spring-back is the common case, so settle it outright.
           if (snapMs <= 0 || Math.abs(x - from) < 0.5) { settle(rel); return; }
           const token = ++settleToken;
+          dropSnapListener();
           clearTimeout(settleTimer);
           pending = { rel: rel };
           track.style.transition = "transform " + snapMs + "ms cubic-bezier(.22,.61,.36,1)";
           setX(x);
-          track.addEventListener("transitionend", function done(e) {
+          snapDone = (e) => {
             if (e.target !== track || e.propertyName !== "transform") return;
-            track.removeEventListener("transitionend", done);
-            if (token === settleToken) settle(rel);
-          });
+            if (token === settleToken) settle(rel); // settle drops this listener
+          };
+          track.addEventListener("transitionend", snapDone);
           // A backgrounded tab never fires the event at all; the timer is the one
           // guarantee that the track does not stop mid-page.
           settleTimer = setTimeout(() => {
@@ -1960,8 +1973,10 @@
             x0: e.clientX,
             y0: e.clientY,
             t0: performance.now(),
-            paging: mouseDrag || e.pointerType !== "mouse",
-            live: false, dead: false, banded: false, rel: 0, eff: 0,
+            // Desktop keeps text selection, which a drag-to-turn would fight;
+            // the arrows and 前/次 are the mouse's page turn.
+            paging: e.pointerType !== "mouse",
+            live: false, dead: false, banded: false, rel: 0, eff: 0, slop: 0,
             samples: [{ x: e.clientX, t: performance.now() }],
           };
           // Correct on Chrome, and WebKit has a defect where capture claimed on an
@@ -1987,6 +2002,14 @@
             // and the wrong axis abandons rather than waits.
             if (!drag.paging || Math.abs(dy) > Math.abs(dx)) { drag.dead = true; return; }
             drag.live = true;
+            // Fixed at the moment the gesture goes live, not recomputed from the
+            // current dx. Subtracting Math.sign(dx) * TAP_SLOP is discontinuous
+            // at dx === 0: dragging a live swipe back through its own start
+            // point flipped the offset from -8 to +8 in one frame, jumping the
+            // page 16px and swapping which neighbour the drag was revealing.
+            // The axis lock above guarantees |dx| >= TAP_SLOP here, so the sign
+            // is never zero.
+            drag.slop = Math.sign(dx) * TAP_SLOP;
             Sheet.dismiss();
             Chrome.hide();
             // iOS fires viewport resizes during a drag; a repagination here would
@@ -1997,7 +2020,7 @@
           e.preventDefault();
           // The slop is subtracted so the page starts from the finger rather than
           // jumping the 8px that proved it was a drag.
-          const raw = dx - Math.sign(dx) * TAP_SLOP;
+          const raw = dx - drag.slop;
           const rel = Math.sign(raw) * advanceSign;
           drag.rel = rel;
           drag.banded = rel !== 0 && !at(rel);
@@ -2185,14 +2208,9 @@
         });
 
         return {
-          start, goTo, step, relayout, retune, invalidate, paint,
+          start, goTo, step, relayout, retune,
           address: () => addr,
           binding: () => bound,
-          busy: () => !!drag || !!pending,
-          // Desktop keeps text selection, which a mouse drag would fight; the keys
-          // and 前/次 are the mouse's page turn. Flip it for a synthesised gesture
-          // test that dispatches pointerType "mouse".
-          setMouseDrag: (on) => { mouseDrag = !!on; },
         };
       })();
 

@@ -205,6 +205,12 @@ def main():
                     help="fail the build on any word outside the known set")
     ap.add_argument("--split", type=Path, metavar="DIR",
                     help="write the loose engine+data form to DIR for UI work, not a story")
+    # Where the contents page sits relative to the file being written. Whoever
+    # chooses the output path owns this: rebuild.py puts archived versions in
+    # docs/versions/ and passes ../index.html for them. The reader must not
+    # re-infer it from the slug — a dot in a story name is not a layout.
+    ap.add_argument("--toc", default="index.html", metavar="HREF",
+                    help="href of the contents page from this reader (default: index.html)")
     args = ap.parse_args()
 
     title, pages = parse_story(args.story)
@@ -280,6 +286,7 @@ def main():
         # Read tracking keys on this. The title is not stable enough — a version
         # build shares its parent's title, which would merge their progress.
         "slug": args.story.stem,
+        "toc": args.toc,
         "afterword": afterword,
         "pages": built,
         "stats": {
