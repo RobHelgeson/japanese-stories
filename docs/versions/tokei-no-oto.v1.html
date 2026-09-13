@@ -315,18 +315,20 @@
          sheet is up. Opacity only, so no reflow. */
       .w.lit rt { opacity: 1; }
       /* Approved stretch vocabulary: not yet learned, so the reading is shown
-         unconditionally rather than waiting for the ふ gate. README:21 and
-         AUTHORING.md:109 both publish that promise; the 傍点 below replace the
-         underline, not this. */
+         unconditionally rather than waiting for the ふ gate. README's "The
+         reader" section publishes that promise to readers — "teal circles with
+         the reading shown" — so it is not an implementation detail to change
+         quietly. The 傍点 below replace the underline, not this. */
       .w.new rt { opacity: 1; color: var(--new); }
 
       /* 傍点 replace both underlines. `under left` is one declaration covering both
          modes — `under` is read only in horizontal typographic modes and `left`
          only in vertical — and it MUST carry both keywords: `under` alone computes
          to `under right`, which in a column puts the sesame on top of the furigana.
-         (This corrects the plan, which says `under`.) Never bare `filled` or
-         `open` either; those compute to a dot in Chrome and to a circle in recent
-         Safari. The colour goes inside the shorthand, which resets it to
+         Asserted by the harness as marks/傍点-and-ruby-on-opposite-sides, in both
+         writing modes, because nothing about it is visible in the cascade. Never
+         bare `filled` or `open` either; those compute to a dot in Chrome and to a
+         circle in recent Safari. The colour goes inside the shorthand, which resets it to
          currentColor when omitted. text-emphasis-position is not part of the
          shorthand and is never reset by it, so it is declared separately. */
       .w.weak, .w.new {
@@ -915,7 +917,7 @@
     <p id="live" class="sr" aria-live="polite" aria-atomic="true"></p>
 
     <script>
-      const DATA = {"title":"時計の音","slug":"tokei-no-oto.v1","afterword":"","pages":[[{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"が"},{"t":"亡くなった","r":[["亡","な"],["くなった",null]],"k":"なくなった","g":"to die"},{"t":"後","r":[["後","あと"]],"k":"あと","g":"behind; rear; after; later; remainder; the rest; more (e.g. five more minutes); left; also; in addition; descendant; suc","w":"後"},{"t":"、"},{"t":"古い","r":[["古","ふる"],["い",null]],"k":"ふるい","g":"old; aged; ancient; antiquated; antique; timeworn; long; since long ago; time-honored; of the distant past; long-ago; st"},{"t":"屋敷","r":[["屋敷","やしき"]],"k":"やしき","g":"residence; estate; grounds; premises; mansion"},{"t":"は"},{"t":"とても"},{"t":"静かに","r":[["静","しず"],["かに",null]],"k":"しずかに","g":"calmly; quietly; gently; peacefully; be quiet!"},{"t":"なった"},{"t":"。"}],"en":"After my grandfather died, the old house went very quiet."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"一人で","r":[["一人","ひとり"],["で",null]],"k":"ひとりで","g":"alone; by oneself; on one's own"},{"t":"家","r":[["家","いえ"]],"k":"いえ","g":"house; residence; dwelling; family; household; lineage; family name"},{"t":"の"},{"t":"中","r":[["中","なか"]],"k":"なか","g":"medium; average; middle; moderation; middle school; China; volume two (of three); during (a certain time when one did or"},{"t":"を"},{"t":"片付け","r":[["片付","かたづ"],["け",null]],"k":"かたづけ","g":"tidying up; finishing; to tidy up; to put in order; to straighten up; to put away; to settle (problem); to clear (disput"},{"t":"始めた","r":[["始","はじ"],["めた",null]],"k":"はじめた","g":"to start; to begin; to commence; to initiate; to originate; to start up (a business, society, etc.); to open (e.g. a sto"},{"t":"。"}],"en":"I started clearing the place out alone."},{"toks":[{"t":"どの"},{"t":"部屋","r":[["部屋","へや"]],"k":"へや","g":"room; chamber; apartment; flat; pad; stable"},{"t":"にも"},{"t":"荷物","r":[["荷物","にもつ"]],"k":"にもつ","g":"luggage; baggage; package; burden; payload (of a packet, cell, etc.)"},{"t":"が"},{"t":"山のよう","r":[["山","やま"],["のよう",null]],"k":"やまのよう","g":"plentiful; lot of; much; pile of"},{"t":"に"},{"t":"残って","r":[["残","のこ"],["って",null]],"k":"のこって","g":"to remain; to be left"},{"t":"いた"},{"t":"。"}],"en":"Every room still held mountains of his belongings."}],[{"toks":[{"t":"机","r":[["机","つくえ"]],"k":"つくえ","g":"desk"},{"t":"の"},{"t":"引き出し","r":[["引","ひ"],["き",null],["出","だ"],["し",null]],"k":"ひきだし","g":"drawer; withdrawal (of money from an account); variety of knowledge and experience useful for handling things impromptu"},{"t":"の"},{"t":"奥","r":[["奥","おく"]],"k":"おく","g":"inner part; inside; interior; depths (e.g. of a forest); back (of a house, drawer, etc.); bottom (e.g. of one's heart); "},{"t":"に"},{"t":"、"},{"t":"小さな","r":[["小","ちい"],["さな",null]],"k":"ちいさな","g":"small; little; tiny"},{"t":"箱","r":[["箱","はこ"]],"k":"はこ","g":"box; case; chest; package; pack; crate; car (of a train, etc.); shamisen case; shamisen; public building; community buil"},{"t":"が"},{"t":"見つかった","r":[["見","み"],["つかった",null]],"k":"みつかった","g":"to be found; to be discovered"},{"t":"。"}],"en":"At the back of a desk drawer I found a small box."},{"toks":[{"t":"中身","r":[["中身","なかみ"]],"k":"なかみ","g":"contents; interior; filling; substance; content; (sword) blade","w":"中身"},{"t":"は"},{"t":"一つ","r":[["一","ひと"],["つ",null]],"k":"ひとつ","g":"one; for one thing; only; (not) even; just (e.g. \"just try it\"); some kind of; one type of"},{"t":"の"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"だった"},{"t":"。"}],"en":"Inside was a single watch."},{"toks":[{"t":"文字盤","r":[["文字盤","もじばん"]],"k":"もじばん","g":"dial (on timepiece, meter, etc.); letter board (e.g. on typewriter, writing aide for the disabled, etc.); character boar","n":"文字盤"},{"t":"は"},{"t":"汚れて","r":[["汚","よご"],["れて",null]],"k":"よごれて","g":"to get dirty; to become dirty; to become sullied; to become corrupted; to lose one's chastity"},{"t":"いた"},{"t":"が"},{"t":"、"},{"t":"裏","r":[["裏","うら"]],"k":"うら","g":"opposite side; bottom; other side; side hidden from view; undersurface; reverse side; rear; back; behind; lining; inside"},{"t":"は"},{"t":"まだ"},{"t":"綺麗","r":[["綺麗","きれい"]],"k":"きれい","g":"pretty; lovely; beautiful; fair; clean; clear; pure; tidy; neat; completely; entirely"},{"t":"だった"},{"t":"。"}],"en":"The dial was grimy, but the back was still clean."},{"toks":[{"t":"持って","r":[["持","も"],["って",null]],"k":"もって","g":"to hold (in one's hand); to take; to carry; to possess; to have; to own; to maintain; to keep; to last; to be durable; t"},{"t":"みる"},{"t":"と"},{"t":"、"},{"t":"思った","r":[["思","おも"],["った",null]],"k":"おもった","g":"to think; to consider; to believe; to reckon; to think (of doing); to plan (to do); to judge; to assess; to regard; to i"},{"t":"より"},{"t":"重かった","r":[["重","おも"],["かった",null]],"k":"おもかった","g":"heavy; weighty; heavy (feeling); depressed; gloomy; blue; uneasy; slow; sluggish; lumbering; ponderous; clumsy; importan"},{"t":"。"}],"en":"When I picked it up, it was heavier than I expected."}],[{"toks":[{"t":"その"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"止まって","r":[["止","と"],["まって",null]],"k":"とまって","g":"to stop (moving); to come to a stop; to stop (doing, working, being supplied); to come to a halt; to cease; to be stoppe"},{"t":"いた"},{"t":"。"}],"en":"The watch had stopped."},{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"の"},{"t":"修理","r":[["修理","しゅうり"]],"k":"しゅうり","g":"repair; mending; fixing; servicing","w":"修理"},{"t":"が"},{"t":"得意","r":[["得意","とくい"]],"k":"とくい","g":"satisfaction; pride; triumph; elation; one's strong point; one's forte; one's specialty; regular customer; regular clien"},{"t":"だった"},{"t":"のに"},{"t":"、"},{"t":"これだけ"},{"t":"は"},{"t":"直さなかった","r":[["直","なお"],["さなかった",null]],"k":"なおさなかった","g":"to cure; to heal; to fix; to correct; to repair"},{"t":"。"}],"en":"My grandfather was good at repairing watches, yet this was the one he never fixed."},{"toks":[{"t":"なぜ"},{"t":"壊れた","r":[["壊","こわ"],["れた",null]],"k":"こわれた","g":"to be broken; to break; to fall through; to come to nothing"},{"t":"まま"},{"t":"残した","r":[["残","のこ"],["した",null]],"k":"のこした","g":"to leave (behind); to leave (undone); to not finish; to save; to set aside; to reserve; to leave (to someone, esp. after","w":"残す"},{"t":"のか"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"には"},{"t":"分からなかった","r":[["分","わ"],["からなかった",null]],"k":"わからなかった","g":"to understand; to comprehend; to grasp; to see; to get; to follow; to become clear; to be known; to be discovered; to be"},{"t":"。"}],"en":"Why he left it broken, I had no idea."}],[{"toks":[{"t":"夜","r":[["夜","よる"]],"k":"よる","g":"evening; night; dinner"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"机","r":[["机","つくえ"]],"k":"つくえ","g":"desk"},{"t":"の"},{"t":"上","r":[["上","うえ"]],"k":"うえ","g":"above; up; over; elder (e.g. daughter); top; summit; head (e.g. of a staircase); surface; before; previous; superiority;"},{"t":"に"},{"t":"置いて","r":[["置","お"],["いて",null]],"k":"おいて","g":"at; in; on; to put; to place; to leave (behind); to establish (an organization, a facility, a position, etc.); to set up"},{"t":"眠った","r":[["眠","ねむ"],["った",null]],"k":"ねむった","g":"to sleep; to die; to rest (in peace); to lie (buried); to sleep (in the grave); to lie idle (e.g. of resources); to lie "},{"t":"。"}],"en":"That night I left the watch on the desk and went to sleep."},{"toks":[{"t":"真夜中","r":[["真夜中","まよなか"]],"k":"まよなか","g":"dead of night; midnight"},{"t":"、"},{"t":"妙","r":[["妙","みょう"]],"k":"みょう","g":"strange; weird; odd; curious; wonder; mystery; miracle; excellence; cleverness; adroitness; knack; skill"},{"t":"な"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"で"},{"t":"目が覚めた","r":[["目","め"],["が",null],["覚","さ"],["めた",null]],"k":"めがさめた","g":"to wake up; to awake; to perk up; to snap out (of a day dream, etc.); to awaken (to the truth, etc.); to come to a reali"},{"t":"。"}],"en":"In the middle of the night, an odd sound woke me."},{"toks":[{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"が"},{"t":"動いて","r":[["動","うご"],["いて",null]],"k":"うごいて","g":"to move; to stir; to shift; to shake; to swing; to operate; to run; to go; to work; to make a move; to take action; to a"},{"t":"いた"},{"t":"。"}],"en":"The watch was running."},{"toks":[{"t":"誰も","r":[["誰","だれ"],["も",null]],"k":"だれも","g":"everyone; anyone; no one; nobody"},{"t":"触って","r":[["触","さわ"],["って",null]],"k":"さわって","g":"to touch; to feel; to get involved (with); to approach; to be harmful to; to hinder; to interfere with; to irritate"},{"t":"いない"},{"t":"のに"},{"t":"、"},{"t":"秒針","r":[["秒針","びょうしん"]],"k":"びょうしん","g":"second hand (of clock)","n":"秒針"},{"t":"が"},{"t":"進んで","r":[["進","すす"],["んで",null]],"k":"すすんで","g":"to advance; to go forward; to precede; to go ahead (of); to make progress; to improve; to deepen; to heighten; to be fas"},{"t":"いた"},{"t":"。"}],"en":"Nobody had touched it, and the second hand was moving."}],[{"toks":[{"t":"驚いて","r":[["驚","おどろ"],["いて",null]],"k":"おどろいて","g":"to be surprised; to be astonished"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"電灯をつけた","r":[["電灯","でんとう"],["をつけた",null]],"k":"でんとうをつけた","g":"to turn on an electric light; to switch on a light"},{"t":"。"}],"en":"Startled, I switched on the lamp."},{"toks":[{"t":"部屋","r":[["部屋","へや"]],"k":"へや","g":"room; chamber; apartment; flat; pad; stable"},{"t":"は"},{"t":"明るく","r":[["明","あか"],["るく",null]],"k":"あかるく","g":"light; well-lit; well-lighted; bright (of a colour); brightly-coloured; brightly-colored; cheerful; bright; spirited; su"},{"t":"なった"},{"t":"が"},{"t":"、"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"そのまま"},{"t":"動き","r":[["動","うご"],["き",null]],"k":"うごき","g":"movement; move; motion; trend; development; change; fluctuation; to move; to stir; to shift; to shake; to swing; to oper"},{"t":"続けた","r":[["続","つづ"],["けた",null]],"k":"つづけた","g":"to continue; to keep up; to keep on"},{"t":"。"}],"en":"The room filled with light, and the watch kept running all the same."},{"toks":[{"t":"不思議","r":[["不思議","ふしぎ"]],"k":"ふしぎ","g":"wonderful; marvelous; strange; incredible; amazing; curious; miraculous; mysterious; strangely enough; oddly enough; for"},{"t":"な"},{"t":"気持ち","r":[["気持","きも"],["ち",null]],"k":"きもち","g":"feeling; sensation; mood; state of mind; preparedness; readiness; attitude; thought; sentiment; consideration; solicitud"},{"t":"だった"},{"t":"。"}],"en":"It was a strange feeling."},{"toks":[{"t":"懐かしい","r":[["懐","なつ"],["かしい",null]],"k":"なつかしい","g":"dear (old); fondly-remembered; beloved; missed; nostalgic"},{"t":"ような"},{"t":"、"},{"t":"怖い","r":[["怖","こわ"],["い",null]],"k":"こわい","g":"scary; frightening; eerie; dreadful"},{"t":"ような"},{"t":"感覚","r":[["感覚","かんかく"]],"k":"かんかく","g":"sense; sensation; feeling; intuition"},{"t":"が"},{"t":"した"},{"t":"。"}],"en":"Something like nostalgia, and something like fear."}],[{"toks":[{"t":"朝","r":[["朝","あさ"]],"k":"あさ","g":"morning; breakfast; next morning"},{"t":"になると"},{"t":"、"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"また"},{"t":"止まって","r":[["止","と"],["まって",null]],"k":"とまって","g":"to stop (moving); to come to a stop; to stop (doing, working, being supplied); to come to a halt; to cease; to be stoppe"},{"t":"いた"},{"t":"。"}],"en":"By morning the watch had stopped again."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"近所","r":[["近所","きんじょ"]],"k":"きんじょ","g":"neighbourhood; neighborhood"},{"t":"の"},{"t":"古い","r":[["古","ふる"],["い",null]],"k":"ふるい","g":"old; aged; ancient; antiquated; antique; timeworn; long; since long ago; time-honored; of the distant past; long-ago; st"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"へ"},{"t":"行って","r":[["行","い"],["って",null]],"k":"いって","g":"to perform; to do; to conduct oneself; to carry out"},{"t":"、"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"の"},{"t":"人","r":[["人","ひと"]],"k":"ひと","g":"person; someone; somebody; human beings; mankind; man; people; humans; human (Homo sapiens); (other) people; others; cha"},{"t":"に"},{"t":"見せた","r":[["見","み"],["せた",null]],"k":"みせた","g":"to show; to display"},{"t":"。"}],"en":"I took it to an old shop nearby and showed it to the owner."},{"toks":[{"t":"「"},{"t":"これ"},{"t":"は"},{"t":"珍しい","r":[["珍","めずら"],["しい",null]],"k":"めずらしい","g":"unusual; rare; curious; new; novel; fine (e.g. gift)"},{"t":"機械","r":[["機械","きかい"]],"k":"きかい","g":"machine; mechanism; instrument; appliance; apparatus"},{"t":"だ"},{"t":"」"},{"t":"と"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"の"},{"t":"人","r":[["人","ひと"]],"k":"ひと","g":"person; someone; somebody; human beings; mankind; man; people; humans; human (Homo sapiens); (other) people; others; cha"},{"t":"は"},{"t":"言った","r":[["言","い"],["った",null]],"k":"いった","g":"to say; to utter; to declare; to name; to call; to go (e.g. \"the alarm went ping\"); to make a noise"},{"t":"。"}],"en":"\"This is an unusual movement,\" he said."},{"toks":[{"t":"「"},{"t":"あなた"},{"t":"の"},{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"も"},{"t":"、"},{"t":"よく"},{"t":"ここ"},{"t":"に"},{"t":"来た","r":[["来","き"],["た",null]],"k":"きた","g":"to come (spatially or temporally); to approach; to arrive; to come back; to do ... and come back; to come to be; to beco"},{"t":"よ"},{"t":"」"}],"en":"\"Your grandfather used to come in here often.\""},{"toks":[{"t":"「"},{"t":"何も","r":[["何","なに"],["も",null]],"k":"なにも","g":"(not) anything; (nothing) at all; (not) any; nothing; and everything else; and all; (not) at all; (not) in the least; (n"},{"t":"買わないで","r":[["買","か"],["わないで",null]],"k":"かわないで","g":"to buy; to purchase; to value; to have a high opinion; to stir; to provoke; to draw upon oneself"},{"t":"、"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"の"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"の"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"を"},{"t":"聞いて","r":[["聞","き"],["いて",null]],"k":"きいて","g":"to hear; to listen (e.g. to music); to ask; to enquire; to query; to hear about; to hear of; to learn of; to follow (adv"},{"t":"いた"},{"t":"」"}],"en":"\"He never bought anything. He would stand and listen to the clocks.\""}],[{"toks":[{"t":"家","r":[["家","いえ"]],"k":"いえ","g":"house; residence; dwelling; family; household; lineage; family name"},{"t":"に"},{"t":"帰って","r":[["帰","かえ"],["って",null]],"k":"かえって","g":"to return; to come home; to go home; to go back; to leave (of a guest, customer, etc.); to get home; to get to home plat"},{"t":"、"},{"t":"箱の底","r":[["箱","はこ"],["の",null],["底","そこ"]],"k":"はこのそこ","g":"bottom of a box"},{"t":"を"},{"t":"よく"},{"t":"見た","r":[["見","み"],["た",null]],"k":"みた","g":"to see; to look; to watch; to view; to observe; to examine; to look over; to assess; to check; to judge; to look after; "},{"t":"。"}],"en":"Back home, I looked carefully at the bottom of the box."},{"toks":[{"t":"薄い","r":[["薄","うす"],["い",null]],"k":"うすい","g":"thin; pale; light; faint; watery; thin; dilute; weak (taste, etc.); little (affection, etc.) not much (of a presence); s"},{"t":"紙","r":[["紙","かみ"]],"k":"かみ","g":"paper"},{"t":"が"},{"t":"敷いて","r":[["敷","し"],["いて",null]],"k":"しいて","g":"to spread out; to lay out; to take a position; to impose widely (e.g. over a city)"},{"t":"あって"},{"t":"、"},{"t":"下","r":[["下","した"]],"k":"した","g":"under (guidance, supervision, rules, the law, etc.); under (a flag, the sun, etc.); beneath; with (e.g. one blow); on (t"},{"t":"から"},{"t":"手紙","r":[["手紙","てがみ"]],"k":"てがみ","g":"letter; missive; note; mail"},{"t":"が"},{"t":"出た","r":[["出","で"],["た",null]],"k":"でた","g":"to leave; to exit; to go out; to come out; to get out; to leave (on a journey); to depart; to start out; to set out; to "},{"t":"。"}],"en":"A thin sheet of paper was laid across it, and underneath was a letter."},{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"の"},{"t":"字","r":[["字","じ"]],"k":"じ","g":"character (esp. kanji); letter; written text; handwriting; penmanship; the ... word (e.g. \"the L word\" = \"love\")"},{"t":"だった"},{"t":"。"}],"en":"It was my grandfather's handwriting."},{"toks":[{"t":"「"},{"t":"この"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"、"},{"t":"寂しい","r":[["寂","さび"],["しい",null]],"k":"さびしい","g":"lonely; lonesome; solitary; desolate"},{"t":"夜","r":[["夜","よる"]],"k":"よる","g":"evening; night; dinner"},{"t":"だけ"},{"t":"動く","r":[["動","うご"],["く",null]],"k":"うごく","g":"to move; to stir; to shift; to shake; to swing; to operate; to run; to go; to work; to make a move; to take action; to a"},{"t":"」"},{"t":"と"},{"t":"書いて","r":[["書","か"],["いて",null]],"k":"かいて","g":"to write; to compose; to pen; to draw; to paint"},{"t":"あった"},{"t":"。"}],"en":"\"This watch runs only on lonely nights,\" it said."},{"toks":[{"t":"「"},{"t":"だから"},{"t":"、"},{"t":"直さなかった","r":[["直","なお"],["さなかった",null]],"k":"なおさなかった","g":"to cure; to heal; to fix; to correct; to repair"},{"t":"」"}],"en":"\"That is why I never fixed it.\""}],[{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"手紙","r":[["手紙","てがみ"]],"k":"てがみ","g":"letter; missive; note; mail"},{"t":"を"},{"t":"握って","r":[["握","にぎ"],["って",null]],"k":"にぎって","g":"to clasp; to grasp; to grip; to clutch; to hold (the answer); to have (e.g. the solution); to be the key; to be the reas"},{"t":"、"},{"t":"長い間","r":[["長","なが"],["い",null],["間","あいだ"]],"k":"ながいあいだ","g":"long time; long interval; for quite some time"},{"t":"黙って","r":[["黙","だま"],["って",null]],"k":"だまって","g":"to be silent; to say nothing"},{"t":"いた"},{"t":"。"}],"en":"I held the letter and said nothing for a long time."},{"toks":[{"t":"子供の頃","r":[["子供","こども"],["の",null],["頃","ころ"]],"k":"こどものころ","g":"(time of) one's childhood; when one was a child"},{"t":"、"},{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"は"},{"t":"何も","r":[["何","なに"],["も",null]],"k":"なにも","g":"(not) anything; (nothing) at all; (not) any; nothing; and everything else; and all; (not) at all; (not) in the least; (n"},{"t":"話さない","r":[["話","はな"],["さない",null]],"k":"はなさない","g":"to talk; to speak; to converse; to chat; to tell; to explain; to narrate; to mention; to describe; to discuss; to speak "},{"t":"人","r":[["人","ひと"]],"k":"ひと","g":"person; someone; somebody; human beings; mankind; man; people; humans; human (Homo sapiens); (other) people; others; cha"},{"t":"だ"},{"t":"と"},{"t":"思って","r":[["思","おも"],["って",null]],"k":"おもって","g":"to think; to consider; to believe; to reckon; to think (of doing); to plan (to do); to judge; to assess; to regard; to i"},{"t":"いた"},{"t":"。"}],"en":"As a child I had thought of him as a man who said nothing."},{"toks":[{"t":"一度だけ","r":[["一度","いちど"],["だけ",null]],"k":"いちどだけ","g":"only once"},{"t":"、"},{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"に"},{"t":"怒られた","r":[["怒","おこ"],["られた",null]],"k":"おこられた","g":""},{"t":"ことがある"},{"t":"。"}],"en":"Only once did he ever get angry with me."},{"toks":[{"t":"「"},{"t":"静かに","r":[["静","しず"],["かに",null]],"k":"しずかに","g":"calmly; quietly; gently; peacefully; be quiet!"},{"t":"しろ"},{"t":"。"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"が"},{"t":"聞こえない","r":[["聞","き"],["こえない",null]],"k":"きこえない","g":"to be heard; to be audible; to reach one's ears; to sound (like); to come across (as); to be well known; to be famous; t"},{"t":"」"}],"en":"\"Be quiet. I can't hear it.\""},{"toks":[{"t":"その時","r":[["その",null],["時","とき"]],"k":"そのとき","g":"at that time; at that moment; then; on that occasion"},{"t":"は"},{"t":"、"},{"t":"嫌われて","r":[["嫌","きら"],["われて",null]],"k":"きらわれて","g":""},{"t":"いる"},{"t":"と"},{"t":"思った","r":[["思","おも"],["った",null]],"k":"おもった","g":"to think; to consider; to believe; to reckon; to think (of doing); to plan (to do); to judge; to assess; to regard; to i"},{"t":"。"}],"en":"I took it to mean he did not want me there."}],[{"toks":[{"t":"次","r":[["次","つぎ"]],"k":"つぎ","g":"next; following; subsequent; stage; station"},{"t":"の"},{"t":"夜","r":[["夜","よる"]],"k":"よる","g":"evening; night; dinner"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"持って","r":[["持","も"],["って",null]],"k":"もって","g":"to hold (in one's hand); to take; to carry; to possess; to have; to own; to maintain; to keep; to last; to be durable; t"},{"t":"庭","r":[["庭","にわ"]],"k":"にわ","g":"garden; yard; courtyard; field (of action); area"},{"t":"に"},{"t":"出た","r":[["出","で"],["た",null]],"k":"でた","g":"to leave; to exit; to go out; to come out; to get out; to leave (on a journey); to depart; to start out; to set out; to "},{"t":"。"}],"en":"The next night I carried the watch out into the garden."},{"toks":[{"t":"風","r":[["風","かぜ"]],"k":"かぜ","g":"method; manner; way; style; appearance; air; tendency; folk song (genre of the Shi Jing); wind (one of the five elements"},{"t":"が"},{"t":"冷たくて","r":[["冷","つめ"],["たくて",null]],"k":"つめたくて","g":"cold (to the touch); chilly; icy; freezing; (emotionally) cold; coldhearted; unfeeling; indifferent; unfriendly; distant"},{"t":"、"},{"t":"空","r":[["空","そら"]],"k":"そら","g":"emptiness; vacuum; blank"},{"t":"には"},{"t":"星","r":[["星","ほし"]],"k":"ほし","g":"star (usu. not including the Sun); planet (usu. not including Earth); heavenly body; star (glyph, symbol, shape); star ("},{"t":"が"},{"t":"見えた","r":[["見","み"],["えた",null]],"k":"みえた","g":"to be seen; to be in sight; to look; to seem; to appear; to come"},{"t":"。"}],"en":"The wind was cold, and there were stars."},{"toks":[{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"ゆっくり"},{"t":"動き","r":[["動","うご"],["き",null]],"k":"うごき","g":"movement; move; motion; trend; development; change; fluctuation; to move; to stir; to shift; to shake; to swing; to oper"},{"t":"始めた","r":[["始","はじ"],["めた",null]],"k":"はじめた","g":"to start; to begin; to commence; to initiate; to originate; to start up (a business, society, etc.); to open (e.g. a sto"},{"t":"。"}],"en":"The watch slowly began to move."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"耳","r":[["耳","みみ"]],"k":"みみ","g":"ear; hearing; ear (for music, etc.); edge; crust; heel (of bread or cheese); selvedge (of woven fabric); selvage; ear (o"},{"t":"に"},{"t":"当てて","r":[["当","あ"],["てて",null]],"k":"あてて","g":"to hit; to expose; to apply (e.g. patch); to put on; to put against; to hold on; to hold against; to allot; to call on s"},{"t":"、"},{"t":"目を閉じた","r":[["目","め"],["を",null],["閉","と"],["じた",null]],"k":"めをとじた","g":"to close one's eyes; to lower one's eyelids; to shut one's eyes; to die; to breathe one's last"},{"t":"。"}],"en":"I held it to my ear and closed my eyes."},{"toks":[{"t":"小さな","r":[["小","ちい"],["さな",null]],"k":"ちいさな","g":"small; little; tiny"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"が"},{"t":"、"},{"t":"確かに","r":[["確","たし"],["かに",null]],"k":"たしかに","g":"surely; certainly"},{"t":"聞こえた","r":[["聞","き"],["こえた",null]],"k":"きこえた","g":"to be heard; to be audible; to reach one's ears; to sound (like); to come across (as); to be well known; to be famous; t"},{"t":"。"}],"en":"A small sound, and I could hear it clearly."}],[{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"は"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"を"},{"t":"嫌って","r":[["嫌","きら"],["って",null]],"k":"きらって","g":"to hate; to dislike; to loathe"},{"t":"いた"},{"t":"の"},{"t":"ではなかった"},{"t":"。"}],"en":"He had not wanted me gone."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"大切に","r":[["大切","たいせつ"],["に",null]],"k":"たいせつに","g":"carefully; with (great) care; with caution"},{"t":"箱","r":[["箱","はこ"]],"k":"はこ","g":"box; case; chest; package; pack; crate; car (of a train, etc.); shamisen case; shamisen; public building; community buil"},{"t":"へ"},{"t":"戻した","r":[["戻","もど"],["した",null]],"k":"もどした","g":"to put back; to return; to give back; to restore (to a previous state, e.g. defrosting, reconstituting, reconciling); to"},{"t":"。"}],"en":"I put the watch carefully back in its box."},{"toks":[{"t":"そして"},{"t":"、"},{"t":"いつか"},{"t":"自分","r":[["自分","じぶん"]],"k":"じぶん","g":"myself; yourself; oneself; himself; herself; I; me; you"},{"t":"の"},{"t":"孫","r":[["孫","まご"]],"k":"まご","g":"grandchild"},{"t":"に"},{"t":"この"},{"t":"話をする","r":[["話","はなし"],["をする",null]],"k":"はなしをする","g":"to have a talk; to tell a story"},{"t":"と"},{"t":"約束","r":[["約束","やくそく"]],"k":"やくそく","g":"promise; agreement; arrangement; one's word; contract; pact; appointment; engagement; date; convention; rule; destiny; f"},{"t":"した"},{"t":"。"}],"en":"And I promised myself I would tell my own grandchild this story one day."}]],"stats":{"words":171,"translated":41,"sentences":41,"weak":["中身","修理","後","残す"],"approved":["文字盤","秒針"],"unknown":[],"knownVocab":6502}};
+      const DATA = {"title":"時計の音","slug":"tokei-no-oto.v1","toc":"../index.html","afterword":"","pages":[[{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"が"},{"t":"亡くなった","r":[["亡","な"],["くなった",null]],"k":"なくなった","g":"to die"},{"t":"後","r":[["後","あと"]],"k":"あと","g":"behind; rear; after; later; remainder; the rest; more (e.g. five more minutes); left; also; in addition; descendant; suc","w":"後"},{"t":"、"},{"t":"古い","r":[["古","ふる"],["い",null]],"k":"ふるい","g":"old; aged; ancient; antiquated; antique; timeworn; long; since long ago; time-honored; of the distant past; long-ago; st"},{"t":"屋敷","r":[["屋敷","やしき"]],"k":"やしき","g":"residence; estate; grounds; premises; mansion"},{"t":"は"},{"t":"とても"},{"t":"静かに","r":[["静","しず"],["かに",null]],"k":"しずかに","g":"calmly; quietly; gently; peacefully; be quiet!"},{"t":"なった"},{"t":"。"}],"en":"After my grandfather died, the old house went very quiet."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"一人で","r":[["一人","ひとり"],["で",null]],"k":"ひとりで","g":"alone; by oneself; on one's own"},{"t":"家","r":[["家","いえ"]],"k":"いえ","g":"house; residence; dwelling; family; household; lineage; family name"},{"t":"の"},{"t":"中","r":[["中","なか"]],"k":"なか","g":"medium; average; middle; moderation; middle school; China; volume two (of three); during (a certain time when one did or"},{"t":"を"},{"t":"片付け","r":[["片付","かたづ"],["け",null]],"k":"かたづけ","g":"tidying up; finishing; to tidy up; to put in order; to straighten up; to put away; to settle (problem); to clear (disput"},{"t":"始めた","r":[["始","はじ"],["めた",null]],"k":"はじめた","g":"to start; to begin; to commence; to initiate; to originate; to start up (a business, society, etc.); to open (e.g. a sto"},{"t":"。"}],"en":"I started clearing the place out alone."},{"toks":[{"t":"どの"},{"t":"部屋","r":[["部屋","へや"]],"k":"へや","g":"room; chamber; apartment; flat; pad; stable"},{"t":"にも"},{"t":"荷物","r":[["荷物","にもつ"]],"k":"にもつ","g":"luggage; baggage; package; burden; payload (of a packet, cell, etc.)"},{"t":"が"},{"t":"山のよう","r":[["山","やま"],["のよう",null]],"k":"やまのよう","g":"plentiful; lot of; much; pile of"},{"t":"に"},{"t":"残って","r":[["残","のこ"],["って",null]],"k":"のこって","g":"to remain; to be left"},{"t":"いた"},{"t":"。"}],"en":"Every room still held mountains of his belongings."}],[{"toks":[{"t":"机","r":[["机","つくえ"]],"k":"つくえ","g":"desk"},{"t":"の"},{"t":"引き出し","r":[["引","ひ"],["き",null],["出","だ"],["し",null]],"k":"ひきだし","g":"drawer; withdrawal (of money from an account); variety of knowledge and experience useful for handling things impromptu"},{"t":"の"},{"t":"奥","r":[["奥","おく"]],"k":"おく","g":"inner part; inside; interior; depths (e.g. of a forest); back (of a house, drawer, etc.); bottom (e.g. of one's heart); "},{"t":"に"},{"t":"、"},{"t":"小さな","r":[["小","ちい"],["さな",null]],"k":"ちいさな","g":"small; little; tiny"},{"t":"箱","r":[["箱","はこ"]],"k":"はこ","g":"box; case; chest; package; pack; crate; car (of a train, etc.); shamisen case; shamisen; public building; community buil"},{"t":"が"},{"t":"見つかった","r":[["見","み"],["つかった",null]],"k":"みつかった","g":"to be found; to be discovered"},{"t":"。"}],"en":"At the back of a desk drawer I found a small box."},{"toks":[{"t":"中身","r":[["中身","なかみ"]],"k":"なかみ","g":"contents; interior; filling; substance; content; (sword) blade","w":"中身"},{"t":"は"},{"t":"一つ","r":[["一","ひと"],["つ",null]],"k":"ひとつ","g":"one; for one thing; only; (not) even; just (e.g. \"just try it\"); some kind of; one type of"},{"t":"の"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"だった"},{"t":"。"}],"en":"Inside was a single watch."},{"toks":[{"t":"文字盤","r":[["文字盤","もじばん"]],"k":"もじばん","g":"dial (on timepiece, meter, etc.); letter board (e.g. on typewriter, writing aide for the disabled, etc.); character boar","n":"文字盤"},{"t":"は"},{"t":"汚れて","r":[["汚","よご"],["れて",null]],"k":"よごれて","g":"to get dirty; to become dirty; to become sullied; to become corrupted; to lose one's chastity"},{"t":"いた"},{"t":"が"},{"t":"、"},{"t":"裏","r":[["裏","うら"]],"k":"うら","g":"opposite side; bottom; other side; side hidden from view; undersurface; reverse side; rear; back; behind; lining; inside"},{"t":"は"},{"t":"まだ"},{"t":"綺麗","r":[["綺麗","きれい"]],"k":"きれい","g":"pretty; lovely; beautiful; fair; clean; clear; pure; tidy; neat; completely; entirely"},{"t":"だった"},{"t":"。"}],"en":"The dial was grimy, but the back was still clean."},{"toks":[{"t":"持って","r":[["持","も"],["って",null]],"k":"もって","g":"to hold (in one's hand); to take; to carry; to possess; to have; to own; to maintain; to keep; to last; to be durable; t"},{"t":"みる"},{"t":"と"},{"t":"、"},{"t":"思った","r":[["思","おも"],["った",null]],"k":"おもった","g":"to think; to consider; to believe; to reckon; to think (of doing); to plan (to do); to judge; to assess; to regard; to i"},{"t":"より"},{"t":"重かった","r":[["重","おも"],["かった",null]],"k":"おもかった","g":"heavy; weighty; heavy (feeling); depressed; gloomy; blue; uneasy; slow; sluggish; lumbering; ponderous; clumsy; importan"},{"t":"。"}],"en":"When I picked it up, it was heavier than I expected."}],[{"toks":[{"t":"その"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"止まって","r":[["止","と"],["まって",null]],"k":"とまって","g":"to stop (moving); to come to a stop; to stop (doing, working, being supplied); to come to a halt; to cease; to be stoppe"},{"t":"いた"},{"t":"。"}],"en":"The watch had stopped."},{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"の"},{"t":"修理","r":[["修理","しゅうり"]],"k":"しゅうり","g":"repair; mending; fixing; servicing","w":"修理"},{"t":"が"},{"t":"得意","r":[["得意","とくい"]],"k":"とくい","g":"satisfaction; pride; triumph; elation; one's strong point; one's forte; one's specialty; regular customer; regular clien"},{"t":"だった"},{"t":"のに"},{"t":"、"},{"t":"これだけ"},{"t":"は"},{"t":"直さなかった","r":[["直","なお"],["さなかった",null]],"k":"なおさなかった","g":"to cure; to heal; to fix; to correct; to repair"},{"t":"。"}],"en":"My grandfather was good at repairing watches, yet this was the one he never fixed."},{"toks":[{"t":"なぜ"},{"t":"壊れた","r":[["壊","こわ"],["れた",null]],"k":"こわれた","g":"to be broken; to break; to fall through; to come to nothing"},{"t":"まま"},{"t":"残した","r":[["残","のこ"],["した",null]],"k":"のこした","g":"to leave (behind); to leave (undone); to not finish; to save; to set aside; to reserve; to leave (to someone, esp. after","w":"残す"},{"t":"のか"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"には"},{"t":"分からなかった","r":[["分","わ"],["からなかった",null]],"k":"わからなかった","g":"to understand; to comprehend; to grasp; to see; to get; to follow; to become clear; to be known; to be discovered; to be"},{"t":"。"}],"en":"Why he left it broken, I had no idea."}],[{"toks":[{"t":"夜","r":[["夜","よる"]],"k":"よる","g":"evening; night; dinner"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"机","r":[["机","つくえ"]],"k":"つくえ","g":"desk"},{"t":"の"},{"t":"上","r":[["上","うえ"]],"k":"うえ","g":"above; up; over; elder (e.g. daughter); top; summit; head (e.g. of a staircase); surface; before; previous; superiority;"},{"t":"に"},{"t":"置いて","r":[["置","お"],["いて",null]],"k":"おいて","g":"at; in; on; to put; to place; to leave (behind); to establish (an organization, a facility, a position, etc.); to set up"},{"t":"眠った","r":[["眠","ねむ"],["った",null]],"k":"ねむった","g":"to sleep; to die; to rest (in peace); to lie (buried); to sleep (in the grave); to lie idle (e.g. of resources); to lie "},{"t":"。"}],"en":"That night I left the watch on the desk and went to sleep."},{"toks":[{"t":"真夜中","r":[["真夜中","まよなか"]],"k":"まよなか","g":"dead of night; midnight"},{"t":"、"},{"t":"妙","r":[["妙","みょう"]],"k":"みょう","g":"strange; weird; odd; curious; wonder; mystery; miracle; excellence; cleverness; adroitness; knack; skill"},{"t":"な"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"で"},{"t":"目が覚めた","r":[["目","め"],["が",null],["覚","さ"],["めた",null]],"k":"めがさめた","g":"to wake up; to awake; to perk up; to snap out (of a day dream, etc.); to awaken (to the truth, etc.); to come to a reali"},{"t":"。"}],"en":"In the middle of the night, an odd sound woke me."},{"toks":[{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"が"},{"t":"動いて","r":[["動","うご"],["いて",null]],"k":"うごいて","g":"to move; to stir; to shift; to shake; to swing; to operate; to run; to go; to work; to make a move; to take action; to a"},{"t":"いた"},{"t":"。"}],"en":"The watch was running."},{"toks":[{"t":"誰も","r":[["誰","だれ"],["も",null]],"k":"だれも","g":"everyone; anyone; no one; nobody"},{"t":"触って","r":[["触","さわ"],["って",null]],"k":"さわって","g":"to touch; to feel; to get involved (with); to approach; to be harmful to; to hinder; to interfere with; to irritate"},{"t":"いない"},{"t":"のに"},{"t":"、"},{"t":"秒針","r":[["秒針","びょうしん"]],"k":"びょうしん","g":"second hand (of clock)","n":"秒針"},{"t":"が"},{"t":"進んで","r":[["進","すす"],["んで",null]],"k":"すすんで","g":"to advance; to go forward; to precede; to go ahead (of); to make progress; to improve; to deepen; to heighten; to be fas"},{"t":"いた"},{"t":"。"}],"en":"Nobody had touched it, and the second hand was moving."}],[{"toks":[{"t":"驚いて","r":[["驚","おどろ"],["いて",null]],"k":"おどろいて","g":"to be surprised; to be astonished"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"電灯をつけた","r":[["電灯","でんとう"],["をつけた",null]],"k":"でんとうをつけた","g":"to turn on an electric light; to switch on a light"},{"t":"。"}],"en":"Startled, I switched on the lamp."},{"toks":[{"t":"部屋","r":[["部屋","へや"]],"k":"へや","g":"room; chamber; apartment; flat; pad; stable"},{"t":"は"},{"t":"明るく","r":[["明","あか"],["るく",null]],"k":"あかるく","g":"light; well-lit; well-lighted; bright (of a colour); brightly-coloured; brightly-colored; cheerful; bright; spirited; su"},{"t":"なった"},{"t":"が"},{"t":"、"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"そのまま"},{"t":"動き","r":[["動","うご"],["き",null]],"k":"うごき","g":"movement; move; motion; trend; development; change; fluctuation; to move; to stir; to shift; to shake; to swing; to oper"},{"t":"続けた","r":[["続","つづ"],["けた",null]],"k":"つづけた","g":"to continue; to keep up; to keep on"},{"t":"。"}],"en":"The room filled with light, and the watch kept running all the same."},{"toks":[{"t":"不思議","r":[["不思議","ふしぎ"]],"k":"ふしぎ","g":"wonderful; marvelous; strange; incredible; amazing; curious; miraculous; mysterious; strangely enough; oddly enough; for"},{"t":"な"},{"t":"気持ち","r":[["気持","きも"],["ち",null]],"k":"きもち","g":"feeling; sensation; mood; state of mind; preparedness; readiness; attitude; thought; sentiment; consideration; solicitud"},{"t":"だった"},{"t":"。"}],"en":"It was a strange feeling."},{"toks":[{"t":"懐かしい","r":[["懐","なつ"],["かしい",null]],"k":"なつかしい","g":"dear (old); fondly-remembered; beloved; missed; nostalgic"},{"t":"ような"},{"t":"、"},{"t":"怖い","r":[["怖","こわ"],["い",null]],"k":"こわい","g":"scary; frightening; eerie; dreadful"},{"t":"ような"},{"t":"感覚","r":[["感覚","かんかく"]],"k":"かんかく","g":"sense; sensation; feeling; intuition"},{"t":"が"},{"t":"した"},{"t":"。"}],"en":"Something like nostalgia, and something like fear."}],[{"toks":[{"t":"朝","r":[["朝","あさ"]],"k":"あさ","g":"morning; breakfast; next morning"},{"t":"になると"},{"t":"、"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"また"},{"t":"止まって","r":[["止","と"],["まって",null]],"k":"とまって","g":"to stop (moving); to come to a stop; to stop (doing, working, being supplied); to come to a halt; to cease; to be stoppe"},{"t":"いた"},{"t":"。"}],"en":"By morning the watch had stopped again."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"近所","r":[["近所","きんじょ"]],"k":"きんじょ","g":"neighbourhood; neighborhood"},{"t":"の"},{"t":"古い","r":[["古","ふる"],["い",null]],"k":"ふるい","g":"old; aged; ancient; antiquated; antique; timeworn; long; since long ago; time-honored; of the distant past; long-ago; st"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"へ"},{"t":"行って","r":[["行","い"],["って",null]],"k":"いって","g":"to perform; to do; to conduct oneself; to carry out"},{"t":"、"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"の"},{"t":"人","r":[["人","ひと"]],"k":"ひと","g":"person; someone; somebody; human beings; mankind; man; people; humans; human (Homo sapiens); (other) people; others; cha"},{"t":"に"},{"t":"見せた","r":[["見","み"],["せた",null]],"k":"みせた","g":"to show; to display"},{"t":"。"}],"en":"I took it to an old shop nearby and showed it to the owner."},{"toks":[{"t":"「"},{"t":"これ"},{"t":"は"},{"t":"珍しい","r":[["珍","めずら"],["しい",null]],"k":"めずらしい","g":"unusual; rare; curious; new; novel; fine (e.g. gift)"},{"t":"機械","r":[["機械","きかい"]],"k":"きかい","g":"machine; mechanism; instrument; appliance; apparatus"},{"t":"だ"},{"t":"」"},{"t":"と"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"の"},{"t":"人","r":[["人","ひと"]],"k":"ひと","g":"person; someone; somebody; human beings; mankind; man; people; humans; human (Homo sapiens); (other) people; others; cha"},{"t":"は"},{"t":"言った","r":[["言","い"],["った",null]],"k":"いった","g":"to say; to utter; to declare; to name; to call; to go (e.g. \"the alarm went ping\"); to make a noise"},{"t":"。"}],"en":"\"This is an unusual movement,\" he said."},{"toks":[{"t":"「"},{"t":"あなた"},{"t":"の"},{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"も"},{"t":"、"},{"t":"よく"},{"t":"ここ"},{"t":"に"},{"t":"来た","r":[["来","き"],["た",null]],"k":"きた","g":"to come (spatially or temporally); to approach; to arrive; to come back; to do ... and come back; to come to be; to beco"},{"t":"よ"},{"t":"」"}],"en":"\"Your grandfather used to come in here often.\""},{"toks":[{"t":"「"},{"t":"何も","r":[["何","なに"],["も",null]],"k":"なにも","g":"(not) anything; (nothing) at all; (not) any; nothing; and everything else; and all; (not) at all; (not) in the least; (n"},{"t":"買わないで","r":[["買","か"],["わないで",null]],"k":"かわないで","g":"to buy; to purchase; to value; to have a high opinion; to stir; to provoke; to draw upon oneself"},{"t":"、"},{"t":"店","r":[["店","みせ"]],"k":"みせ","g":"store; shop; establishment; restaurant"},{"t":"の"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"の"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"を"},{"t":"聞いて","r":[["聞","き"],["いて",null]],"k":"きいて","g":"to hear; to listen (e.g. to music); to ask; to enquire; to query; to hear about; to hear of; to learn of; to follow (adv"},{"t":"いた"},{"t":"」"}],"en":"\"He never bought anything. He would stand and listen to the clocks.\""}],[{"toks":[{"t":"家","r":[["家","いえ"]],"k":"いえ","g":"house; residence; dwelling; family; household; lineage; family name"},{"t":"に"},{"t":"帰って","r":[["帰","かえ"],["って",null]],"k":"かえって","g":"to return; to come home; to go home; to go back; to leave (of a guest, customer, etc.); to get home; to get to home plat"},{"t":"、"},{"t":"箱の底","r":[["箱","はこ"],["の",null],["底","そこ"]],"k":"はこのそこ","g":"bottom of a box"},{"t":"を"},{"t":"よく"},{"t":"見た","r":[["見","み"],["た",null]],"k":"みた","g":"to see; to look; to watch; to view; to observe; to examine; to look over; to assess; to check; to judge; to look after; "},{"t":"。"}],"en":"Back home, I looked carefully at the bottom of the box."},{"toks":[{"t":"薄い","r":[["薄","うす"],["い",null]],"k":"うすい","g":"thin; pale; light; faint; watery; thin; dilute; weak (taste, etc.); little (affection, etc.) not much (of a presence); s"},{"t":"紙","r":[["紙","かみ"]],"k":"かみ","g":"paper"},{"t":"が"},{"t":"敷いて","r":[["敷","し"],["いて",null]],"k":"しいて","g":"to spread out; to lay out; to take a position; to impose widely (e.g. over a city)"},{"t":"あって"},{"t":"、"},{"t":"下","r":[["下","した"]],"k":"した","g":"under (guidance, supervision, rules, the law, etc.); under (a flag, the sun, etc.); beneath; with (e.g. one blow); on (t"},{"t":"から"},{"t":"手紙","r":[["手紙","てがみ"]],"k":"てがみ","g":"letter; missive; note; mail"},{"t":"が"},{"t":"出た","r":[["出","で"],["た",null]],"k":"でた","g":"to leave; to exit; to go out; to come out; to get out; to leave (on a journey); to depart; to start out; to set out; to "},{"t":"。"}],"en":"A thin sheet of paper was laid across it, and underneath was a letter."},{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"の"},{"t":"字","r":[["字","じ"]],"k":"じ","g":"character (esp. kanji); letter; written text; handwriting; penmanship; the ... word (e.g. \"the L word\" = \"love\")"},{"t":"だった"},{"t":"。"}],"en":"It was my grandfather's handwriting."},{"toks":[{"t":"「"},{"t":"この"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"、"},{"t":"寂しい","r":[["寂","さび"],["しい",null]],"k":"さびしい","g":"lonely; lonesome; solitary; desolate"},{"t":"夜","r":[["夜","よる"]],"k":"よる","g":"evening; night; dinner"},{"t":"だけ"},{"t":"動く","r":[["動","うご"],["く",null]],"k":"うごく","g":"to move; to stir; to shift; to shake; to swing; to operate; to run; to go; to work; to make a move; to take action; to a"},{"t":"」"},{"t":"と"},{"t":"書いて","r":[["書","か"],["いて",null]],"k":"かいて","g":"to write; to compose; to pen; to draw; to paint"},{"t":"あった"},{"t":"。"}],"en":"\"This watch runs only on lonely nights,\" it said."},{"toks":[{"t":"「"},{"t":"だから"},{"t":"、"},{"t":"直さなかった","r":[["直","なお"],["さなかった",null]],"k":"なおさなかった","g":"to cure; to heal; to fix; to correct; to repair"},{"t":"」"}],"en":"\"That is why I never fixed it.\""}],[{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"手紙","r":[["手紙","てがみ"]],"k":"てがみ","g":"letter; missive; note; mail"},{"t":"を"},{"t":"握って","r":[["握","にぎ"],["って",null]],"k":"にぎって","g":"to clasp; to grasp; to grip; to clutch; to hold (the answer); to have (e.g. the solution); to be the key; to be the reas"},{"t":"、"},{"t":"長い間","r":[["長","なが"],["い",null],["間","あいだ"]],"k":"ながいあいだ","g":"long time; long interval; for quite some time"},{"t":"黙って","r":[["黙","だま"],["って",null]],"k":"だまって","g":"to be silent; to say nothing"},{"t":"いた"},{"t":"。"}],"en":"I held the letter and said nothing for a long time."},{"toks":[{"t":"子供の頃","r":[["子供","こども"],["の",null],["頃","ころ"]],"k":"こどものころ","g":"(time of) one's childhood; when one was a child"},{"t":"、"},{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"は"},{"t":"何も","r":[["何","なに"],["も",null]],"k":"なにも","g":"(not) anything; (nothing) at all; (not) any; nothing; and everything else; and all; (not) at all; (not) in the least; (n"},{"t":"話さない","r":[["話","はな"],["さない",null]],"k":"はなさない","g":"to talk; to speak; to converse; to chat; to tell; to explain; to narrate; to mention; to describe; to discuss; to speak "},{"t":"人","r":[["人","ひと"]],"k":"ひと","g":"person; someone; somebody; human beings; mankind; man; people; humans; human (Homo sapiens); (other) people; others; cha"},{"t":"だ"},{"t":"と"},{"t":"思って","r":[["思","おも"],["って",null]],"k":"おもって","g":"to think; to consider; to believe; to reckon; to think (of doing); to plan (to do); to judge; to assess; to regard; to i"},{"t":"いた"},{"t":"。"}],"en":"As a child I had thought of him as a man who said nothing."},{"toks":[{"t":"一度だけ","r":[["一度","いちど"],["だけ",null]],"k":"いちどだけ","g":"only once"},{"t":"、"},{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"に"},{"t":"怒られた","r":[["怒","おこ"],["られた",null]],"k":"おこられた","g":""},{"t":"ことがある"},{"t":"。"}],"en":"Only once did he ever get angry with me."},{"toks":[{"t":"「"},{"t":"静かに","r":[["静","しず"],["かに",null]],"k":"しずかに","g":"calmly; quietly; gently; peacefully; be quiet!"},{"t":"しろ"},{"t":"。"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"が"},{"t":"聞こえない","r":[["聞","き"],["こえない",null]],"k":"きこえない","g":"to be heard; to be audible; to reach one's ears; to sound (like); to come across (as); to be well known; to be famous; t"},{"t":"」"}],"en":"\"Be quiet. I can't hear it.\""},{"toks":[{"t":"その時","r":[["その",null],["時","とき"]],"k":"そのとき","g":"at that time; at that moment; then; on that occasion"},{"t":"は"},{"t":"、"},{"t":"嫌われて","r":[["嫌","きら"],["われて",null]],"k":"きらわれて","g":""},{"t":"いる"},{"t":"と"},{"t":"思った","r":[["思","おも"],["った",null]],"k":"おもった","g":"to think; to consider; to believe; to reckon; to think (of doing); to plan (to do); to judge; to assess; to regard; to i"},{"t":"。"}],"en":"I took it to mean he did not want me there."}],[{"toks":[{"t":"次","r":[["次","つぎ"]],"k":"つぎ","g":"next; following; subsequent; stage; station"},{"t":"の"},{"t":"夜","r":[["夜","よる"]],"k":"よる","g":"evening; night; dinner"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"持って","r":[["持","も"],["って",null]],"k":"もって","g":"to hold (in one's hand); to take; to carry; to possess; to have; to own; to maintain; to keep; to last; to be durable; t"},{"t":"庭","r":[["庭","にわ"]],"k":"にわ","g":"garden; yard; courtyard; field (of action); area"},{"t":"に"},{"t":"出た","r":[["出","で"],["た",null]],"k":"でた","g":"to leave; to exit; to go out; to come out; to get out; to leave (on a journey); to depart; to start out; to set out; to "},{"t":"。"}],"en":"The next night I carried the watch out into the garden."},{"toks":[{"t":"風","r":[["風","かぜ"]],"k":"かぜ","g":"method; manner; way; style; appearance; air; tendency; folk song (genre of the Shi Jing); wind (one of the five elements"},{"t":"が"},{"t":"冷たくて","r":[["冷","つめ"],["たくて",null]],"k":"つめたくて","g":"cold (to the touch); chilly; icy; freezing; (emotionally) cold; coldhearted; unfeeling; indifferent; unfriendly; distant"},{"t":"、"},{"t":"空","r":[["空","そら"]],"k":"そら","g":"emptiness; vacuum; blank"},{"t":"には"},{"t":"星","r":[["星","ほし"]],"k":"ほし","g":"star (usu. not including the Sun); planet (usu. not including Earth); heavenly body; star (glyph, symbol, shape); star ("},{"t":"が"},{"t":"見えた","r":[["見","み"],["えた",null]],"k":"みえた","g":"to be seen; to be in sight; to look; to seem; to appear; to come"},{"t":"。"}],"en":"The wind was cold, and there were stars."},{"toks":[{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"は"},{"t":"ゆっくり"},{"t":"動き","r":[["動","うご"],["き",null]],"k":"うごき","g":"movement; move; motion; trend; development; change; fluctuation; to move; to stir; to shift; to shake; to swing; to oper"},{"t":"始めた","r":[["始","はじ"],["めた",null]],"k":"はじめた","g":"to start; to begin; to commence; to initiate; to originate; to start up (a business, society, etc.); to open (e.g. a sto"},{"t":"。"}],"en":"The watch slowly began to move."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"耳","r":[["耳","みみ"]],"k":"みみ","g":"ear; hearing; ear (for music, etc.); edge; crust; heel (of bread or cheese); selvedge (of woven fabric); selvage; ear (o"},{"t":"に"},{"t":"当てて","r":[["当","あ"],["てて",null]],"k":"あてて","g":"to hit; to expose; to apply (e.g. patch); to put on; to put against; to hold on; to hold against; to allot; to call on s"},{"t":"、"},{"t":"目を閉じた","r":[["目","め"],["を",null],["閉","と"],["じた",null]],"k":"めをとじた","g":"to close one's eyes; to lower one's eyelids; to shut one's eyes; to die; to breathe one's last"},{"t":"。"}],"en":"I held it to my ear and closed my eyes."},{"toks":[{"t":"小さな","r":[["小","ちい"],["さな",null]],"k":"ちいさな","g":"small; little; tiny"},{"t":"音","r":[["音","おと"]],"k":"おと","g":"sound; noise; report; note; fame; Chinese-derived character reading"},{"t":"が"},{"t":"、"},{"t":"確かに","r":[["確","たし"],["かに",null]],"k":"たしかに","g":"surely; certainly"},{"t":"聞こえた","r":[["聞","き"],["こえた",null]],"k":"きこえた","g":"to be heard; to be audible; to reach one's ears; to sound (like); to come across (as); to be well known; to be famous; t"},{"t":"。"}],"en":"A small sound, and I could hear it clearly."}],[{"toks":[{"t":"祖父","r":[["祖父","そふ"]],"k":"そふ","g":"grandfather; old man; kyogen mask used for the role of an old man"},{"t":"は"},{"t":"、"},{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"を"},{"t":"嫌って","r":[["嫌","きら"],["って",null]],"k":"きらって","g":"to hate; to dislike; to loathe"},{"t":"いた"},{"t":"の"},{"t":"ではなかった"},{"t":"。"}],"en":"He had not wanted me gone."},{"toks":[{"t":"私","r":[["私","わたし"]],"k":"わたし","g":"I; me"},{"t":"は"},{"t":"時計","r":[["時計","とけい"]],"k":"とけい","g":"clock; watch; timepiece"},{"t":"を"},{"t":"大切に","r":[["大切","たいせつ"],["に",null]],"k":"たいせつに","g":"carefully; with (great) care; with caution"},{"t":"箱","r":[["箱","はこ"]],"k":"はこ","g":"box; case; chest; package; pack; crate; car (of a train, etc.); shamisen case; shamisen; public building; community buil"},{"t":"へ"},{"t":"戻した","r":[["戻","もど"],["した",null]],"k":"もどした","g":"to put back; to return; to give back; to restore (to a previous state, e.g. defrosting, reconstituting, reconciling); to"},{"t":"。"}],"en":"I put the watch carefully back in its box."},{"toks":[{"t":"そして"},{"t":"、"},{"t":"いつか"},{"t":"自分","r":[["自分","じぶん"]],"k":"じぶん","g":"myself; yourself; oneself; himself; herself; I; me; you"},{"t":"の"},{"t":"孫","r":[["孫","まご"]],"k":"まご","g":"grandchild"},{"t":"に"},{"t":"この"},{"t":"話をする","r":[["話","はなし"],["をする",null]],"k":"はなしをする","g":"to have a talk; to tell a story"},{"t":"と"},{"t":"約束","r":[["約束","やくそく"]],"k":"やくそく","g":"promise; agreement; arrangement; one's word; contract; pact; appointment; engagement; date; convention; rule; destiny; f"},{"t":"した"},{"t":"。"}],"en":"And I promised myself I would tell my own grandchild this story one day."}]],"stats":{"words":171,"translated":41,"sentences":41,"weak":["中身","修理","後","残す"],"approved":["文字盤","秒針"],"unknown":[],"knownVocab":6502}};
       const $ = (id) => document.getElementById(id);
 
       // ------------------------------------------------------------ storage --
@@ -952,15 +954,28 @@
           }
         };
 
+        // Firefox names a full quota NS_ERROR_DOM_QUOTA_REACHED rather than
+        // QuotaExceededError, and the DOMException code differs as well — 22
+        // against 1014 — so both names are matched and the code is not read.
+        const isFull = (e) =>
+          !!e && (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED");
+
         const writeJSON = (key, value) => {
           if (dead) return false;
           try {
             localStorage.setItem(PREFIX + key, JSON.stringify(value));
             return true;
           } catch (e) {
-            // Safari in private browsing reads normally and throws on the first
-            // write, so this is the only place the flag can be raised.
-            dead = true;
+            // A store that refuses to write at all is dead and says so once. A
+            // FULL one is not: it still works, this one value did not fit, and
+            // the next write may well succeed. They are one flag apart and the
+            // difference is the whole session — twelve readers share one origin
+            // and one progress map that is never pruned, so a quota reached
+            // while writing progress would also stop the type size, the writing
+            // mode and the theme persisting, silently, until the tab is closed.
+            // The cost of not latching is one caught exception per attempt on a
+            // store that is permanently full, and both writers are debounced.
+            if (!isFull(e)) dead = true;
             return false;
           }
         };
@@ -1011,9 +1026,6 @@
           flush,
           listen,
           ok: () => !dead,
-          disable: () => {
-            dead = true;
-          },
         };
       })();
 
@@ -1236,12 +1248,6 @@
           return set("fontSize", next);
         };
 
-        const reset = () => {
-          rest = {};
-          setAll(defaults());
-          save();
-        };
-
         const subscribe = (fn) => {
           subs.push(fn);
           return () => {
@@ -1271,13 +1277,9 @@
         snapshot = freeze();
 
         return {
-          V,
           FONT_STEPS,
-          FONT_MIN,
-          FONT_MAX,
           boot,
           subscribe,
-          reset,
           get: () => snapshot,
           set,
           setAll,
@@ -1293,12 +1295,17 @@
 
       // ----------------------------------------------------------- progress --
       const Progress = (() => {
-        // page is 1-based — the number the reader shows — so done reduces to
-        // page >= of and the record reads correctly in devtools. The contents
-        // page emitted by index.py reads the same record, and this comment and
-        // the one in index.py's TEMPLATE are the two places that convention is
-        // written down. sub stays 0-based: it indexes the screens a page was
-        // split into, and 0 is its value on every page that did not split.
+        // page is 1-based — the number the reader shows — so the record reads
+        // correctly in devtools. sub stays 0-based: it indexes the screens a
+        // page was split into, and 0 is its value on every page that did not
+        // split.
+        //
+        // Whether a story is FINISHED is decided here and nowhere else, and it
+        // is written into the record as `done`. Reaching the last authored page
+        // is not enough — that page may be split across screens, and it usually
+        // is on a phone — so the contents page emitted by index.py reads this
+        // field rather than re-deriving it from page and of. Re-deriving it is
+        // what made a 23-page story read 読了 with a screen still to go.
         let slug = "";
         let of = 0;
         let done = false;
@@ -1339,7 +1346,7 @@
               sub = Math.max(0, Math.round(saved.sub));
             }
           }
-          return { pageIndex: pageIndex, sub: sub, done: done, restored: pageIndex > 0 || sub > 0 };
+          return { pageIndex: pageIndex, sub: sub };
         };
 
         // subCount is how many screens the authored page's own content produced.
@@ -1362,16 +1369,7 @@
           flush();
         };
 
-        const clear = () => {
-          done = false;
-          rec = null;
-          if (!slug) return;
-          const all = Store.readJSON("progress") || {};
-          delete all[slug];
-          Store.writeJSON("progress", all);
-        };
-
-        return { open, mark, clear, done: () => done };
+        return { open, mark };
       })();
 
       // ------------------------------------------------------------ pagebox --
@@ -1589,7 +1587,6 @@
           refresh: () => refresh(false),
           metrics: () => m,
           measureBox: () => probe,
-          clearMeasure: () => { if (probe) probe.textContent = ""; },
           overflows,
           boxSlack,
           selfTest,
@@ -2074,8 +2071,8 @@
           pageEl.append(buildAfter(s.from, s.to));
         }
 
-        // 1-based on the way out, so done reduces to page >= of and index.py's
-        // contents-page script reads the same convention.
+        // Progress stores an authored page index; clamp settles the sub against
+        // the split this geometry actually produces, which storage cannot know.
         const addressFromProgress = (p) => clamp({ page: p.pageIndex, sub: p.sub });
 
         const idle = window.requestIdleCallback
@@ -2092,15 +2089,8 @@
           ensure();
         }
 
-        // VERIFICATION ENTRY POINT ONLY — forces pagination of the whole story.
-        function screenCounts() {
-          const out = [];
-          for (let i = 0; i < total; i++) out.push(textCount(i));
-          return out;
-        }
-
         return {
-          invalidate, screensOf, screenAt, screenCount, textCount, screenCounts,
+          invalidate, screensOf, screenAt, screenCount, textCount,
           clamp, next, prev, first, last, final, isFirst, isLast, isAfter,
           sameAddress, screenLabel, countLabel, renderScreen, addressFromProgress,
           warm, total,
@@ -2458,8 +2448,9 @@
           const p = Prefs.get();
           // An armed 訳/意 changes nothing on the page until something is tapped,
           // so the lit glyph is the only cue that the tap will do anything. The
-          // bar stays up for as long as it carries that state. (Deviation from
-          // plan:67, settled in review: kept deliberately — do not delete it.)
+          // bar stays up for as long as it carries that state, which is why the
+          // bars do not auto-hide unconditionally. Asserted by the harness as
+          // chrome/refuses-to-hide-while-訳-armed — kept deliberately.
           if (p.trans || p.meaning) return;
           // inert on an element holding focus is undefined territory; drop it
           // first. A keypress brings the bars back, so nothing is stranded.
@@ -2665,11 +2656,15 @@
         function init() {
           cache();
           els.title.textContent = DATA.title || "";
-          // docs/versions/ has no contents page of its own; the version builds are
-          // the only slugs carrying a dot.
-          if (DATA.slug && DATA.slug.indexOf(".") !== -1) {
-            els.toc.setAttribute("href", "../index.html");
-          }
+          // Where the contents page sits relative to this file is a fact about
+          // where the file was written, so the tool that chose that — rebuild.py,
+          // which puts version builds one directory down in docs/versions/ —
+          // states it in DATA. Inferring it here from a dot in the slug read a
+          // filename convention as a layout, and broke on both sides: a story
+          // slug containing a dot linked out of docs/, and renaming the archive
+          // form to slug-v1 linked every version build at a sibling that does
+          // not exist.
+          if (DATA.toc) els.toc.setAttribute("href", DATA.toc);
           fillStats();
           bind();
           syncControls();
@@ -2721,11 +2716,17 @@
         let settleToken = 0;
         let settleTimer = 0;
         let suppressClick = false;
-        let mouseDrag = false;
+        let snapDone = null; // the transitionend listener of the snap in flight
         let snapMs = reduced.matches ? 0 : SNAP_MS;
 
         // Reduce Motion is a Control Centre toggle on iOS, so it moves mid-read.
-        reduced.addEventListener("change", (e) => { snapMs = e.matches ? 0 : SNAP_MS; });
+        // Guarded like the prefers-color-scheme listener in Chrome.bind: this
+        // runs while the module body is still evaluating, so on an engine whose
+        // MediaQueryList predates addEventListener an unguarded call throws
+        // before the bootstrap below ever runs and the reader opens blank.
+        if (reduced.addEventListener) {
+          reduced.addEventListener("change", (e) => { snapMs = e.matches ? 0 : SNAP_MS; });
+        }
 
         // Slot 1 is always the screen on view. Which side holds "next" is the
         // whole of the binding difference, so it is one sign and nothing else: a
@@ -2795,8 +2796,21 @@
           Paginator.warm(addr.page - 1);
         }
 
+        // A snap that is interrupted rather than completed fires transitioncancel,
+        // never transitionend, so its listener cannot remove itself. Every path
+        // that ends a snap comes through settle() or starts a new one, so both
+        // drop the outstanding listener here rather than leaving it to be drained
+        // by whichever snap eventually lands — a held arrow key registers one per
+        // key repeat, and they would all fire together on that one.
+        function dropSnapListener() {
+          if (!snapDone) return;
+          track.removeEventListener("transitionend", snapDone);
+          snapDone = null;
+        }
+
         function settle(rel) {
           settleToken++;
+          dropSnapListener();
           clearTimeout(settleTimer);
           pending = null;
           // Clearing the transition before the transform is what stops the reset
@@ -2819,15 +2833,16 @@
           // zero-length spring-back is the common case, so settle it outright.
           if (snapMs <= 0 || Math.abs(x - from) < 0.5) { settle(rel); return; }
           const token = ++settleToken;
+          dropSnapListener();
           clearTimeout(settleTimer);
           pending = { rel: rel };
           track.style.transition = "transform " + snapMs + "ms cubic-bezier(.22,.61,.36,1)";
           setX(x);
-          track.addEventListener("transitionend", function done(e) {
+          snapDone = (e) => {
             if (e.target !== track || e.propertyName !== "transform") return;
-            track.removeEventListener("transitionend", done);
-            if (token === settleToken) settle(rel);
-          });
+            if (token === settleToken) settle(rel); // settle drops this listener
+          };
+          track.addEventListener("transitionend", snapDone);
           // A backgrounded tab never fires the event at all; the timer is the one
           // guarantee that the track does not stop mid-page.
           settleTimer = setTimeout(() => {
@@ -2877,8 +2892,10 @@
             x0: e.clientX,
             y0: e.clientY,
             t0: performance.now(),
-            paging: mouseDrag || e.pointerType !== "mouse",
-            live: false, dead: false, banded: false, rel: 0, eff: 0,
+            // Desktop keeps text selection, which a drag-to-turn would fight;
+            // the arrows and 前/次 are the mouse's page turn.
+            paging: e.pointerType !== "mouse",
+            live: false, dead: false, banded: false, rel: 0, eff: 0, slop: 0,
             samples: [{ x: e.clientX, t: performance.now() }],
           };
           // Correct on Chrome, and WebKit has a defect where capture claimed on an
@@ -2904,6 +2921,14 @@
             // and the wrong axis abandons rather than waits.
             if (!drag.paging || Math.abs(dy) > Math.abs(dx)) { drag.dead = true; return; }
             drag.live = true;
+            // Fixed at the moment the gesture goes live, not recomputed from the
+            // current dx. Subtracting Math.sign(dx) * TAP_SLOP is discontinuous
+            // at dx === 0: dragging a live swipe back through its own start
+            // point flipped the offset from -8 to +8 in one frame, jumping the
+            // page 16px and swapping which neighbour the drag was revealing.
+            // The axis lock above guarantees |dx| >= TAP_SLOP here, so the sign
+            // is never zero.
+            drag.slop = Math.sign(dx) * TAP_SLOP;
             Sheet.dismiss();
             Chrome.hide();
             // iOS fires viewport resizes during a drag; a repagination here would
@@ -2914,7 +2939,7 @@
           e.preventDefault();
           // The slop is subtracted so the page starts from the finger rather than
           // jumping the 8px that proved it was a drag.
-          const raw = dx - Math.sign(dx) * TAP_SLOP;
+          const raw = dx - drag.slop;
           const rel = Math.sign(raw) * advanceSign;
           drag.rel = rel;
           drag.banded = rel !== 0 && !at(rel);
@@ -3102,14 +3127,9 @@
         });
 
         return {
-          start, goTo, step, relayout, retune, invalidate, paint,
+          start, goTo, step, relayout, retune,
           address: () => addr,
           binding: () => bound,
-          busy: () => !!drag || !!pending,
-          // Desktop keeps text selection, which a mouse drag would fight; the keys
-          // and 前/次 are the mouse's page turn. Flip it for a synthesised gesture
-          // test that dispatches pointerType "mouse".
-          setMouseDrag: (on) => { mouseDrag = !!on; },
         };
       })();
 

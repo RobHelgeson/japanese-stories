@@ -342,7 +342,11 @@
           var page = Number(rec.page);
           if (!total || !isFinite(page) || page < 1) continue;
           if (page > total) page = total;
-          var finished = rec.done === true || page >= total;
+          // Whether the story is finished is the reader's verdict, read back,
+          // never re-derived here. Reaching the last authored page is not the
+          // same thing: that page is usually split across screens on a phone,
+          // and `page >= total` painted 読了 with a screen still to go.
+          var finished = rec.done === true;
           var prog = cell.querySelector(".prog");
           // Floored, because page 1 of 41 rounds to under a pixel and an empty
           // bar reads as "not started".
