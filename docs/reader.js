@@ -1386,8 +1386,10 @@
           if (node === lastNode && now - lastAt <= DOUBLE_MS) {
             // Restart the sequence rather than let a third fast tap reopen what
             // is already open: the next tap is a first tap, and the toggle below
-            // puts everything away.
-            lastAt = 0;
+            // puts everything away. Clearing the NODE, not the timestamp —
+            // performance.now() is milliseconds since page load, so lastAt = 0
+            // still reads as "just now" for the first 300ms of the session.
+            lastNode = null;
             light(node);
             openFor(node);
             return true;

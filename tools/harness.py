@@ -1064,14 +1064,16 @@ window.H = (() => {
         !!spot && isLit(bare) && !Sheet.isOpen(),
         { spot: !!spot, lit: isLit(bare), open: Sheet.isOpen() });
     // The clone now leaves the DOM under a live light, which is exactly what a
-    // recycled cell does to one. The MutationObserver has to drop it, or the
-    // next light() would try to strip .lit off a detached node.
+    // recycled cell does to one. The MutationObserver has to notice and call
+    // light(null), and the CLONE is where that shows: a "#track .lit" query
+    // could not fail here, because a detached node is not inside #track whether
+    // the observer ran or not.
     s.style.display = "";
     bare.remove();
-    await sleep(80);
+    await sleep(120);
     add("sheet/light-drops-when-its-node-is-recycled",
-        !document.querySelector("#track .lit"),
-        { stillLit: !!document.querySelector("#track .lit") });
+        !bare.classList.contains("lit"),
+        { stillLit: bare.classList.contains("lit") });
 
     // The bars now auto-hide unconditionally. The refusal they used to make
     // while 訳 or 意 was armed went with the gates: there is no armed state left
@@ -1088,11 +1090,21 @@ window.H = (() => {
     // And a tap in the cell's chrome reserve brings them back. That strip is the
     // primary way to summon the bars now that every tap on the text is consumed
     // by the reading gesture, so it is asserted rather than assumed.
+    //
+    // Chrome.hide() AFTER reset(), never before: reset() goes through
+    // Track.goTo, which calls Chrome.show() unconditionally, so a tap dispatched
+    // straight after it would find the bars already up and the row could not
+    // fail. The precondition is asserted with the result for the same reason.
     await reset();
+    Chrome.hide();
+    await sleep(30);
+    const wasHidden = !Chrome.isShown();
     const cellR = document.querySelector("#track .cell.is-current").getBoundingClientRect();
     const topH = parseFloat(getComputedStyle(document.getElementById("top")).height) || 44;
     await tapAt({ x: Math.round(cellR.left + cellR.width / 2), y: Math.round(cellR.top + topH / 2) });
-    add("chrome/a-tap-in-the-reserve-summons-the-bars", Chrome.isShown(), { shown: Chrome.isShown() });
+    add("chrome/a-tap-in-the-reserve-summons-the-bars",
+        wasHidden && Chrome.isShown(),
+        { hiddenFirst: wasHidden, shown: Chrome.isShown() });
     return out;
   }
 

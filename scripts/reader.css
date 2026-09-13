@@ -406,7 +406,13 @@
          inside an untranslated sentence. */
       @media (hover: hover) and (pointer: fine) {
         .w:hover rt { opacity: 1; }
-        .w:hover {
+        /* :not(.lit) is load-bearing, not tidiness. .w:hover and .w.lit are both
+           (0,2,0) and this rule is the later one, so a bare .w:hover would beat
+           the light at 12% — and the pointer is still ON the word at the moment
+           it is clicked, which means a desktop single click would produce no
+           visible change at all until the cursor left. The light is the only
+           feedback that gesture has. */
+        .w:not(.lit):hover {
           border-radius: 3px;
           background: rgba(128, 128, 128, 0.14);
           background: color-mix(in srgb, var(--accent) 12%, transparent);
