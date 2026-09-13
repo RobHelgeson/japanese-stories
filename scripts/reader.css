@@ -39,9 +39,15 @@
            box subtracts these unconditionally, so the box is the same size whether
            chrome is shown or hidden and a bar fade can never repaginate. THESE TWO
            MUST NOT CHANGE while a story is open. */
-        --top-h: calc(var(--tap) + var(--chrome-gap) * 2 + var(--safe-t));
+        --top-h: calc(var(--top-content) + var(--chrome-gap) * 2 + var(--safe-t));
         --bar-h: calc(var(--tap) + var(--chrome-gap) * 2 + var(--safe-b));
-        --scrim: 1.25rem;
+        /* The top bar carries no tap target — 目次 moved down to join the other
+           controls — so it is sized to its own text rather than to --tap, and
+           the ~22px that buys goes to the page box. The bottom bar keeps --tap,
+           because everything in it is thumbed. */
+        --top-content: 1.4rem;
+        --count-w: 4.4rem;
+        --top-gap: 0.6rem;
 
         --z-chrome: 20;
         --z-sheet: 30;
@@ -235,6 +241,16 @@
         line-break: strict;
         word-break: normal;
         overflow-wrap: normal;
+        /* The box is a constant rectangle but its content rarely fills it —
+           extent is capped so a median authored page reaches about 70% — so
+           without this a short screen hangs off the block-start edge: in
+           vertical-rl that is the right, and a one-sentence screen reads as
+           right-aligned against empty paper. Centring costs a shift of up to
+           half a column between turns, which is the price of not having a
+           ragged left edge on most screens. .page.tight overrides it back to
+           start, because a sentence too long for the box must keep its
+           beginning rather than lose both ends. */
+        align-content: center;
       }
 
       /* writing-mode lives HERE, never on body or #track: a flex container's row
@@ -256,10 +272,16 @@
         text-orientation: mixed;
         --lh: 2;
       }
+      /* 2, not the 2.6 this shipped with. The 1.94 floor derived above is
+         geometry, not a fact about 縦書き: rotate the page and ruby is 0.44em
+         above the line while text-emphasis-position: under puts 傍点 0.5em
+         below it, so the line box needs the same 1.94em and no more. 2.6 was
+         spending a whole extra line of leading per four lines to buy nothing —
+         about 23% of the screen. Do not go under 2 here either. */
       body.horizontal .page {
         -webkit-writing-mode: horizontal-tb;
         writing-mode: horizontal-tb;
-        --lh: 2.6;
+        --lh: 2;
       }
 
       /* A screen whose single sentence exceeds the box. The paginator lays it
@@ -272,16 +294,24 @@
          new column, so the break is the separation; 横書き needs a little air
          between consecutive sentences. */
       body.broken.horizontal .page p + p { margin-block-start: 0.5em; }
-      /* 改行 off: a <p> is an inferred paragraph holding several sentences.
-         Japanese marks a paragraph with a one-character indent rather than with
-         space, and a quoted utterance uses its 「 as that indent, so dialogue
-         takes none. text-indent applies to BLOCK CONTAINERS ONLY — which is why
-         the sentences inside collapse to inline <span class="s"> and the paragraph
-         stays a real <p>. A block continuing from the previous screen is not a new
-         paragraph and takes no indent either. */
-      body.flowing .page p { text-indent: 1em; }
-      body.flowing .page p.dialogue,
-      body.flowing .page p.cont { text-indent: 0; }
+      /* 改行 off: a <p> is an inferred paragraph holding several sentences, and
+         横書き needs a mark for where one ends and the next begins. Japanese
+         uses a one-character indent rather than space, and a quoted utterance
+         uses its 「 as that indent, so dialogue takes none. text-indent applies
+         to BLOCK CONTAINERS ONLY — which is why the sentences inside collapse to
+         inline <span class="s"> and the paragraph stays a real <p>. A block
+         continuing from the previous screen is not a new paragraph and takes no
+         indent either.
+
+         縦書き is excluded, and for the same reason 改行-on below takes no
+         indent: a <p> is a block, so a paragraph already opens a new column, and
+         the column break IS the separation. Indenting on top of it drops the
+         first line of every narration paragraph a character below its
+         neighbours — the reported defect, and the one place in the reader where
+         correct Japanese typography was the wrong thing to do. */
+      body.flowing.horizontal .page p { text-indent: 1em; }
+      body.flowing.horizontal .page p.dialogue,
+      body.flowing.horizontal .page p.cont { text-indent: 0; }
 
       /* ---- ruby and 傍点 -------------------------------------------------- */
       /* Ruby is always laid out and only its opacity changes. NOTHING below may
@@ -425,10 +455,12 @@
         touch-action: manipulation;
         transition: opacity 0.22s ease;
       }
+      /* A text strip, not a control surface: nothing in here is tappable, so it
+         is sized to --top-content rather than to a 44px target. */
       #top {
         top: 0;
         block-size: var(--top-h);
-        gap: 0.6rem;
+        gap: var(--top-gap);
         padding-block: calc(var(--chrome-gap) + var(--safe-t)) var(--chrome-gap);
         padding-inline: max(0.9rem, var(--safe-l)) max(0.9rem, var(--safe-r));
       }
@@ -438,41 +470,55 @@
         gap: clamp(0.2rem, 1.2vw, 0.5rem);
         justify-content: space-between;
         padding-block: var(--chrome-gap) calc(var(--chrome-gap) + var(--safe-b));
-        padding-inline: max(0.6rem, var(--safe-l)) max(0.6rem, var(--safe-r));
+        /* Narrower gutters than the top strip, because the bar is the crowded
+           one: it carries seven tap targets since 目次 came down from the
+           header, where the top carries two lines of text. */
+        padding-inline: max(0.35rem, var(--safe-l)) max(0.35rem, var(--safe-r));
       }
-      /* A soft edge rather than a rule: a hard line drawn across a page of
-         Japanese reads as a table cell. Not backdrop-filter — it would make its
-         own element a containing block for fixed descendants, and iOS 26 samples
-         page colour for its toolbar tint. */
-      #top::after, #bar::before {
-        content: "";
-        position: absolute;
-        inset-inline: 0;
-        block-size: var(--scrim);
-        pointer-events: none;
-      }
-      #top::after { top: 100%; background: linear-gradient(var(--paper), transparent); }
-      #bar::before { bottom: 100%; background: linear-gradient(transparent, var(--paper)); }
+      /* The two bars used to carry a scrim — a 1.25rem paper-to-transparent
+         gradient, drawn at top: 100% and bottom: 100% so it fell OUTSIDE the bar
+         and over the page box. That was a softer edge than a rule, which is
+         right, but .cell only pads by --top-h and --bar-h and never by the
+         scrim, so what the gradient actually veiled was the first and last
+         20px of live text — the head and foot of every column in 縦書き. Text
+         the reader is trying to read outranks the edge treatment, and the bars
+         already end in flat --paper against --paper.
+
+         If an edge is ever wanted back, it has to be paid for out of the page
+         box (fold the scrim into --top-h and --bar-h), not borrowed from it.
+         Not backdrop-filter either — it would make its own element a containing
+         block for fixed descendants, and iOS 26 samples page colour for its
+         toolbar tint. */
 
       /* Hiding changes opacity and inertness, never a box: --top-h and --bar-h
          stay reserved, so a fade can never resize the page box. */
       body.chrome-off #top, body.chrome-off #bar { opacity: 0; pointer-events: none; }
 
-      #toc, #count { flex: 0 0 auto; min-inline-size: 4.4rem; }
       /* The count replaces the retired 2px progress rule, so it is now the only
          progress indicator and takes --ink rather than --muted. tabular-nums stops
          it jittering on every turn. */
       #count {
+        flex: 0 0 auto;
+        min-inline-size: var(--count-w);
         text-align: end;
         color: var(--ink);
         font-variant-numeric: tabular-nums;
       }
+      /* 目次 used to balance the count on the other side of the title; it now
+         lives in the button bar, and a two-item flex row would push the title
+         half the count's width off centre. The start padding is that missing
+         item, and it has to carry the flex gap as well as the count's width —
+         the gap sits between title and count and nowhere else, so leaving it
+         out lands the title half a gap (4.8px) to the left, which is visible on
+         a centred line. Both terms are variables so the three cannot drift. */
       #title {
         flex: 1 1 auto;
         min-inline-size: 0;
         margin: 0;
+        padding-inline-start: calc(var(--count-w) + var(--top-gap));
         font: inherit;
         font-weight: 600;
+        line-height: var(--top-content);
         color: var(--ink);
         text-align: center;
         overflow: hidden;
@@ -498,14 +544,18 @@
         line-height: 1;
       }
       /* Styled as a button but an anchor, so it works with no JS and offers a real
-         target for open-in-new-tab. */
+         target for open-in-new-tab. It sits among the gate buttons now rather
+         than beside the title, so it takes --ink with them: --muted next to a
+         row of ink glyphs reads as disabled. */
       a.btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         block-size: var(--tap);
-        padding-inline: 0.7rem;
-        color: var(--muted);
+        /* The only elastic control in the bar. Seven 44px targets plus gaps need
+           about 358px, so this is what buys the last few pixels on a narrow
+           phone before anything has to be clipped. */
+        padding-inline: clamp(0.2rem, 1.4vw, 0.55rem);
         text-decoration: none;
       }
       /* The lit glyph is the only thing on screen saying a gate is armed, so it is
@@ -576,8 +626,14 @@
         user-select: text;
         opacity: 0;
         transform: translateY(6px);
-        transition: opacity 0.16s ease, transform 0.16s ease;
+        transition: opacity 0.16s ease, transform 0.16s ease, bottom 0.22s ease;
       }
+      /* With the bars faded there is nothing to clear, so the sheet takes the
+         space they were sitting in rather than floating a bar's height above
+         empty paper. The page box still reserves --bar-h either way, so moving
+         down covers less text, never more. The transition matches the bars'
+         0.22s, so the two move together when a drag hides the chrome. */
+      body.chrome-off #sheet { bottom: max(0.5rem, var(--safe-b)); }
       #sheet.on { opacity: 1; transform: none; }
       #sheet-head { display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; }
       #sheet-word { font-family: var(--serif); font-size: 1.35rem; line-height: 1.25; }

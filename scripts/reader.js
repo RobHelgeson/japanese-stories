@@ -1338,6 +1338,25 @@
           return p ? nearestSentence(p, x, y) : null;
         }
 
+        // Tapping what is already open closes it. That is the double-tap the
+        // reader asked for and more besides, because it carries no timing
+        // window: a second tap thirty seconds later closes just as a quick one
+        // does, which is the forgiving version on a phone. A real dblclick
+        // listener was the alternative and would have been fighting the track,
+        // which owns pointer capture and suppresses the synthesised click.
+        //
+        // It returns true — consumed — so Track.tap does not read the close as
+        // a tap on bare paper and summon the chrome behind it.
+        // sticky is what separates "you opened this" from "your mouse passed
+        // over it": a hover preview also parks the word in subject, and without
+        // the test the first real click on a hovered word would close a sheet
+        // the reader never asked to open.
+        function toggle(node, open) {
+          if (subject && subject.el === node && sticky && !el.hidden) { dismiss(); return true; }
+          open();
+          return true;
+        }
+
         // A .w always wins over the sentence around it, exactly as the old click
         // handler did: the reading is owed unconditionally, the translation is
         // not. Returns true when the tap was consumed.
@@ -1346,10 +1365,10 @@
           if (el.contains(target)) return true;
           if (!track.contains(target)) { dismiss(); return false; }
           const w = target.closest(".w");
-          if (w) { showWord(w, true); return true; }
+          if (w) return toggle(w, () => showWord(w, true));
           const s = sentenceAt(target, x, y);
           // A sentence with no translation is inert — no data-en, nothing opens.
-          if (s && s.dataset.en && armed("trans")) { showSentence(s); return true; }
+          if (s && s.dataset.en && armed("trans")) return toggle(s, () => showSentence(s));
           dismiss();
           return false;
         }
@@ -1487,7 +1506,10 @@
 
         const els = {};
         let MODAL = false;
-        let shown = true;
+        // Off at boot, and never persisted: chrome state is a property of the
+        // current glance at the page rather than a setting, and a reader who
+        // left the bars up an hour ago still wants to open on the story.
+        let shown = false;
         let painted = false;
         let lastFocus = null;
         let closeHandled = true;
@@ -1750,6 +1772,16 @@
           bind();
           syncControls();
           syncThemeColor();
+          // The reader opens on the story, not on its controls. Stamped here
+          // rather than by calling hide(), which refuses while 訳 or 意 is armed
+          // — a sensible rule for an auto-hide mid-read, and the wrong one at
+          // boot, where a gate left armed in a previous session would be enough
+          // to ship the bars up. The page box reserves --top-h and --bar-h
+          // either way, so this changes nothing about the layout: one tap in the
+          // margin, any key, or 前/次 brings them back.
+          document.body.classList.add("chrome-off");
+          setInert(els.top, true);
+          setInert(els.bar, true);
         }
 
         return {

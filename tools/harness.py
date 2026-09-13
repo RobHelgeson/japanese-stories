@@ -853,6 +853,7 @@ window.H = (() => {
     const add = (name, ok, detail) => out.push({ name, ok: !!ok, detail });
     const body = document.getElementById("sheet-body");
     const head = document.getElementById("sheet-head");
+    const panel = document.getElementById("sheet");
 
     // Walk forward until a screen carries a glossed word and a sentence with a
     // tappable bare spot.
@@ -889,6 +890,31 @@ window.H = (() => {
         Sheet.isOpen() && !head.hidden && !body.hidden && body.textContent === w.dataset.gloss,
         { open: Sheet.isOpen(), body: body.textContent, want: w.dataset.gloss });
 
+    // Tapping the open word again closes it, with no timing window — the whole
+    // of the double-tap gesture, and the thing a repeat tap used to not do.
+    await tapAt(centre(w));
+    await sleep(320);
+    const toggledOff = !Sheet.isOpen();
+    // And a third tap reopens, so the close is a toggle rather than a latch.
+    await tapAt(centre(w));
+    add("sheet/repeat-tap-toggles-a-word",
+        toggledOff && Sheet.isOpen(),
+        { closed: toggledOff, reopened: Sheet.isOpen() });
+
+    // The sheet clears the button bar while the bars are up and drops into the
+    // space they occupied once they fade. Both are read off the used value, so
+    // a change to --bar-h cannot quietly decouple them.
+    Chrome.show();
+    await sleep(260);
+    const upWith = parseFloat(getComputedStyle(panel).bottom);
+    document.body.classList.add("chrome-off");
+    await sleep(260);
+    const upWithout = parseFloat(getComputedStyle(panel).bottom);
+    document.body.classList.toggle("chrome-off", !Chrome.isShown());
+    add("sheet/sits-lower-with-the-chrome-hidden",
+        upWith > upWithout + 8,
+        { shown: upWith, hidden: upWithout });
+
     Sheet.dismiss();
     await sleep(300);
     Prefs.setAll({ trans: false, meaning: false });
@@ -913,7 +939,12 @@ window.H = (() => {
         { open: Sheet.isOpen(), body: body.textContent.slice(0, 60) });
 
     // Dismiss on a tap away — the top bar is outside both the track and the
-    // sheet, and carries no data-keep-sheet.
+    // sheet, and carries no data-keep-sheet. Chrome.show() first: the bars ship
+    // hidden, and a hidden bar is pointer-events: none, so elementFromPoint
+    // would hand the tap to the cell behind it and the tap-away handler would
+    // correctly decline to fire.
+    Chrome.show();
+    await sleep(20);
     const topR = document.getElementById("title").getBoundingClientRect();
     pev("pointerdown", Math.round(topR.left + topR.width / 2), Math.round(topR.top + topR.height / 2), "touch");
     await sleep(320);
@@ -1159,6 +1190,30 @@ window.H = (() => {
         off.fontSize === on.fontSize && off.lineHeight === on.lineHeight &&
         off.opacity !== on.opacity && off.sh === on.sh && off.sw === on.sw,
         { off, on });
+
+    // Seven tap targets in a row is as many as a phone holds. Nothing about an
+    // eighth would look wrong in the source, and the symptom is 次 sitting half
+    // off the screen edge, which only shows at the narrowest width anyone reads
+    // at. scrollWidth is the only honest reading: a flex row that cannot fit
+    // overflows its padding box silently and html's overflow: hidden eats the
+    // evidence. Checked at every viewport this suite runs at.
+    const bar = document.getElementById("bar");
+    Chrome.show();
+    await frame();
+    const spill = bar.scrollWidth - bar.clientWidth;
+    add("invariants/button-bar-fits-its-width",
+        spill <= 0,
+        { spill, width: bar.clientWidth, viewport: innerWidth });
+
+    // The title is centred on the bar, not on the space left over beside the
+    // count — it has to carry the count's width AND the flex gap as start
+    // padding, and dropping either term slides it off centre by a few pixels.
+    const t = document.getElementById("title");
+    const tr = t.getBoundingClientRect();
+    const inner = tr.left + parseFloat(getComputedStyle(t).paddingLeft);
+    const drift = Math.abs((inner + tr.right) / 2 - innerWidth / 2);
+    add("invariants/title-is-centred-on-the-bar", drift < 1.5,
+        { drift: Math.round(drift * 10) / 10 });
     return out;
   }
 
