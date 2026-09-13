@@ -25,9 +25,6 @@ __READER_CSS__
       <button id="prev" type="button" aria-label="前のページ">前</button>
       <span class="gates">
         <a class="btn" id="toc" href="index.html">目次</a>
-        <button id="furi" type="button" aria-label="ふりがな" aria-pressed="false" data-keep-sheet>ふ</button>
-        <button id="trans" type="button" aria-label="翻訳" aria-pressed="false" data-keep-sheet>訳</button>
-        <button id="mean" type="button" aria-label="意味" aria-pressed="false" data-keep-sheet>意</button>
         <button id="set" type="button" aria-label="設定" aria-expanded="false" aria-controls="settings">設</button>
       </span>
       <button id="next" type="button" aria-label="次のページ">次</button>
@@ -40,7 +37,6 @@ __READER_CSS__
         <span id="sheet-tags"></span>
       </div>
       <p id="sheet-body" hidden></p>
-      <p id="sheet-hint" hidden>意 で語義</p>
     </aside>
 
     <div id="veil" hidden></div>
@@ -87,26 +83,20 @@ __READER_CSS__
           </span>
         </div>
 
-        <h3>ひらく</h3>
         <div class="row">
-          <label class="rlabel" for="sw-furi">ふりがな</label>
+          <label class="rlabel" for="sw-furi">ふりがな<small>すべての読みを出す</small></label>
           <input class="sw" type="checkbox" role="switch" id="sw-furi" />
-        </div>
-        <div class="row">
-          <label class="rlabel" for="sw-trans">訳<small>文をタップすると出る</small></label>
-          <input class="sw" type="checkbox" role="switch" id="sw-trans" />
-        </div>
-        <div class="row">
-          <label class="rlabel" for="sw-mean">意味<small>漢字語をタップすると出る</small></label>
-          <input class="sw" type="checkbox" role="switch" id="sw-mean" />
         </div>
 
         <h3>この物語</h3>
         <div class="stats" id="stats"></div>
 
         <p class="keys">
+          タップで読み · 二回で語義 · 語の外をタップすると文ぜんたい
+        </p>
+        <p class="keys">
           <kbd>←</kbd> <kbd>→</kbd> ページ ·
-          <kbd>f</kbd> ふりがな · <kbd>t</kbd> 訳 · <kbd>m</kbd> 意味 ·
+          <kbd>f</kbd> ふりがな · <kbd>Enter</kbd> 語義 ·
           <kbd>Esc</kbd> 閉じる
         </p>
       </div>

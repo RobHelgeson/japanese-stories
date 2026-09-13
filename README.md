@@ -14,18 +14,22 @@ Stories were self-contained single files until the site was published, which was
 
 Text is vertical by default, as Japanese literary prose is, and a page never scrolls: an authored page too big for the screen is split across screens that keep its page number.
 
-|                     |                                                   |
-| ------------------- | ------------------------------------------------- |
-| Tap or click a word | its reading, in a sheet at the foot of the page   |
-| `意` / `m`          | add the English meaning to that sheet             |
-| `訳` / `t`          | arm translations, then tap a sentence for its own |
-| `ふ` / `f`          | reveal every reading at once                      |
-| Swipe               | turn the page (touch; on a mouse use the arrows)  |
-| `←` `→`             | turn pages, following the binding direction       |
-| `設`                | writing mode, 改行, 綴じ, type size, theme        |
-| `目次`              | back to the contents page                         |
+|                          |                                                      |
+| ------------------------ | ---------------------------------------------------- |
+| Tap a kanji word         | its reading, in place, attached to the kanji         |
+| Tap again                | put the reading away                                 |
+| Double tap a kanji word  | its meaning, in a sheet at the foot of the page      |
+| Tap between words        | the reading for the whole sentence                   |
+| Double tap between words | that sentence in English                             |
+| `f`                      | reveal every reading at once (also 設 → ふりがな)    |
+| Swipe                    | turn the page (touch; on a mouse use the arrows)     |
+| `←` `→`                  | turn pages, following the binding direction          |
+| `設`                     | writing mode, 改行, 綴じ, type size, theme, ふりがな |
+| `目次`                   | back to the contents page                            |
 
-Hovering still reveals a reading on a mouse, but tapping is the primary path and the one that works everywhere. The reading and the meaning stay separate gates on purpose: a story built from words you already know should not put the English one gesture away.
+Kana, particles and punctuation are not wrapped as words, so "between words" is about half of every line and easy to hit with a thumb. On a mouse, hovering a word reveals its reading and a double click opens the sheet; `Tab` reaches every word and sentence, and `Enter` opens the sheet directly.
+
+The reading and the meaning stay one gesture apart on purpose: a story built from words you already know should not put the English in reach of the same tap that asks how a kanji is pronounced. That separation used to be three buttons in the bar — ふ, 訳, 意 — which meant the page did nothing at all until one of them was armed. Moving it into the gesture is what let them go.
 
 Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose uses to draw attention to a word. **Red sesame** is a leech: a known word on a card that keeps being failed, with its reading hidden. **Teal circles with the reading shown** is a new word, approved for this story but not yet learned.
 

@@ -333,9 +333,14 @@
         text-emphasis: none;
       }
       body.furigana .page rt { opacity: 1; }
-      /* The tapped word keeps its reading attached to the kanji for as long as its
-         sheet is up. Opacity only, so no reflow. */
-      .w.lit rt { opacity: 1; }
+      /* What one tap does. The light persists on its own — it is a reading aid,
+         not a decoration on an open panel — and a tap on the kana between two
+         words lights the whole sentence, which is why .s carries it too.
+         Opacity only, so no reflow. .s.lit rt is (0,2,1) and ties .w.new rt
+         below; both set opacity: 1 and only .w.new rt sets a colour, which still
+         wins on source order. */
+      .w.lit rt,
+      .s.lit rt { opacity: 1; }
       /* Approved stretch vocabulary: not yet learned, so the reading is shown
          unconditionally rather than waiting for the ふ gate. README's "The
          reader" section publishes that promise to readers — "teal circles with
@@ -373,20 +378,32 @@
         text-emphasis: filled sesame var(--weak);
       }
 
-      /* The tapped word or sentence, for as long as its sheet is up. The flat
-         declaration is what an engine without color-mix keeps, and it is a neutral
-         grey because it has to read against both papers. */
+      /* The lit word or sentence. Nothing else on the page reports that state now
+         that the light outlives the panel, so it sits a tier above :hover below
+         rather than beside it. The flat declaration is what an engine without
+         color-mix keeps, and it is a neutral grey because it has to read against
+         both papers. */
       .w.lit, .s.lit {
         border-radius: 3px;
-        background: rgba(128, 128, 128, 0.18);
-        background: color-mix(in srgb, var(--accent) 15%, transparent);
+        background: rgba(128, 128, 128, 0.26);
+        background: color-mix(in srgb, var(--accent) 22%, transparent);
+      }
+      /* A lit sentence is a whole column of this, not one token of it, so the
+         same tint that reads as a highlight on 祖父 reads as a slab down half the
+         page. Scope, not emphasis, is all it has to carry — the ruby it just
+         turned on is the actual answer. */
+      .s.lit {
+        background: rgba(128, 128, 128, 0.14);
+        background: color-mix(in srgb, var(--accent) 11%, transparent);
       }
 
-      /* Desktop only. Ungated, both of these stick to whatever was last tapped —
-         the reported defect in the current file. A translatable sentence still
-         gets no permanent marking (a marker on every line would compete with the
-         傍点 that carry real information); the cursor appears only while 訳 is
-         armed, which is the only time the tap does anything at all. */
+      /* Desktop only, and this IS the single tap: a reading for free, no panel,
+         no commitment. The panel is a double click, same as on the phone.
+         cursor marks where the tap has a payload rather than where it does
+         something — every tap on the page lights something now, so a strictly
+         honest cursor would be pointer on the whole story. .w needs its own
+         selector because cursor inherits: .s.has-en alone would miss the words
+         inside an untranslated sentence. */
       @media (hover: hover) and (pointer: fine) {
         .w:hover rt { opacity: 1; }
         .w:hover {
@@ -394,7 +411,7 @@
           background: rgba(128, 128, 128, 0.14);
           background: color-mix(in srgb, var(--accent) 12%, transparent);
         }
-        body.trans .s.has-en { cursor: pointer; }
+        .w, .s.has-en { cursor: pointer; }
       }
 
       /* ---- あとがき ------------------------------------------------------- */
@@ -544,31 +561,24 @@
         line-height: 1;
       }
       /* Styled as a button but an anchor, so it works with no JS and offers a real
-         target for open-in-new-tab. It sits among the gate buttons now rather
-         than beside the title, so it takes --ink with them: --muted next to a
-         row of ink glyphs reads as disabled. */
+         target for open-in-new-tab. It sits beside 設 rather than beside the
+         title, so it takes --ink with it: --muted next to a row of ink glyphs
+         reads as disabled. */
       a.btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         block-size: var(--tap);
-        /* The only elastic control in the bar. Seven 44px targets plus gaps need
-           about 358px, so this is what buys the last few pixels on a narrow
-           phone before anything has to be clipped. */
+        /* The only elastic control in the bar. Four 44px targets plus gaps need
+           about 200px, so the clamp has room to spare now that ふ/訳/意 have
+           gone — kept because the bar must still survive a 320px phone with the
+           safe-area insets of a notch eating both ends. */
         padding-inline: clamp(0.2rem, 1.4vw, 0.55rem);
         text-decoration: none;
       }
-      /* The lit glyph is the only thing on screen saying a gate is armed, so it is
-         a solid fill, not a tint — color-mix would drop the cue entirely where it
-         is unsupported. */
-      #bar button[aria-pressed="true"] {
-        border-color: var(--accent);
-        background: var(--accent);
-        color: var(--paper);
-      }
       #bar button:disabled { opacity: 0.3; cursor: default; }
       @media (hover: hover) and (pointer: fine) {
-        #bar button:hover:not(:disabled):not([aria-pressed="true"]),
+        #bar button:hover:not(:disabled),
         a.btn:hover { border-color: var(--accent); color: var(--accent); }
       }
       :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -577,8 +587,8 @@
       #prev { order: 0; }
       #next { order: 2; }
       /* 右綴じ: the next page lies to the left, so its control does too. Flexbox
-         order does not move DOM order, so the tab sequence stays 前 → ふ → 訳 → 意
-         → 設 → 次, which is the reading order in either binding. */
+         order does not move DOM order, so the tab sequence stays
+         前 → 目次 → 設 → 次, which is the reading order in either binding. */
       body.bind-right #prev { order: 2; }
       body.bind-right #next { order: 0; }
 
@@ -588,9 +598,8 @@
          inset-* resolve against the containing block's writing mode while logical
          margins resolve against the element's own.
 
-         It sits ABOVE #bar, not under it: arming 意 with a word already open is
-         the shortest route to its meaning, so the nav has to stay reachable and
-         the sheet has to survive the tap (see data-keep-sheet). */
+         It sits ABOVE #bar, not under it: a gloss is read with one thumb on 次,
+         so the nav has to stay reachable while the sheet is up. */
       #sheet {
         position: fixed;
         z-index: var(--z-sheet);
@@ -651,7 +660,6 @@
       /* A third of glosses are truncated mid-word at 120 chars and none of them is
          guaranteed to carry a break opportunity. */
       #sheet-body { margin: 0.4rem 0 0; overflow-wrap: anywhere; }
-      #sheet-hint { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.72rem; }
 
       /* ---- settings ------------------------------------------------------- */
       /* A <dialog>, for the free focus trap, backdrop, Escape and inert-ing of the

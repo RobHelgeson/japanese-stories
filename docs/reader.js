@@ -134,8 +134,6 @@
           fontSize: 28,
           theme: "system",
           furigana: false,
-          trans: false,
-          meaning: false,
         });
 
         const oneOf = (list) => (v) => (list.indexOf(v) >= 0 ? v : undefined);
@@ -158,19 +156,18 @@
         //   layout  — screens must be rebuilt from DATA and re-split
         //   binding — the turn direction may have flipped; nothing reflows
         //   theme   — custom properties only
-        //   gates   — ふ/訳/意. Ruby is always laid out and only its opacity
-        //             moves, so arming furigana must never repaginate: the
-        //             paginator measures overflow, and a reflow here would move
-        //             sub-screen boundaries under the reader's finger.
+        // furigana declares none of them. Ruby is always laid out and only its
+        // opacity moves, so arming it must never repaginate: the paginator
+        // measures overflow, and a reflow here would move sub-screen boundaries
+        // under the reader's finger. apply() flips the body class, and that is
+        // the whole cost.
         const FIELDS = {
           writingMode: { ok: oneOf(WRITING), fx: ["layout", "binding"] },
           linebreaks: { ok: marks, fx: ["layout"] },
           binding: { ok: oneOf(BINDING), fx: ["binding"] },
           fontSize: { ok: size, fx: ["layout"] },
           theme: { ok: oneOf(THEME), fx: ["theme"] },
-          furigana: { ok: bool, fx: ["gates"] },
-          trans: { ok: bool, fx: ["gates"] },
-          meaning: { ok: bool, fx: ["gates"] },
+          furigana: { ok: bool, fx: [] },
         };
 
         let state = defaults();
@@ -231,7 +228,7 @@
           c.toggle("flowing", !linebreaks());
           c.toggle("bind-right", bindingEdge() === "right");
           c.toggle("bind-left", bindingEdge() === "left");
-          for (const key of ["furigana", "trans", "meaning"]) c.toggle(key, state[key]);
+          c.toggle("furigana", state.furigana);
           const root = document.documentElement;
           // The dark palette is a media query, so an explicit choice has to
           // out-specify it rather than replace it. No attribute means follow the
@@ -255,7 +252,7 @@
         const commit = (keys, external) => {
           if (!keys.length) return;
           snapshot = freeze();
-          const effects = { layout: false, binding: false, theme: false, gates: false };
+          const effects = { layout: false, binding: false, theme: false };
           for (const key of keys) for (const fx of FIELDS[key].fx) effects[fx] = true;
           // Classes and custom properties land before anyone is told, because a
           // subscriber that hears "layout" measures the box immediately and has
@@ -784,7 +781,12 @@
         function sentenceEl(sent, tokFrom, tokTo) {
           const s = document.createElement("span");
           s.className = sent.en ? "s has-en" : "s";
-          if (sent.en) s.dataset.en = sent.en;
+          // The tab stop is a property of the element, not of the session: every
+          // word answers Enter with its gloss and every translated sentence with
+          // its English, unconditionally. tabIndex only — role="button" on all 39
+          // ruby tokens of the densest page would have a screen reader read the
+          // story as "私 button、は、猫 button".
+          if (sent.en) { s.dataset.en = sent.en; s.tabIndex = 0; }
           for (let ti = tokFrom; ti < tokTo; ti++) {
             const tok = sent.toks[ti];
             if (!tok.r) {
@@ -800,6 +802,7 @@
             w.dataset.t = tok.t;
             w.dataset.kana = tok.k || "";
             w.dataset.gloss = tok.g || "";
+            w.tabIndex = 0;
             for (const pair of tok.r) {
               const text = pair[0], ruby = pair[1];
               if (!ruby) {
@@ -1179,11 +1182,15 @@
       })();
 
       // -------------------------------------------------------------- sheet --
-      // Two gates, one surface, and they stay separate on purpose: a word tap
-      // always answers "how is this read", 意味 adds "what does it mean", 訳
-      // answers "what does this sentence say". Collapsing them into one
-      // tap-for-everything would hand over the whole page at once, which is the
-      // one thing this reader is built not to do.
+      // The gesture grammar, and the whole of it: one tap reveals the reading in
+      // place, two taps open this panel for the meaning. A word tap scopes to the
+      // word, a tap on the kana and punctuation between words scopes to the
+      // sentence. That separation is the thing the reader is built on — the
+      // reading is owed cheaply and often, the meaning is asked for deliberately
+      // — and it used to be spelled ふ/訳/意 in the button bar. Moving it into
+      // the gesture is what let those three buttons go.
+      //
+      // Sheet reads no prefs. It answers what it was asked for, every time.
       //
       // The track is the sole input router for the text surface: it owns
       // setPointerCapture and the tap/drag discrimination, and it suppresses the
@@ -1191,7 +1198,7 @@
       // on the track.
       const Sheet = (() => {
         const OUT_MS = 220; // outlasts the 0.16s CSS fade
-        const KEEP = "[data-keep-sheet]";
+        const DOUBLE_MS = 300; // the platform's own double-click window
 
         const el = $("sheet");
         const head = $("sheet-head");
@@ -1199,17 +1206,20 @@
         const kana = $("sheet-kana");
         const tags = $("sheet-tags");
         const body = $("sheet-body");
-        const hint = $("sheet-hint");
         let track = null;
 
+        // INVARIANT: subject !== null implies subject.el === lit. The light can
+        // exist without the panel — it is a reading aid in its own right — but
+        // the panel can never exist without the light, nor describe anything but
+        // the lit node. light() is the one place that can break it, so it is the
+        // one place that repairs it.
         let subject = null; // {kind, el, t, kana, gloss, weak, fresh, en}
-        let sticky = false;
         let lit = null;
-        let hoverW = null;
         let timer = 0;
-        let redecorate = 0;
+        let pending = 0;
 
-        const armed = (gate) => !!Prefs.get()[gate];
+        let lastNode = null; // the RESOLVED .w or .s of the previous tap
+        let lastAt = 0;      // performance.now() when it resolved
 
         // textContent on a .w concatenates the <rt> text, so 私 reads back as
         // 私わたし — which is what every gloss in every shipped story has said.
@@ -1233,7 +1243,6 @@
         function paint() {
           if (!subject) return;
           const isWord = subject.kind === "word";
-          const meaning = armed("meaning");
           head.hidden = !isWord;
           let spoken;
           if (isWord) {
@@ -1243,21 +1252,18 @@
             if (subject.weak) tags.append(chip("weak", "苦手"));
             if (subject.fresh) tags.append(chip("new", "新出"));
             tags.hidden = !tags.firstChild;
-            const gloss = meaning ? subject.gloss : "";
-            body.hidden = !gloss;
-            body.textContent = gloss;
-            // Never advertise a gate that would show nothing: 42 tokens ship with
-            // an empty gloss.
-            hint.hidden = meaning || !subject.gloss;
+            // 42 tokens ship with an empty gloss. The line goes away rather than
+            // opening blank; the headword and its reading are still an answer.
+            body.hidden = !subject.gloss;
+            body.textContent = subject.gloss;
             spoken =
               subject.t + " " + subject.kana +
               (subject.weak ? "、苦手" : "") +
               (subject.fresh ? "、新出" : "") +
-              (gloss ? "。" + gloss : "");
+              (subject.gloss ? "。" + subject.gloss : "");
           } else {
             body.hidden = false;
             body.textContent = subject.en;
-            hint.hidden = true;
             spoken = subject.en;
           }
           Chrome.announce(spoken);
@@ -1278,20 +1284,33 @@
           if (lit) lit.classList.remove("lit");
           lit = target;
           if (target) target.classList.add("lit");
+          // The panel describes the lit node and nothing else, so moving the
+          // light is the only way to produce a stale panel. Hence the repair
+          // lives here rather than at any of the half-dozen call sites.
+          if (subject && subject.el !== lit) closeSheet();
         }
 
-        function dismiss() {
-          light(null);
+        // Puts the panel away and leaves the light alone. A reader who has just
+        // read the gloss usually still wants the reading attached to the kanji.
+        function closeSheet() {
           subject = null;
-          sticky = false;
-          hoverW = null;
           if (el.hidden) return;
           el.classList.remove("on");
           clearTimeout(timer);
           timer = setTimeout(() => { el.hidden = true; }, OUT_MS);
         }
 
-        function showWord(w, held) {
+        // The full reset: nothing lit, nothing open, and the tap sequence
+        // forgotten. Everything that interrupts the gesture stream calls this —
+        // a drag going live, a page turn, Escape, a tap away, 設.
+        function dismiss() {
+          lastNode = null;
+          lastAt = 0;
+          light(null);
+          closeSheet();
+        }
+
+        function showWord(w) {
           subject = {
             kind: "word", el: w,
             t: surfaceOf(w),
@@ -1300,15 +1319,11 @@
             weak: w.classList.contains("weak"),
             fresh: w.classList.contains("new"),
           };
-          sticky = held;
-          light(held ? w : null);
           show();
         }
 
         function showSentence(s) {
           subject = { kind: "sentence", el: s, en: s.dataset.en };
-          sticky = true;
-          light(s);
           show();
         }
 
@@ -1338,68 +1353,75 @@
           return p ? nearestSentence(p, x, y) : null;
         }
 
-        // Tapping what is already open closes it. That is the double-tap the
-        // reader asked for and more besides, because it carries no timing
-        // window: a second tap thirty seconds later closes just as a quick one
-        // does, which is the forgiving version on a phone. A real dblclick
-        // listener was the alternative and would have been fighting the track,
-        // which owns pointer capture and suppresses the synthesised click.
+        // One tap lights, two inside the window open. Three things hold it up:
         //
-        // It returns true — consumed — so Track.tap does not read the close as
-        // a tap on bare paper and summon the chrome behind it.
-        // sticky is what separates "you opened this" from "your mouse passed
-        // over it": a hover preview also parks the word in subject, and without
-        // the test the first real click on a hovered word would close a sheet
-        // the reader never asked to open.
-        function toggle(node, open) {
-          if (subject && subject.el === node && sticky && !el.hidden) { dismiss(); return true; }
-          open();
+        //   the SUBJECT, not the event target. A word's first tap can land on
+        //   its <ruby> and the second on the bare kanji text node beside it, and
+        //   both are the same word. This is also why the detector lives here
+        //   rather than in Track, which only ever sees the raw pointerdown
+        //   target and would miss about half of all real double taps.
+        //
+        //   node IDENTITY, not any key that could be rebuilt. The track recycles
+        //   cells, so a screen rebuilt between the two taps hands back a
+        //   different object, which reads as a first tap — which is what it is.
+        //   A token index or a data-t string would survive the rebuild and pair
+        //   a tap on page 4 with a tap on page 3.
+        //
+        //   the time the tap RESOLVES, which is pointerup. Measuring from
+        //   pointerdown would let a 500ms considered press eat the window and
+        //   break the double tap that follows it.
+        //
+        // A real dblclick listener is not available: Track suppresses the
+        // synthesised click that follows every gesture, so no pair of them is
+        // ever composed into one.
+        //
+        // Nothing is deferred. Lighting is additive, announces nothing and moves
+        // no layout, so paying 300ms on the commonest interaction to disambiguate
+        // the rarer one would be the wrong trade — the same call TAP_SLOP makes
+        // about the drag. The one case that would flicker, a fast repeat tap on
+        // an already-lit node, is removed by testing the window BEFORE the
+        // unlight branch: a fast repeat never reaches it.
+        function gesture(node) {
+          const now = performance.now();
+          if (node === lastNode && now - lastAt <= DOUBLE_MS) {
+            // Restart the sequence rather than let a third fast tap reopen what
+            // is already open: the next tap is a first tap, and the toggle below
+            // puts everything away.
+            lastAt = 0;
+            light(node);
+            openFor(node);
+            return true;
+          }
+          lastNode = node;
+          lastAt = now;
+          // The slow repeat tap is the toggle, and light() takes any open panel
+          // with it.
+          light(node === lit ? null : node);
           return true;
         }
 
-        // A .w always wins over the sentence around it, exactly as the old click
-        // handler did: the reading is owed unconditionally, the translation is
-        // not. Returns true when the tap was consumed.
+        // The double tap's payload. A sentence with no translation has nothing
+        // to open, so its light is the whole of the answer.
+        function openFor(node) {
+          if (node.classList.contains("w")) showWord(node);
+          else if (node.dataset.en) showSentence(node);
+          else closeSheet();
+        }
+
+        // A .w always wins over the sentence around it: it is the smaller, more
+        // specific subject, and it is what the finger was aiming at. Returns true
+        // when the tap was consumed — Track.tap reads false as "that was bare
+        // paper" and summons the chrome.
         function route(target, x, y) {
           if (!target || !target.closest) { dismiss(); return false; }
           if (el.contains(target)) return true;
           if (!track.contains(target)) { dismiss(); return false; }
           const w = target.closest(".w");
-          if (w) return toggle(w, () => showWord(w, true));
+          if (w) return gesture(w);
           const s = sentenceAt(target, x, y);
-          // A sentence with no translation is inert — no data-en, nothing opens.
-          if (s && s.dataset.en && armed("trans")) return toggle(s, () => showSentence(s));
+          if (s) return gesture(s);
           dismiss();
           return false;
-        }
-
-        // A word or sentence is a tab stop only while its gate is armed: the
-        // densest page carries 39 ruby tokens, and three live cells of permanently
-        // focusable spans would bury every real control on the page.
-        function setStop(node, on) {
-          if (on) {
-            node.tabIndex = 0;
-            node.setAttribute("role", "button");
-          } else {
-            node.removeAttribute("tabindex");
-            node.removeAttribute("role");
-          }
-        }
-
-        function decorate(root) {
-          const meaning = armed("meaning");
-          const trans = armed("trans");
-          for (const w of root.querySelectorAll(".w")) setStop(w, meaning);
-          for (const s of root.querySelectorAll(".s[data-en]")) setStop(s, trans);
-        }
-
-        function refresh() {
-          decorate(track);
-          if (!subject) return;
-          // Disarming 意味 with a word open drops the gloss line in place;
-          // disarming 訳 with a sentence open leaves nothing to show.
-          if (subject.kind === "sentence" && !armed("trans")) return dismiss();
-          paint();
         }
 
         function start() {
@@ -1410,66 +1432,48 @@
           document.addEventListener("pointerdown", (e) => {
             if (el.hidden) return;
             if (el.contains(e.target) || track.contains(e.target)) return;
-            // 意 and 訳 stay live while the sheet is up: arming a gate with a word
-            // already open is the shortest route to its meaning.
-            if (e.target.closest && e.target.closest(KEEP)) return;
             dismiss();
           }, true);
 
-          // Hover previews only with 意味 armed — :hover already reveals the ruby,
-          // so without a gloss the sheet would pop up on every sweep and add
-          // nothing.
-          track.addEventListener("pointerover", (e) => {
-            if (e.pointerType !== "mouse") return;
-            const w = e.target.closest ? e.target.closest(".w") : null;
-            // Unchanged means the pointer crossed into a word's own <ruby>/<rt>,
-            // which is what made the old gloss flicker on every hover.
-            if (w === hoverW) return;
-            hoverW = w;
-            if (!armed("meaning")) return;
-            if (w) {
-              if (!subject || subject.el !== w) showWord(w, false);
-            } else if (!sticky) {
-              dismiss();
-            }
-          });
-          track.addEventListener("pointerleave", (e) => {
-            if (e.pointerType !== "mouse" || sticky) return;
-            dismiss();
-          });
+          // Desktop's single tap, and all of it: .w:hover reveals the ruby in
+          // CSS, at no cost and with no reflow. The panel is a double click,
+          // same as everywhere else — a hover that opened it would fire on every
+          // sweep across the page and hand over the story a word at a time.
 
-          // A span with role="button" gets no activation for free. Enter only:
-          // Space is page-forward everywhere else in the reader.
+          // A span with tabindex gets no activation for free. Enter only: Space
+          // is page-forward everywhere else in the reader. Enter does what the
+          // DOUBLE tap does, because there is no keyboard equivalent of "twice,
+          // quickly" and arriving at the tab stop is already the deliberation.
           track.addEventListener("keydown", (e) => {
             if (e.key !== "Enter") return;
-            const node = e.target.closest && e.target.closest(".w[tabindex], .s[tabindex]");
+            const node = e.target.closest && e.target.closest(".w, .s[data-en]");
             if (!node) return;
             e.preventDefault();
-            route(node);
+            if (node === lit && !el.hidden) { light(null); return; }
+            light(node);
+            openFor(node);
           });
 
-          // The track recycles cells, so the element the sheet is describing can
-          // be rebuilt under it and a fresh cell arrives with no tab stops.
-          // childList only — decorate() writes attributes, and observing those
-          // would make this retrigger itself.
+          // The track recycles cells, so the node the light is attached to — and
+          // the one the panel is describing — can be rebuilt out from under both.
+          // The light outlives the panel now, so it is the thing that has to be
+          // dropped. childList only: tab stops are written at construction, and
+          // nothing here touches attributes.
           new MutationObserver(() => {
-            if (redecorate) return;
-            redecorate = requestAnimationFrame(() => {
-              redecorate = 0;
-              decorate(track);
-              if (subject && subject.el && !subject.el.isConnected) dismiss();
+            if (pending) return;
+            pending = requestAnimationFrame(() => {
+              pending = 0;
+              if (lit && !lit.isConnected) light(null);
+              else if (subject && subject.el && !subject.el.isConnected) closeSheet();
+              if (lastNode && !lastNode.isConnected) lastNode = null;
             });
           }).observe(track, { childList: true, subtree: true });
-
-          decorate(track);
         }
 
         return {
           start,
           tap: route,
           dismiss,
-          refresh,
-          decorate,
           isOpen: () => !el.hidden,
         };
       })();
@@ -1517,9 +1521,9 @@
         function cache() {
           const ids = [
             "top", "toc", "title", "count", "bar", "prev", "next",
-            "furi", "trans", "mean", "set", "veil", "settings",
+            "set", "veil", "settings",
             "settings-close", "stats", "live",
-            "sw-lb", "sw-furi", "sw-trans", "sw-mean",
+            "sw-lb", "sw-furi",
             "fs-dec", "fs-inc", "fs-val",
           ];
           for (const id of ids) els[id] = $(id);
@@ -1548,13 +1552,6 @@
 
         function hide() {
           if (!shown || isSettingsOpen()) return;
-          const p = Prefs.get();
-          // An armed 訳/意 changes nothing on the page until something is tapped,
-          // so the lit glyph is the only cue that the tap will do anything. The
-          // bar stays up for as long as it carries that state, which is why the
-          // bars do not auto-hide unconditionally. Asserted by the harness as
-          // chrome/refuses-to-hide-while-訳-armed — kept deliberately.
-          if (p.trans || p.meaning) return;
           // inert on an element holding focus is undefined territory; drop it
           // first. A keypress brings the bars back, so nothing is stranded.
           const a = document.activeElement;
@@ -1583,18 +1580,9 @@
           );
         }
 
-        function syncGates(p) {
-          els.furi.setAttribute("aria-pressed", String(!!p.furigana));
-          els.trans.setAttribute("aria-pressed", String(!!p.trans));
-          els.mean.setAttribute("aria-pressed", String(!!p.meaning));
-          els["sw-furi"].checked = !!p.furigana;
-          els["sw-trans"].checked = !!p.trans;
-          els["sw-mean"].checked = !!p.meaning;
-        }
-
         function syncControls() {
           const p = Prefs.get();
-          syncGates(p);
+          els["sw-furi"].checked = !!p.furigana;
           for (const r of els.wm) r.checked = r.value === p.writingMode;
           for (const r of els.bind) r.checked = r.value === p.binding;
           for (const r of els.theme) r.checked = r.value === p.theme;
@@ -1710,9 +1698,6 @@
         function bind() {
           els.prev.addEventListener("click", () => { show(); Track.step(-1); });
           els.next.addEventListener("click", () => { show(); Track.step(1); });
-          els.furi.addEventListener("click", () => Prefs.toggle("furigana"));
-          els.trans.addEventListener("click", () => Prefs.toggle("trans"));
-          els.mean.addEventListener("click", () => Prefs.toggle("meaning"));
           els.set.addEventListener("click", openSettings);
           els["settings-close"].addEventListener("click", closeSettings);
 
@@ -1724,8 +1709,6 @@
           // belonging to the mode currently on screen.
           els["sw-lb"].addEventListener("change", () => Prefs.setLinebreaks(els["sw-lb"].checked));
           els["sw-furi"].addEventListener("change", () => Prefs.set("furigana", els["sw-furi"].checked));
-          els["sw-trans"].addEventListener("change", () => Prefs.set("trans", els["sw-trans"].checked));
-          els["sw-mean"].addEventListener("change", () => Prefs.set("meaning", els["sw-mean"].checked));
 
           els["fs-dec"].addEventListener("click", () => Prefs.stepFont(-1));
           els["fs-inc"].addEventListener("click", () => Prefs.stepFont(1));
@@ -1739,7 +1722,7 @@
           els.settings.addEventListener("close", afterClose);
 
           // The panel owns every key while it is open. Stopping propagation here
-          // is what keeps f/t/m and the arrows out of a form, and it means the
+          // is what keeps f and the arrows out of a form, and it means the
           // track's keyboard handler needs no guard of its own.
           els.settings.addEventListener("keydown", (e) => {
             e.stopPropagation();
@@ -1773,19 +1756,17 @@
           syncControls();
           syncThemeColor();
           // The reader opens on the story, not on its controls. Stamped here
-          // rather than by calling hide(), which refuses while 訳 or 意 is armed
-          // — a sensible rule for an auto-hide mid-read, and the wrong one at
-          // boot, where a gate left armed in a previous session would be enough
-          // to ship the bars up. The page box reserves --top-h and --bar-h
-          // either way, so this changes nothing about the layout: one tap in the
-          // margin, any key, or 前/次 brings them back.
+          // rather than by calling hide(), which is a no-op while `shown` is
+          // still false. The page box reserves --top-h and --bar-h either way,
+          // so this changes nothing about the layout: one tap in the margin, any
+          // key, or 前/次 brings them back.
           document.body.classList.add("chrome-off");
           setInert(els.top, true);
           setInert(els.bar, true);
         }
 
         return {
-          init, show, hide, update, announce, syncGates, syncControls,
+          init, show, hide, update, announce, syncControls,
           syncThemeColor, openSettings, closeSettings, isSettingsOpen,
           isShown: () => shown,
         };
@@ -2234,8 +2215,6 @@
             // End belongs to the story, not to the spoilers.
             case "End": e.preventDefault(); goTo(Paginator.last(), false); break;
             case "f": case "F": e.preventDefault(); Prefs.toggle("furigana"); break;
-            case "t": case "T": e.preventDefault(); Prefs.toggle("trans"); break;
-            case "m": case "M": e.preventDefault(); Prefs.toggle("meaning"); break;
           }
         });
 
@@ -2256,7 +2235,7 @@
         console.warn("reader: the measure probe reports no overflow; pages will not split");
       }
       Chrome.init();     // title, stats, controls, listeners
-      Sheet.start();     // tap-away, hover, tab stops
+      Sheet.start();     // tap-away, Enter, the recycling guard
       Track.start();     // restore position, paint, bind input
 
       // Two paths reach a relayout — a pref change and a geometry change — and a
@@ -2283,7 +2262,6 @@
         }
         if (change.effects.binding) Track.retune();
         if (change.effects.theme) Chrome.syncThemeColor();
-        if (change.effects.gates) { Chrome.syncGates(change.prefs); Sheet.refresh(); }
         Chrome.syncControls();
       });
 

@@ -685,8 +685,8 @@ window.H = (() => {
     await release(cx + Math.round(W * 0.25), cy, "touch");
     add("gesture/band-at-last-holds", same(addr(), endAddr), { addr: addr() });
 
-    // 5. the 8px boundary. 7px is a tap and reaches disclosure; 9px is a drag
-    //    and reaches nothing.
+    // 5. the 8px boundary. 7px is a tap and lights the word; 9px is a drag and
+    //    reaches nothing.
     await reset();
     let w = wordAt();
     let p = centre(w);
@@ -696,7 +696,10 @@ window.H = (() => {
     await sleep(20);
     pev("pointerup", p.x + 7, p.y, "touch");
     await sleep(40);
-    add("gesture/7px-is-a-tap", Sheet.isOpen(), { open: Sheet.isOpen() });
+    // A single tap lights and opens nothing — both halves matter, because the
+    // panel appearing here would mean the double tap had collapsed into one.
+    add("gesture/7px-is-a-tap", isLit(w) && !Sheet.isOpen(),
+        { lit: isLit(w), open: Sheet.isOpen() });
 
     Sheet.dismiss();
     await sleep(300);
@@ -709,11 +712,11 @@ window.H = (() => {
     pev("pointermove", p.x + 9, p.y, "touch");
     await sleep(20);
     await release(p.x + 9, p.y, "touch");
-    add("gesture/9px-is-a-drag", !Sheet.isOpen() && same(addr(), a5),
-        { open: Sheet.isOpen(), addr: addr() });
+    add("gesture/9px-is-a-drag", !isLit(w) && !Sheet.isOpen() && same(addr(), a5),
+        { lit: isLit(w), open: Sheet.isOpen(), addr: addr() });
 
-    // 6. a swipe must open no sheet, including via the click the engine
-    //    synthesises after the pointer sequence.
+    // 6. a swipe must light nothing and open nothing, including via the click
+    //    the engine synthesises after the pointer sequence.
     await reset();
     w = wordAt();
     p = centre(w);
@@ -722,7 +725,8 @@ window.H = (() => {
     w.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, composed: true,
                                               clientX: p.x, clientY: p.y }));
     await sleep(40);
-    add("gesture/swipe-opens-no-sheet", !Sheet.isOpen(), { open: Sheet.isOpen() });
+    add("gesture/swipe-reveals-nothing", !isLit(w) && !Sheet.isOpen(),
+        { lit: isLit(w), open: Sheet.isOpen() });
 
     // 7. a stationary press is a tap however long it is held. A duration cap
     //    was considered and dropped: TAP_SLOP is the whole of the tap/drag
@@ -737,7 +741,14 @@ window.H = (() => {
     await sleep(500);
     pev("pointerup", p.x, p.y, "touch");
     await sleep(60);
-    add("gesture/long-press-still-reveals", Sheet.isOpen(), { open: Sheet.isOpen(), heldMs: 500 });
+    add("gesture/long-press-still-reveals", isLit(w), { lit: isLit(w), heldMs: 500 });
+
+    // And the window runs from pointerup, not pointerdown: a considered press
+    // followed by a quick second tap is still a double tap. Measuring from the
+    // down would have let the 500ms hold above eat the whole window.
+    await tapAt(p, DOUBLE_MS + 80);
+    const heldOpen = Sheet.isOpen();
+    add("gesture/held-press-then-tap-is-a-double", heldOpen, { open: heldOpen });
 
     // 8. two turns in quick succession are two turns.
     Sheet.dismiss();
@@ -762,11 +773,20 @@ window.H = (() => {
     await reset();
     w = wordAt();
     p = centre(w);
+    // The mouse reaches the same grammar through the same door — one click
+    // lights, two inside the window open — so nothing in the detector keys on
+    // pointerType.
     pev("pointerdown", p.x, p.y, "mouse");
     await sleep(30);
     pev("pointerup", p.x, p.y, "mouse");
     await sleep(60);
-    add("gesture/mouse-click-reaches-disclosure", Sheet.isOpen(), { open: Sheet.isOpen() });
+    const mouseLit = isLit(w) && !Sheet.isOpen();
+    pev("pointerdown", p.x, p.y, "mouse");
+    await sleep(30);
+    pev("pointerup", p.x, p.y, "mouse");
+    await sleep(60);
+    add("gesture/mouse-click-lights-double-click-opens", mouseLit && Sheet.isOpen(),
+        { lit: mouseLit, open: Sheet.isOpen() });
     Sheet.dismiss();
     await sleep(300);
 
@@ -839,13 +859,29 @@ window.H = (() => {
     }
     return null;
   }
-  async function tapAt(pt) {
+  const isLit = (node) => !!node && node.classList.contains("lit");
+
+  // DOUBLE_MS in reader.js. A tap lands 20ms after its pointerdown, so two bare
+  // tapAt calls would be ~80ms apart and EVERY consecutive pair would read as a
+  // double tap. The trailing settle is therefore longer than the window by
+  // default, and a test that wants a double tap asks for it by name.
+  const DOUBLE_MS = 300;
+
+  async function tapAt(pt, settleMs) {
     if (!pt) return false;
     pev("pointerdown", pt.x, pt.y, "touch");
     await sleep(20);
     pev("pointerup", pt.x, pt.y, "touch");
-    await sleep(60);
+    await sleep(settleMs === undefined ? DOUBLE_MS + 80 : settleMs);
     return true;
+  }
+
+  // Two taps well inside the window. The gap is the interval between the two
+  // pointerups, which is what the engine measures.
+  async function doubleTapAt(pt, second) {
+    if (!pt) return false;
+    await tapAt(pt, 60);
+    return await tapAt(second || pt, DOUBLE_MS + 80);
   }
 
   async function sheet() {
@@ -873,33 +909,66 @@ window.H = (() => {
     }
     if (!w || !s) return [{ name: "sheet/fixture", ok: false, detail: { w: !!w, s: !!s } }];
 
-    Prefs.setAll({ meaning: false, trans: false });
-    await sleep(30);
+    // One tap is the reading and nothing else: the word lights, so its ruby is
+    // showing, and the panel stays shut.
     await tapAt(centre(w));
-    add("sheet/word-reading-with-意-off",
-        Sheet.isOpen() && !head.hidden && body.hidden,
-        { open: Sheet.isOpen(), head: !head.hidden, body: !body.hidden });
+    add("sheet/one-tap-lights-a-word",
+        isLit(w) && !Sheet.isOpen(),
+        { lit: isLit(w), open: Sheet.isOpen() });
 
-    Prefs.setAll({ meaning: true });
-    await sleep(30);
+    // A slow repeat tap is the toggle: it puts the light out rather than
+    // opening anything, which is the only way back to a bare page.
+    await tapAt(centre(w));
+    add("sheet/slow-repeat-tap-unlights",
+        !isLit(w) && !Sheet.isOpen(),
+        { lit: isLit(w), open: Sheet.isOpen() });
+
+    // Two taps inside the window open the panel, with the gloss unconditional —
+    // there is no 意 gate left to withhold it.
+    await doubleTapAt(centre(w));
+    add("sheet/double-tap-opens-reading-and-gloss",
+        Sheet.isOpen() && isLit(w) && !head.hidden && !body.hidden &&
+          body.textContent === w.dataset.gloss,
+        { open: Sheet.isOpen(), lit: isLit(w), body: body.textContent, want: w.dataset.gloss });
+
+    // The light outlives the panel: reading the gloss must not cost the reading
+    // attached to the kanji.
+    Sheet.dismiss();
+    await sleep(300);
+    await doubleTapAt(centre(w));
+    const beforeAway = isLit(w) && Sheet.isOpen();
+    // A first tap on a DIFFERENT word moves the light and takes the stale panel
+    // with it — the invariant that the panel never describes an unlit node.
+    let other = null;
+    for (const cand of document.querySelectorAll("#track .cell.is-current .w")) {
+      if (cand !== w) { other = cand; break; }
+    }
+    if (other) await tapAt(centre(other));
+    add("sheet/light-moves-and-closes-a-stale-panel",
+        beforeAway && !!other && isLit(other) && !isLit(w) && !Sheet.isOpen(),
+        { before: beforeAway, moved: isLit(other), stale: isLit(w), open: Sheet.isOpen() });
+
+    // The subject is the resolved word, not the node the finger hit: a double
+    // tap whose contacts land on the <ruby> and then on the bare kanji beside it
+    // is one gesture on one word. This is why the detector cannot live in Track.
+    Sheet.dismiss();
+    await sleep(300);
+    let split = null;
+    for (const cand of document.querySelectorAll("#track .cell.is-current .w")) {
+      if (cand.dataset.gloss && cand.querySelector("ruby") && bareSpot(cand)) { split = cand; break; }
+    }
+    if (split) {
+      const r = split.querySelector("ruby").getClientRects()[0];
+      const onRuby = { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+      await doubleTapAt(onRuby, bareSpot(split) || onRuby);
+    }
+    add("sheet/double-tap-across-two-nodes-of-one-word",
+        !!split && Sheet.isOpen() && isLit(split),
+        { found: !!split, open: Sheet.isOpen() });
+
     Sheet.dismiss();
     await sleep(300);
     w = glossWord() || w;
-    await tapAt(centre(w));
-    add("sheet/word-reading-and-gloss-with-意-on",
-        Sheet.isOpen() && !head.hidden && !body.hidden && body.textContent === w.dataset.gloss,
-        { open: Sheet.isOpen(), body: body.textContent, want: w.dataset.gloss });
-
-    // Tapping the open word again closes it, with no timing window — the whole
-    // of the double-tap gesture, and the thing a repeat tap used to not do.
-    await tapAt(centre(w));
-    await sleep(320);
-    const toggledOff = !Sheet.isOpen();
-    // And a third tap reopens, so the close is a toggle rather than a latch.
-    await tapAt(centre(w));
-    add("sheet/repeat-tap-toggles-a-word",
-        toggledOff && Sheet.isOpen(),
-        { closed: toggledOff, reopened: Sheet.isOpen() });
 
     // The sheet clears the button bar while the bars are up and drops into the
     // space they occupied once they fade. Both are read off the used value, so
@@ -917,32 +986,52 @@ window.H = (() => {
 
     Sheet.dismiss();
     await sleep(300);
-    Prefs.setAll({ trans: false, meaning: false });
-    await sleep(30);
     // A fixture that has gone missing is a failed row, never a thrown
     // exception: this runs inside an awaited eval, and throwing here aborts the
     // whole harness before marks, persistence and degradation ever run.
     let hit = liveSentence();
-    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "訳-off" } }]);
+    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "one-tap" } }]);
     s = hit.s;
+    // A tap on the kana and punctuation between words scopes to the sentence:
+    // one tap lights the whole of it, ruby and all, and opens nothing.
     await tapAt(hit.pt);
-    add("sheet/sentence-inert-with-訳-off", !Sheet.isOpen(), { open: Sheet.isOpen() });
+    add("sheet/one-tap-lights-a-sentence",
+        isLit(s) && !Sheet.isOpen(),
+        { lit: isLit(s), open: Sheet.isOpen() });
 
-    Prefs.setAll({ trans: true });
-    await sleep(30);
-    hit = liveSentence();
-    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "訳-on" } }]);
-    s = hit.s;
     await tapAt(hit.pt);
-    add("sheet/sentence-opens-with-訳-on",
-        Sheet.isOpen() && body.textContent === s.dataset.en,
-        { open: Sheet.isOpen(), body: body.textContent.slice(0, 60) });
+    add("sheet/slow-repeat-tap-unlights-a-sentence",
+        !isLit(s) && !Sheet.isOpen(),
+        { lit: isLit(s), open: Sheet.isOpen() });
+
+    hit = liveSentence();
+    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "double-tap" } }]);
+    s = hit.s;
+    await doubleTapAt(hit.pt);
+    add("sheet/double-tap-opens-a-translation",
+        Sheet.isOpen() && isLit(s) && body.textContent === s.dataset.en,
+        { open: Sheet.isOpen(), lit: isLit(s), body: body.textContent.slice(0, 60) });
+
+    // A word inside a lit sentence takes the light off it. Single-slot lighting
+    // is what keeps the page from drifting into full-page ふりがな a tap at a
+    // time.
+    const inner = s.querySelector(".w");
+    if (inner) await tapAt(centre(inner));
+    add("sheet/a-word-takes-the-light-from-its-sentence",
+        !!inner && isLit(inner) && !isLit(s) && !Sheet.isOpen(),
+        { found: !!inner, word: isLit(inner), sentence: isLit(s), open: Sheet.isOpen() });
+
+    Sheet.dismiss();
+    await sleep(300);
+    hit = liveSentence();
+    if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "tap-away" } }]);
+    s = hit.s;
+    await doubleTapAt(hit.pt);
 
     // Dismiss on a tap away — the top bar is outside both the track and the
-    // sheet, and carries no data-keep-sheet. Chrome.show() first: the bars ship
-    // hidden, and a hidden bar is pointer-events: none, so elementFromPoint
-    // would hand the tap to the cell behind it and the tap-away handler would
-    // correctly decline to fire.
+    // sheet. Chrome.show() first: the bars ship hidden, and a hidden bar is
+    // pointer-events: none, so elementFromPoint would hand the tap to the cell
+    // behind it and the tap-away handler would correctly decline to fire.
     Chrome.show();
     await sleep(20);
     const topR = document.getElementById("title").getBoundingClientRect();
@@ -953,13 +1042,15 @@ window.H = (() => {
     hit = liveSentence();
     if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "escape" } }]);
     s = hit.s;
-    await tapAt(hit.pt);
+    await doubleTapAt(hit.pt);
     const opened = Sheet.isOpen();
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
     await sleep(320);
-    add("sheet/dismiss-on-escape", opened && !Sheet.isOpen(), { opened, open: Sheet.isOpen() });
+    add("sheet/dismiss-on-escape", opened && !Sheet.isOpen() && !isLit(s),
+        { opened, open: Sheet.isOpen(), lit: isLit(s) });
 
-    // An untranslated sentence is inert even with 訳 armed.
+    // An untranslated sentence still lights — the reading is owed whether or not
+    // a translation was ever written — but its double tap has nothing to open.
     Sheet.dismiss();
     await sleep(300);
     const bare = s.cloneNode(true);
@@ -968,30 +1059,40 @@ window.H = (() => {
     s.style.display = "none";
     await sleep(20);
     const spot = bareSpot(bare);
-    if (spot) await tapAt(spot);
-    add("sheet/untranslated-sentence-inert", !!spot && !Sheet.isOpen(), { spot: !!spot, open: Sheet.isOpen() });
+    if (spot) await doubleTapAt(spot);
+    add("sheet/untranslated-sentence-lights-but-opens-nothing",
+        !!spot && isLit(bare) && !Sheet.isOpen(),
+        { spot: !!spot, lit: isLit(bare), open: Sheet.isOpen() });
+    // The clone now leaves the DOM under a live light, which is exactly what a
+    // recycled cell does to one. The MutationObserver has to drop it, or the
+    // next light() would try to strip .lit off a detached node.
     s.style.display = "";
     bare.remove();
+    await sleep(80);
+    add("sheet/light-drops-when-its-node-is-recycled",
+        !document.querySelector("#track .lit"),
+        { stillLit: !!document.querySelector("#track .lit") });
 
-    // Chrome must refuse to auto-hide while 訳 or 意 is armed (kept on purpose).
+    // The bars now auto-hide unconditionally. The refusal they used to make
+    // while 訳 or 意 was armed went with the gates: there is no armed state left
+    // for the bar to be the only cue for.
     Sheet.dismiss();
     await sleep(300);
-    Prefs.setAll({ trans: true, meaning: false });
-    await sleep(20);
-    Chrome.show();
     const T = track();
-    await drag(Math.round(T.clientWidth / 2), Math.round(T.clientHeight / 2), 40, "touch");
-    const stayed = Chrome.isShown();
-    await release(Math.round(T.clientWidth / 2) + 40, Math.round(T.clientHeight / 2), "touch");
-    add("chrome/refuses-to-hide-while-訳-armed", stayed, { shown: stayed });
-
-    Prefs.setAll({ trans: false, meaning: false });
-    await sleep(20);
     Chrome.show();
     await drag(Math.round(T.clientWidth / 2), Math.round(T.clientHeight / 2), 40, "touch");
     const hid = !Chrome.isShown();
     await release(Math.round(T.clientWidth / 2) + 40, Math.round(T.clientHeight / 2), "touch");
-    add("chrome/hides-on-drag-with-no-gate-armed", hid, { hidden: hid });
+    add("chrome/hides-on-a-live-drag", hid, { hidden: hid });
+
+    // And a tap in the cell's chrome reserve brings them back. That strip is the
+    // primary way to summon the bars now that every tap on the text is consumed
+    // by the reading gesture, so it is asserted rather than assumed.
+    await reset();
+    const cellR = document.querySelector("#track .cell.is-current").getBoundingClientRect();
+    const topH = parseFloat(getComputedStyle(document.getElementById("top")).height) || 44;
+    await tapAt({ x: Math.round(cellR.left + cellR.width / 2), y: Math.round(cellR.top + topH / 2) });
+    add("chrome/a-tap-in-the-reserve-summons-the-bars", Chrome.isShown(), { shown: Chrome.isShown() });
     return out;
   }
 
@@ -1153,7 +1254,6 @@ window.H = (() => {
     // The bars are overlays over a permanent reserve, so hiding them must move
     // nothing. A box that grew when the chrome went away would repaginate under
     // the reader on the first drag.
-    Prefs.setAll({ trans: false, meaning: false });
     Chrome.show();
     await frame();
     const shownM = PageBox.metrics(), shownR = box().getBoundingClientRect();
@@ -1191,12 +1291,14 @@ window.H = (() => {
         off.opacity !== on.opacity && off.sh === on.sh && off.sw === on.sw,
         { off, on });
 
-    // Seven tap targets in a row is as many as a phone holds. Nothing about an
-    // eighth would look wrong in the source, and the symptom is 次 sitting half
-    // off the screen edge, which only shows at the narrowest width anyone reads
-    // at. scrollWidth is the only honest reading: a flex row that cannot fit
-    // overflows its padding box silently and html's overflow: hidden eats the
-    // evidence. Checked at every viewport this suite runs at.
+    // The bar is down to four tap targets from seven, which is the whole point
+    // of moving ふ/訳/意 into the gesture — but the assertion stays, because
+    // nothing about one target too many looks wrong in the source. The symptom
+    // is 次 sitting half off the screen edge, which only shows at the narrowest
+    // width anyone reads at. scrollWidth is the only honest reading: a flex row
+    // that cannot fit overflows its padding box silently and html's
+    // overflow: hidden eats the evidence. Checked at every viewport this suite
+    // runs at.
     const bar = document.getElementById("bar");
     Chrome.show();
     await frame();
@@ -1269,15 +1371,14 @@ def apply_prefs(br, wm, lb, fs, extra=None):
     Every field is written, not just the three a cell is named after. Prefs
     persist across navigations on one origin, so writing only writingMode,
     fontSize and linebreaks let suite_persistence's dark theme, left binding and
-    three armed gates leak into every later suite — including all 288 matrix
-    cells, where a forced left binding meant the 縦書き turn direction, half the
-    matrix, was never exercised at all, and an armed 訳 stopped the chrome ever
-    auto-hiding. The cell label has to name the whole state it ran under.
+    armed ふりがな leak into every later suite — including all 288 matrix cells,
+    where a forced left binding meant the 縦書き turn direction, half the matrix,
+    was never exercised at all. The cell label has to name the whole state it ran
+    under.
     """
     patch = {"writingMode": wm, "fontSize": fs,
              "linebreaks": {"vertical": bool(lb), "horizontal": bool(lb)},
-             "binding": "auto", "theme": "system",
-             "furigana": False, "trans": False, "meaning": False}
+             "binding": "auto", "theme": "system", "furigana": False}
     if extra:
         patch.update(extra)
     br.eval("H.setPrefs(" + json.dumps(patch) + ")")
@@ -1426,7 +1527,7 @@ def suite_persistence(br, rep, base):
     br.reload()
     br.eval(LIB)
     want = {"writingMode": "horizontal", "binding": "left", "fontSize": 36,
-            "theme": "dark", "furigana": True, "trans": True, "meaning": True,
+            "theme": "dark", "furigana": True,
             "linebreaks": {"vertical": True, "horizontal": True}}
     br.eval("H.setPrefs(" + json.dumps(want) + ")")
     br.eval("Track.goTo({page: 9, sub: 0}, false)")
