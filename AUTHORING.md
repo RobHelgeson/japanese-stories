@@ -171,11 +171,11 @@ python3 check.py ../stories/<slug>.txt            # vocabulary; slow, ~30-60s
 python3 rebuild.py                                # only stale stories; index.py last
 ```
 
-`rebuild.py` handles ordering, and knows about every build input — editing `reader.js`, `reader.css` or an afterword in `stories-index.md` correctly marks stories stale. Do not run `build.py` and `index.py` by hand unless you know why: `index.py` reads the built readers, so rebuilding a story after it leaves the contents page stale with nothing to flag it.
+`rebuild.py` handles ordering, and knows which build input touches which output — editing an afterword in `stories-index.md` re-segments the story it belongs to, while editing `reader.js` or `reader.css` only rewrites the shared engine. Do not run `build.py` and `index.py` by hand unless you know why: `index.py` reads the built readers, so rebuilding a story after it leaves the contents page stale with nothing to flag it.
 
 Unknown words no longer block a build; they print a note. `--strict` restores the old gate.
 
-To work on the reader UI rather than a story, `python3 build.py <story> --split <scratch-dir>` writes the loose engine + data form. That is a dev harness, not a shipping format — stories stay self-contained.
+To work on the reader UI rather than a story, `python3 build.py <story> --split <scratch-dir>` writes one story into a scratch directory in the same linked shape `docs/` uses, with flat filenames. Edit `scripts/reader.css` or `scripts/reader.js`, re-run, reload — nothing re-segments.
 
 ## Where a story lands
 

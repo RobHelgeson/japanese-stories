@@ -8,7 +8,9 @@ The constraint is the whole idea. Every story is written against a vocabulary li
 
 ## The reader
 
-Each story is a single self-contained HTML file — CSS, JavaScript, and the whole annotated text inlined, no network requests at all. That is deliberate: a story has to survive being opened from `file://`, mailed, or dropped onto a tablet, and a multi-file bundle does not.
+A story is a small HTML shell beside a shared `reader.css` and `reader.js`, with its own annotated text in `data/<slug>.js`. Everything is local — classic `<link>` and `<script src>`, no network requests, no modules, no `fetch` — so a story still opens straight off the filesystem; it needs its siblings, so copy the folder rather than the one file.
+
+Stories were self-contained single files until the site was published, which was the right shape for mailing one around and the wrong one to maintain: `reader.css` and `reader.js` were inlined into all eleven readers, so a one-line CSS change rewrote 2.5MB and had to re-segment every story through Ichiran to do it. `docs/versions/` is still built the old way — see [Publishing](#publishing).
 
 Text is vertical by default, as Japanese literary prose is, and a page never scrolls: an authored page too big for the screen is split across screens that keep its page number.
 
@@ -32,10 +34,15 @@ Preferences and your place in each story are remembered per device.
 ## Layout
 
 ```
-scripts/      the engine — build, validate, segment, inflect
-stories/      story sources (.txt) and stories-index.md (summaries + afterwords)
-docs/         the built readers; this is what GitHub Pages serves
-AUTHORING.md  the craft spec a new story is written against
+scripts/          the engine — build, validate, segment, inflect
+stories/          story sources (.txt) and stories-index.md (summaries + afterwords)
+docs/             what GitHub Pages serves
+  reader.css      one copy, shared by every live story
+  reader.js       one copy
+  data/<slug>.js  one story's annotated text
+  <slug>.html     a ~5KB shell linking the three
+  versions/       archived drafts, self-contained and frozen
+AUTHORING.md      the craft spec a new story is written against
 ```
 
 A story source is plain text: a `# title` line, then alternating Japanese sentences and `>` English translations, with a blank line between pages. Furigana is authored inline as `｜漢字《かんじ》`. Everything else — level, brief, new-word budget, reading order — lives in `scripts/corpus.json`.
@@ -48,7 +55,19 @@ export ICHIRAN_URL=http://localhost:3005
 python3 rebuild.py          # rebuild stale stories in reading order, then the index
 ```
 
-`rebuild.py` is the entry point. It walks the reading order in `corpus.json` rather than globbing, rebuilds only what is stale against every build input (including `reader.js`, `reader.css`, and the afterwords), covers the archived drafts in `versions/`, and always runs `index.py` last — the contents page is generated from the built readers, so anything rebuilt after it would leave it stale.
+`rebuild.py` is the entry point. It walks the reading order in `corpus.json` rather than globbing, and always runs `index.py` last — the contents page is generated from the built readers, so anything rebuilt after it would leave it stale.
+
+A live story is three outputs with three different inputs, and only the first is expensive:
+
+| Output               | Stale against                                     | Needs Ichiran + Anki |
+| -------------------- | ------------------------------------------------- | -------------------- |
+| `data/<slug>.js`     | the story `.txt`, the afterword, the `.py` engine | yes                  |
+| `<slug>.html`        | `reader.html`, `build.py`                         | no                   |
+| `reader.css` / `.js` | `reader.css`, `reader.js`, `build.py`             | no                   |
+
+So editing the reader's styling or behaviour now rewrites two files in about a second, and re-segments nothing.
+
+`docs/versions/` is left out of all of this. An archived draft is self-contained and **frozen** — it keeps the engine it published with, because an archive that re-renders with today's code preserves the story and not the reading it shipped with. `--versions` rebuilds them anyway.
 
 | Command                                  | What it does                                                        |
 | ---------------------------------------- | ------------------------------------------------------------------- |
@@ -57,6 +76,7 @@ python3 rebuild.py          # rebuild stale stories in reading order, then the i
 | `python3 have.py 単語1 単語2`            | quick known / unknown / leech lookup                                |
 | `python3 brief.py`                       | resolve and print a story brief before drafting                     |
 | `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki               |
+| `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                |
 
 ### Requirements
 
@@ -71,3 +91,5 @@ This repo **cannot build in CI**, by design. Three of its inputs are local to th
 ## Publishing
 
 GitHub Pages serves the `docs/` directory from `main`. There is no workflow and no build step: `rebuild.py` writes the finished HTML, and pushing it publishes it.
+
+`reader.css` and `reader.js` are served at stable URLs under Pages' own `max-age=600`, so a freshly pushed engine change can be up to ten minutes stale on a device that has the old one cached. Content-hashed filenames would close that window, at the cost of rewriting every story shell on every engine change — which is the expense this layout exists to remove. Ten minutes is the trade.

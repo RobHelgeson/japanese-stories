@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Build a self-contained hover-furigana reader from a story text file.
+"""Build a hover-furigana reader from a story text file.
+
+Three output forms, one story pipeline: --linked for the published tree (a small
+shell beside a shared engine and its own data file), --split for a scratch
+directory while working on the engine, and the default inline single file for
+docs/versions/, where an archived draft has to keep its engine frozen.
 
 Story format: `# Title` on the first line, then pages separated by blank lines,
 one sentence per line. A line starting with `> ` is an English translation of
@@ -143,56 +148,102 @@ def to_token(tok, known, weak, approved, authored=None):
     return entry
 
 
+def blob(data):
+    return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+
+
 def render(title, data):
-    """The shipped reader: one self-contained file, no server, no network.
+    """One self-contained file: engine, styling and story in a single document.
 
-    Engine and styling live in reader.js and reader.css so there is one copy to
-    edit and diff, but they are inlined here rather than linked: a story has to
-    survive being opened from file://, mailed, or dropped onto an iPad, and a
-    multi-file bundle does not. The placeholders sit alone on their own lines,
-    so replacing the line reproduces the original template byte for byte.
+    This is what docs/versions/ ships, and what the harness renders its fixtures
+    from. It is no longer the form the live stories take — see render_shell —
+    but an archived draft has to keep rendering the way it did the day it was
+    published, which means carrying its own engine rather than linking whatever
+    the current one has become.
 
-    The JS is inlined before __STORY_DATA__ is substituted, because the engine
-    is what contains that placeholder.
+    The placeholders sit alone on their own lines, so replacing the line
+    reproduces the original template byte for byte. The JS is inlined before
+    __STORY_DATA__ is substituted, because the engine is what contains that
+    placeholder.
     """
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__READER_CSS__\n", READER_CSS.read_text(encoding="utf-8"))
     html = html.replace("__READER_JS__\n", READER_JS.read_text(encoding="utf-8"))
     html = html.replace("__TITLE__", title)
-    return html.replace(
-        '"__STORY_DATA__"', json.dumps(data, ensure_ascii=False, separators=(",", ":"))
-    )
+    return html.replace('"__STORY_DATA__"', blob(data))
 
 
-def render_split(title, data, outdir):
-    """Loose form, for working on the engine without rebuilding a 90KB file.
+def render_shell(title, data_href, css_href="reader.css", js_href="reader.js"):
+    """The linked form: a ~2KB document that pulls in the engine and one story.
 
-    Classic <script src> only: fetch() and type="module" are both blocked on
-    file://, which is where these are opened. Not a shipping format — the
-    stories in docs/ stay self-contained. Write this to a scratch directory.
+    Classic <link> and <script src> only. fetch() and type="module" are both
+    blocked on file://, and these are still opened from the filesystem during
+    story work; classic scripts also run in document order, which is what
+    guarantees window.STORY exists before the engine reads it.
+
+    The story's 目次 href is not in here. It rides in the data as DATA.toc and
+    is applied at runtime, so one shell serves every story in a tree.
     """
-    outdir.mkdir(parents=True, exist_ok=True)
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace(
         "    <style>\n__READER_CSS__\n    </style>\n",
-        '    <link rel="stylesheet" href="reader.css" />\n',
+        f'    <link rel="stylesheet" href="{css_href}" />\n',
     )
     html = html.replace(
         "    <script>\n__READER_JS__\n    </script>\n",
-        '    <script src="data.js"></script>\n    <script src="reader.js"></script>\n',
+        f'    <script src="{data_href}"></script>\n    <script src="{js_href}"></script>\n',
     )
-    (outdir / "index.html").write_text(html.replace("__TITLE__", title), encoding="utf-8")
-    (outdir / "reader.css").write_text(READER_CSS.read_text(encoding="utf-8"), encoding="utf-8")
+    return html.replace("__TITLE__", title)
+
+
+def write_engine(out_dir):
+    """The two shared assets, written once for a whole published tree.
+
+    The substitution lives here and nowhere else. rebuild.py imports this rather
+    than re-implementing the one-line replace, for the same reason the harness
+    imports render() — a second copy of a build contract is a contract that can
+    drift without anything failing.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "reader.css").write_text(READER_CSS.read_text(encoding="utf-8"), encoding="utf-8")
     # The engine reads the same name either way; only where it comes from differs.
-    (outdir / "reader.js").write_text(
+    (out_dir / "reader.js").write_text(
         READER_JS.read_text(encoding="utf-8").replace('"__STORY_DATA__"', "window.STORY"),
         encoding="utf-8",
     )
-    (outdir / "data.js").write_text(
-        "window.STORY = " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n",
-        encoding="utf-8",
-    )
+
+
+def write_data(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("window.STORY = " + blob(data) + ";\n", encoding="utf-8")
+
+
+def render_split(title, data, outdir):
+    """Loose form in a scratch directory, for working on the engine.
+
+    Same shape the published tree uses, with the flat filenames a one-story
+    directory can afford. Editing reader.css or reader.js and reloading is the
+    whole dev loop; nothing here needs a rebuild.
+    """
+    outdir.mkdir(parents=True, exist_ok=True)
+    (outdir / "index.html").write_text(render_shell(title, "data.js"), encoding="utf-8")
+    write_engine(outdir)
+    write_data(outdir / "data.js", data)
     return outdir / "index.html"
+
+
+def render_linked(title, data, out, slug):
+    """A story in the published tree: shell beside the shared engine, data apart.
+
+    The data is the 200KB half and changes only when the story or its vocabulary
+    marking does; the shell is 2KB and changes only with the template. Splitting
+    them is what lets an engine edit rebuild nothing at all.
+    """
+    write_engine(out.parent)
+    write_data(out.parent / "data" / f"{slug}.js", data)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render_shell(title, f"data/{slug}.js"), encoding="utf-8")
+    return out
 
 
 def main():
@@ -205,6 +256,10 @@ def main():
                     help="fail the build on any word outside the known set")
     ap.add_argument("--split", type=Path, metavar="DIR",
                     help="write the loose engine+data form to DIR for UI work, not a story")
+    # The live tree's form. Inline stays the default because docs/versions/ is
+    # built through the same script and has to keep carrying its own engine.
+    ap.add_argument("--linked", action="store_true",
+                    help="write a shell beside the shared engine and data/<slug>.js")
     # Where the contents page sits relative to the file being written. Whoever
     # chooses the output path owns this: rebuild.py puts archived versions in
     # docs/versions/ and passes ../index.html for them. The reader must not
@@ -302,6 +357,10 @@ def main():
 
     if args.split:
         out = render_split(title, data, args.split)
+    elif args.linked:
+        out = render_linked(
+            title, data, args.out or args.story.with_suffix(".html"), args.story.stem
+        )
     else:
         out = args.out or args.story.with_suffix(".html")
         out.write_text(render(title, data), encoding="utf-8")

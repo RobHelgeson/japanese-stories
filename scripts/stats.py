@@ -90,13 +90,36 @@ ADJ_I = {"adj-i", "adj-ix"}
 
 
 # Built-reader access, used by index.py to build the contents page. Kept here
-# because the embedded DATA blob is this module's other input format.
+# because the DATA blob is this module's other input format.
 ROW = re.compile(r"const DATA = (\{.*?\});\n", re.S)
+BLOB = re.compile(r"window\.STORY = (\{.*?\});\n", re.S)
+
+
+def data_file(path):
+    """The blob in a data/<slug>.js sidecar."""
+    return json.loads(BLOB.search(Path(path).read_text(encoding="utf-8")).group(1))
+
+
+def data_of(path):
+    """A built reader's DATA, whether it carries it or links it.
+
+    docs/versions/ is self-contained and answers from the document itself; a
+    live story is a shell whose blob sits in data/<slug>.js beside it. Both are
+    read here so no caller has to know which form a given reader took.
+    """
+    path = Path(path)
+    hit = ROW.search(path.read_text(encoding="utf-8"))
+    if hit:
+        return json.loads(hit.group(1))
+    side = path.parent / "data" / f"{path.stem}.js"
+    if not side.exists():
+        raise SystemExit(f"{path.name} links its data and {side} is missing")
+    return data_file(side)
 
 
 def read(path):
-    """The stats a built reader carries in its embedded DATA blob."""
-    d = json.loads(ROW.search(Path(path).read_text(encoding="utf-8")).group(1))
+    """The stats a built reader carries in its DATA blob."""
+    d = data_of(path)
     return {
         "file": Path(path).name,
         "title": d["title"],

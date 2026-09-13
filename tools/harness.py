@@ -95,11 +95,27 @@ def check_contracts():
     if not js.startswith("      const DATA = "):
         raise SystemExit("build contract broken: reader.js line 1 is no longer the DATA line")
 
+    # The linked form is what docs/ ships, and its one load-bearing property is
+    # invisible in the markup: classic scripts run in document order, so the
+    # story has to be written out BEFORE the engine that reads it. Swap the two
+    # lines and every story fails at boot with DATA undefined, which nothing
+    # else here would catch — the fixtures are rendered inline.
+    shell = build.render_shell("x", "data/x.js")
+    data_at = shell.find('<script src="data/x.js">')
+    engine_at = shell.find('<script src="reader.js">')
+    if data_at < 0 or engine_at < 0:
+        raise SystemExit("build contract broken: render_shell emitted no linked scripts")
+    if data_at > engine_at:
+        raise SystemExit("build contract broken: the engine loads before the story data")
+    if "__READER_CSS__" in shell or "__READER_JS__" in shell:
+        raise SystemExit("build contract broken: render_shell left a placeholder behind")
+
 
 def build_fixture(slug, inject=False):
     """Re-render a shipped reader against the working-tree engine."""
-    src = (REPO / "docs" / f"{slug}.html").read_text(encoding="utf-8")
-    d = json.loads(stats.ROW.search(src).group(1))
+    # data_of, not a regex here: a live story links its blob from data/<slug>.js
+    # while docs/versions/ still carries one inline, and stats owns that fork.
+    d = stats.data_of(REPO / "docs" / f"{slug}.html")
     d["slug"] = slug
     if inject:
         # No corpus token is both 苦手 and 新出, and reader.css declares a
@@ -124,7 +140,7 @@ def mark_both(d):
 def corpus_has_both():
     hits = []
     for slug in SLUGS:
-        d = json.loads(stats.ROW.search((REPO / "docs" / f"{slug}.html").read_text(encoding="utf-8")).group(1))
+        d = stats.data_of(REPO / "docs" / f"{slug}.html")
         for page in d["pages"]:
             for sent in page:
                 for tok in sent["toks"]:
