@@ -10,17 +10,24 @@ The constraint is the whole idea. Every story is written against a vocabulary li
 
 Each story is a single self-contained HTML file — CSS, JavaScript, and the whole annotated text inlined, no network requests at all. That is deliberate: a story has to survive being opened from `file://`, mailed, or dropped onto a tablet, and a multi-file bundle does not.
 
-|                    |                                |
-| ------------------ | ------------------------------ |
-| Hover a kanji word | its reading, in a gloss box    |
-| Click a word       | pins the gloss                 |
-| `ふりがな` / `f`   | reveal every reading           |
-| `訳` / `t`         | show all English translations  |
-| Click a sentence   | show just that one translation |
-| `意味`             | inline meanings                |
-| `←` `→`            | turn pages                     |
+Text is vertical by default, as Japanese literary prose is, and a page never scrolls: an authored page too big for the screen is split across screens that keep its page number.
 
-Two kinds of word are marked. A **dotted red underline** is a leech — a known word on a card that keeps being failed; its reading stays hidden. A **solid teal underline with the reading shown** is a new word, approved for this story but not yet learned.
+|                     |                                                   |
+| ------------------- | ------------------------------------------------- |
+| Tap or click a word | its reading, in a sheet at the foot of the page   |
+| `意` / `m`          | add the English meaning to that sheet             |
+| `訳` / `t`          | arm translations, then tap a sentence for its own |
+| `ふ` / `f`          | reveal every reading at once                      |
+| Swipe               | turn the page (touch; on a mouse use the arrows)  |
+| `←` `→`             | turn pages, following the binding direction       |
+| `設`                | writing mode, 改行, 綴じ, type size, theme        |
+| `目次`              | back to the contents page                         |
+
+Hovering still reveals a reading on a mouse, but tapping is the primary path and the one that works everywhere. The reading and the meaning stay separate gates on purpose: a story built from words you already know should not put the English one gesture away.
+
+Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose uses to draw attention to a word. **Red sesame** is a leech: a known word on a card that keeps being failed, with its reading hidden. **Teal circles with the reading shown** is a new word, approved for this story but not yet learned.
+
+Preferences and your place in each story are remembered per device.
 
 ## Layout
 
