@@ -1,0 +1,859 @@
+      /* Seven palette tokens, one set per theme. The dark set is written out
+         twice rather than folded into light-dark(): that function drops the whole
+         declaration below Safari 17.5, and an unstyled reader is a worse failure
+         than eight repeated lines. The media block is guarded rather than paired
+         with a light block, so the system preference stays the default and an
+         explicit 設定 choice — stamped as data-theme on <html>, where it can also
+         reach color-scheme — wins in both directions. */
+      :root {
+        color-scheme: light;
+        --paper: #faf7f0;
+        --ink: #22201c;
+        --muted: #6f695e;
+        --rule: #e2dcd0;
+        --accent: #7a5c2e;
+        --weak: #b4562a;
+        --new: #2f7d6a;
+        --veil: rgba(34, 32, 28, 0.38);
+
+        --serif: "Hiragino Mincho ProN", "Yu Mincho", serif;
+        --sans: -apple-system, system-ui, sans-serif;
+
+        /* Written by Prefs.apply() and PageBox.refresh() on documentElement.
+           These are what the reader paints with before either has run, and what
+           it keeps if localStorage throws. --fs is a LENGTH, applied verbatim:
+           the setting has to be what the type measures. */
+        --fs: 28px;
+        --lh: 2.6;
+        --measure: 30;
+        --extent: 6;
+
+        --gutter: 16px;
+        --tap: clamp(40px, 2.75rem, 56px);
+        --chrome-gap: 0.34rem;
+        --safe-t: env(safe-area-inset-top, 0px);
+        --safe-b: env(safe-area-inset-bottom, 0px);
+        --safe-l: env(safe-area-inset-left, 0px);
+        --safe-r: env(safe-area-inset-right, 0px);
+        /* The permanent chrome reserve. The bars are fixed overlays, but the page
+           box subtracts these unconditionally, so the box is the same size whether
+           chrome is shown or hidden and a bar fade can never repaginate. THESE TWO
+           MUST NOT CHANGE while a story is open. */
+        --top-h: calc(var(--top-content) + var(--chrome-gap) * 2 + var(--safe-t));
+        --bar-h: calc(var(--tap) + var(--chrome-gap) * 2 + var(--safe-b));
+        /* The top bar carries no tap target — 目次 moved down to join the other
+           controls — so it is sized to its own text rather than to --tap, and
+           the ~22px that buys goes to the page box. The bottom bar keeps --tap,
+           because everything in it is thumbed. */
+        --top-content: 1.4rem;
+        --count-w: 4.4rem;
+        --top-gap: 0.6rem;
+
+        --z-chrome: 20;
+        --z-sheet: 30;
+        --z-veil: 40;
+        --z-panel: 50;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          color-scheme: dark;
+          --paper: #16151a;
+          --ink: #e8e4dc;
+          --muted: #9a9488;
+          --rule: #2c2a31;
+          --accent: #d3b075;
+          --weak: #e0895e;
+          --new: #6cc5ab;
+          --veil: rgba(0, 0, 0, 0.5);
+        }
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --paper: #16151a;
+        --ink: #e8e4dc;
+        --muted: #9a9488;
+        --rule: #2c2a31;
+        --accent: #d3b075;
+        --weak: #e0895e;
+        --new: #6cc5ab;
+        --veil: rgba(0, 0, 0, 0.5);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      /* #sheet, #settings, #veil and #sheet-head all lay out with display, which
+         beats the UA's [hidden] rule and would ship them open. */
+      [hidden] { display: none !important; }
+
+      /* Nothing scrolls, anywhere. That is not only a layout decision: with the
+         document unscrollable iOS never collapses its toolbar, so dvh stops moving
+         mid-session and the reflow it would cause — which would repaginate under
+         the reader's finger — cannot happen. text-size-adjust is what holds the
+         rendered size equal to the setting on iOS, which inflates text in narrow
+         blocks otherwise. */
+      html {
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+        background: var(--paper);
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        height: 100vh;
+        height: 100dvh; /* order load-bearing: vh is the pre-15.4 fallback */
+        overflow: hidden;
+        overscroll-behavior: none;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 0.85rem;
+      }
+
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      /* ---- the track ---------------------------------------------------- */
+      /* Exactly the viewport, so a cell width is exactly the distance a gesture
+         drags. Three cells at flex-basis 100% overflow it by two viewports; html
+         and body clip the rest.
+
+         #track carries a transform, which makes it the containing block for any
+         position:fixed descendant — so #top, #bar, #sheet, #veil and #settings
+         MUST stay its siblings. will-change: transform, a non-none filter,
+         backdrop-filter and contain: paint each do the same thing on their own;
+         none of them may ever appear on #track or on <body>.
+
+         No transition here on purpose: the gesture code sets and clears one
+         inline, which is what lets the settle reset the transform in the same
+         frame as the cell rotation without animating backwards over the turn. */
+      #track {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        transform: translateX(-100%);
+        /* All panning is ours; the browser keeps pinch-zoom. */
+        touch-action: pinch-zoom;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      #track * { touch-action: pinch-zoom; }
+      /* A mouse drag is a text selection, so the fine-pointer platform keeps
+         copy-out and turns pages with the keys and 前/次 instead. */
+      @media (hover: hover) and (pointer: fine) {
+        #track, #track * { -webkit-user-select: text; user-select: text; }
+        /* Re-excluded at (1,0,1), because the rule above is what defeats the
+           plain `rt` one: a sentence dragged out of the page must copy as 私,
+           never as 私わたし. The clipboard half of that promise is kept in JS —
+           only Chrome honours this in the copy string. */
+        #track rt { -webkit-user-select: none; user-select: none; }
+      }
+
+      /* The chrome clearance is the CELL's padding, not the track's, because the
+         track has to stay exactly one viewport wide. The cell itself never
+         rotates — only the box inside it does — so its logical padding maps to
+         physical top/bottom and left/right in both writing modes, which is what
+         holds text clear of the physically top and bottom bars. */
+      .cell {
+        flex: 0 0 100%;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-block: var(--top-h) var(--bar-h);
+        padding-inline: max(var(--gutter), var(--safe-l)) max(var(--gutter), var(--safe-r));
+      }
+
+      /* The hidden probe the paginator measures against. Fixed at inset 0 like
+         #track, with its cell absolutely filling it, so one set of rules sizes
+         both it and a live cell and nothing has to be pinned from JS.
+         visibility: hidden still lays out, which is the entire point; it also
+         keeps the text out of find-in-page and out of the accessibility tree.
+         Created by PageBox.init() rather than by reader.html, because build.py's
+         render_split matches reader.html by whole indented block. */
+      #measure {
+        position: fixed;
+        inset: 0;
+        visibility: hidden;
+        pointer-events: none;
+        contain: layout;
+        z-index: -1;
+      }
+      #measure .cell { position: absolute; inset: 0; }
+      /* The probe opts out of the clipping its live twin needs. Clipping is there
+         to stop a stray focus()/find-in-page scroll on a cell the reader can
+         reach, and none of those reach a hidden, inert, pointer-events: none
+         probe — while every split in the book is decided by reading scrollWidth /
+         scrollHeight off this box. The clip-box reports a true scrolling area in
+         Chrome; that is one engine, and this ships to WebKit, where the same
+         mistake would read as "no page ever overflows" and nothing would ever
+         split. overflow: visible is the reading both engines have shared since
+         before clip existed. PageBox.selfTest() proves it on the device. */
+      #measure .page, #measure .after { overflow: visible; }
+
+      /* ---- the page box -------------------------------------------------- */
+      /* One constant, centred, typographically capped rectangle, the same on a
+         phone and on a laptop. --measure is full-width characters per column (per
+         line in 横書き) and --extent is columns (lines); 1em is one full-width
+         character, which is why the old 34rem cap had to go — it held 66 Latin
+         characters but only 16 Japanese ones. Column pitch in vertical-rl is
+         exactly font-size x line-height and ruby does not widen it, so
+         extent * lh * 1em is an exact whole number of columns.
+
+         min(..., 100%) is the belt that `justify-content: safe center` used to
+         be, and it is strictly better: the box can never exceed its cell, so
+         centring can never clip the start of it, and content that does not fit
+         surfaces as measurable overflow rather than as ink outside the viewport.
+         The 1px is sub-pixel insurance — block-size is computed from the specified
+         numbers while the laid-out line boxes accumulate the engine's rounded
+         pitch, and 1px cannot admit another line.
+
+         overflow: clip rather than hidden because a hidden box is still a scroll
+         container — a stray focus(), scrollIntoView, Find-in-page hit or the
+         VoiceOver cursor can scroll it to half a column with no way back — while
+         clip pins it and still reports the true scrollWidth the paginator reads.
+         The clip margin keeps a 傍点 or a furigana run sitting on the box edge
+         from being shaved. */
+      .page, .after {
+        flex: 0 0 auto;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        overflow: clip;
+        overflow-clip-margin: 0.5em;
+      }
+      .page {
+        font-family: var(--serif);
+        font-size: var(--fs);
+        line-height: var(--lh);
+        inline-size: min(calc(var(--measure) * 1em), 100%);
+        block-size: min(calc(var(--extent) * var(--lh) * 1em + 1px), 100%);
+        line-break: strict;
+        word-break: normal;
+        overflow-wrap: normal;
+        /* The box is a constant rectangle but its content rarely fills it —
+           extent is capped so a median authored page reaches about 70% — so
+           without this a short screen hangs off the block-start edge: in
+           vertical-rl that is the right, and a one-sentence screen reads as
+           right-aligned against empty paper. Centring costs a shift of up to
+           half a column between turns, which is the price of not having a
+           ragged left edge on most screens. .page.tight overrides it back to
+           start, because a sentence too long for the box must keep its
+           beginning rather than lose both ends. */
+        align-content: center;
+      }
+
+      /* writing-mode lives HERE, never on body or #track: a flex container's row
+         axis follows its own writing mode, so vertical-rl on either would stack
+         the three cells instead of laying them in a row, and it would rotate the
+         chrome, the sheet and the settings panel with the text.
+
+         The column gap is exactly one full-width character, half of it each side
+         of the glyph run. That half is what holds the furigana (0.44em, right of
+         the column) and the 傍点 (0.5em, left of it) clear of the neighbouring
+         column: the two protrude into the same gap from opposite sides, so the gap
+         must carry 0.94em and the arithmetic floor is 1.94. 2 is that floor with
+         the rounding paid for, and it is also the traditional 行間＝全角アキ.
+         Going below it collides ruby with the next column's glyphs — invisibly to
+         every automated check, because the pitch arithmetic still works. */
+      body.vertical .page {
+        -webkit-writing-mode: vertical-rl;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        --lh: 2;
+      }
+      /* 2, not the 2.6 this shipped with. The 1.94 floor derived above is
+         geometry, not a fact about 縦書き: rotate the page and ruby is 0.44em
+         above the line while text-emphasis-position: under puts 傍点 0.5em
+         below it, so the line box needs the same 1.94em and no more. 2.6 was
+         spending a whole extra line of leading per four lines to buy nothing —
+         about 23% of the screen. Do not go under 2 here either. */
+      body.horizontal .page {
+        -webkit-writing-mode: horizontal-tb;
+        writing-mode: horizontal-tb;
+        --lh: 2;
+      }
+
+      /* A screen whose single sentence exceeds the box. The paginator lays it
+         down anyway rather than spinning, and start-aligns it so the beginning of
+         the sentence is the part that survives. Must not change metrics. */
+      .page.tight { align-content: start; }
+
+      .page p { margin: 0; text-indent: 0; }
+      /* 改行 on: one <p> per sentence. In 縦書き a paragraph break already opens a
+         new column, so the break is the separation; 横書き needs a little air
+         between consecutive sentences. */
+      body.broken.horizontal .page p + p { margin-block-start: 0.5em; }
+      /* 改行 off: a <p> is an inferred paragraph holding several sentences, and
+         横書き needs a mark for where one ends and the next begins. Japanese
+         uses a one-character indent rather than space, and a quoted utterance
+         uses its 「 as that indent, so dialogue takes none. text-indent applies
+         to BLOCK CONTAINERS ONLY — which is why the sentences inside collapse to
+         inline <span class="s"> and the paragraph stays a real <p>. A block
+         continuing from the previous screen is not a new paragraph and takes no
+         indent either.
+
+         縦書き is excluded, and for the same reason 改行-on below takes no
+         indent: a <p> is a block, so a paragraph already opens a new column, and
+         the column break IS the separation. Indenting on top of it drops the
+         first line of every narration paragraph a character below its
+         neighbours — the reported defect, and the one place in the reader where
+         correct Japanese typography was the wrong thing to do. */
+      body.flowing.horizontal .page p { text-indent: 1em; }
+      body.flowing.horizontal .page p.dialogue,
+      body.flowing.horizontal .page p.cont { text-indent: 0; }
+
+      /* ---- ruby and 傍点 -------------------------------------------------- */
+      /* Ruby is always laid out and only its opacity changes. NOTHING below may
+         switch display, visibility or font-size on rt: the paginator measures the
+         box, so a reveal that reflowed would re-split the page under the reader's
+         finger depending on whether ふりがな happens to be on. line-height: 1 is
+         what makes the annotation exactly 0.44em deep, which is the number the
+         column-gap arithmetic above assumes. */
+      ruby { -webkit-ruby-position: before; ruby-position: over; }
+      rt {
+        font-size: 0.44em;
+        line-height: 1;
+        color: var(--accent);
+        opacity: 0;
+        transition: opacity 0.12s ease;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-text-emphasis: none;
+        text-emphasis: none;
+      }
+      body.furigana .page rt { opacity: 1; }
+      /* The tapped word keeps its reading attached to the kanji for as long as its
+         sheet is up. Opacity only, so no reflow. */
+      .w.lit rt { opacity: 1; }
+      /* Approved stretch vocabulary: not yet learned, so the reading is shown
+         unconditionally rather than waiting for the ふ gate. README's "The
+         reader" section publishes that promise to readers — "teal circles with
+         the reading shown" — so it is not an implementation detail to change
+         quietly. The 傍点 below replace the underline, not this. */
+      .w.new rt { opacity: 1; color: var(--new); }
+
+      /* 傍点 replace both underlines. `under left` is one declaration covering both
+         modes — `under` is read only in horizontal typographic modes and `left`
+         only in vertical — and it MUST carry both keywords: `under` alone computes
+         to `under right`, which in a column puts the sesame on top of the furigana.
+         Asserted by the harness as marks/傍点-and-ruby-on-opposite-sides, in both
+         writing modes, because nothing about it is visible in the cascade. Never
+         bare `filled` or `open` either; those compute to a dot in Chrome and to a
+         circle in recent Safari. The colour goes inside the shorthand, which resets it to
+         currentColor when omitted. text-emphasis-position is not part of the
+         shorthand and is never reset by it, so it is declared separately. */
+      .w.weak, .w.new {
+        -webkit-text-emphasis-position: under left;
+        text-emphasis-position: under left;
+      }
+      .w.weak {
+        -webkit-text-emphasis: filled sesame var(--weak);
+        text-emphasis: filled sesame var(--weak);
+      }
+      .w.new {
+        -webkit-text-emphasis: open circle var(--new);
+        text-emphasis: open circle var(--new);
+      }
+      /* No story has one yet, and source order should not be what decides it: a
+         word being failed repeatedly is the more urgent mark, and 新出 still says
+         its piece through the unconditional reading above. */
+      .w.weak.new {
+        -webkit-text-emphasis: filled sesame var(--weak);
+        text-emphasis: filled sesame var(--weak);
+      }
+
+      /* The tapped word or sentence, for as long as its sheet is up. The flat
+         declaration is what an engine without color-mix keeps, and it is a neutral
+         grey because it has to read against both papers. */
+      .w.lit, .s.lit {
+        border-radius: 3px;
+        background: rgba(128, 128, 128, 0.18);
+        background: color-mix(in srgb, var(--accent) 15%, transparent);
+      }
+
+      /* Desktop only. Ungated, both of these stick to whatever was last tapped —
+         the reported defect in the current file. A translatable sentence still
+         gets no permanent marking (a marker on every line would compete with the
+         傍点 that carry real information); the cursor appears only while 訳 is
+         armed, which is the only time the tap does anything at all. */
+      @media (hover: hover) and (pointer: fine) {
+        .w:hover rt { opacity: 1; }
+        .w:hover {
+          border-radius: 3px;
+          background: rgba(128, 128, 128, 0.14);
+          background: color-mix(in srgb, var(--accent) 12%, transparent);
+        }
+        body.trans .s.has-en { cursor: pointer; }
+      }
+
+      /* ---- あとがき ------------------------------------------------------- */
+      /* Its own box, NOT a .page modifier: body.flowing .page p (0,2,2) would beat
+         .page.after p (0,2,1) and push a 全角 indent into English prose. The
+         renderer swaps the class wholesale, so an afterword box never carries
+         `page` at all.
+
+         Ninety-six to ninety-nine per cent of it is English, so it neither rotates
+         with 縦書き nor wears the story's serif or type size — at 28px in a 366px
+         cell it would be thirteen Latin characters per line. Its furigana is
+         glossing for comprehension rather than reading practice, so it stays
+         legible whatever the ふ gate says; because .after is outside
+         `body.furigana .page rt`, that exemption is structural now rather than the
+         ID-specificity accident it was.
+
+         The <details> collapse retires: a <details> cannot straddle a screen
+         boundary, and these screens split like any other. The spoiler gate is that
+         you reach the afterword only by deliberately turning past the last page,
+         and the label below is the first thing on the first afterword screen. */
+      .after {
+        -webkit-writing-mode: horizontal-tb;
+        writing-mode: horizontal-tb;
+        font-family: var(--sans);
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--ink);
+        inline-size: min(34rem, 100%);
+        block-size: 100%;
+        -webkit-hyphens: auto;
+        hyphens: auto;
+      }
+      .after .after-label {
+        display: block;
+        margin: 0 0 0.9em;
+        color: var(--accent);
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+        -webkit-hyphens: none;
+        hyphens: none;
+      }
+      .after rt { font-size: 0.5em; opacity: 0.75; }
+
+      /* ---- chrome: two fixed overlay bars --------------------------------- */
+      #top, #bar {
+        position: fixed;
+        inset-inline: 0;
+        z-index: var(--z-chrome);
+        display: flex;
+        align-items: center;
+        background: var(--paper);
+        color: var(--muted);
+        font-family: var(--sans);
+        font-size: 0.85rem;
+        /* The reader's writing mode must not reach the controls. */
+        writing-mode: horizontal-tb;
+        direction: ltr;
+        touch-action: manipulation;
+        transition: opacity 0.22s ease;
+      }
+      /* A text strip, not a control surface: nothing in here is tappable, so it
+         is sized to --top-content rather than to a 44px target. */
+      #top {
+        top: 0;
+        block-size: var(--top-h);
+        gap: var(--top-gap);
+        padding-block: calc(var(--chrome-gap) + var(--safe-t)) var(--chrome-gap);
+        padding-inline: max(0.9rem, var(--safe-l)) max(0.9rem, var(--safe-r));
+      }
+      #bar {
+        bottom: 0;
+        block-size: var(--bar-h);
+        gap: clamp(0.2rem, 1.2vw, 0.5rem);
+        justify-content: space-between;
+        padding-block: var(--chrome-gap) calc(var(--chrome-gap) + var(--safe-b));
+        /* Narrower gutters than the top strip, because the bar is the crowded
+           one: it carries seven tap targets since 目次 came down from the
+           header, where the top carries two lines of text. */
+        padding-inline: max(0.35rem, var(--safe-l)) max(0.35rem, var(--safe-r));
+      }
+      /* The two bars used to carry a scrim — a 1.25rem paper-to-transparent
+         gradient, drawn at top: 100% and bottom: 100% so it fell OUTSIDE the bar
+         and over the page box. That was a softer edge than a rule, which is
+         right, but .cell only pads by --top-h and --bar-h and never by the
+         scrim, so what the gradient actually veiled was the first and last
+         20px of live text — the head and foot of every column in 縦書き. Text
+         the reader is trying to read outranks the edge treatment, and the bars
+         already end in flat --paper against --paper.
+
+         If an edge is ever wanted back, it has to be paid for out of the page
+         box (fold the scrim into --top-h and --bar-h), not borrowed from it.
+         Not backdrop-filter either — it would make its own element a containing
+         block for fixed descendants, and iOS 26 samples page colour for its
+         toolbar tint. */
+
+      /* Hiding changes opacity and inertness, never a box: --top-h and --bar-h
+         stay reserved, so a fade can never resize the page box. */
+      body.chrome-off #top, body.chrome-off #bar { opacity: 0; pointer-events: none; }
+
+      /* The count replaces the retired 2px progress rule, so it is now the only
+         progress indicator and takes --ink rather than --muted. tabular-nums stops
+         it jittering on every turn. */
+      #count {
+        flex: 0 0 auto;
+        min-inline-size: var(--count-w);
+        text-align: end;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+      }
+      /* 目次 used to balance the count on the other side of the title; it now
+         lives in the button bar, and a two-item flex row would push the title
+         half the count's width off centre. The start padding is that missing
+         item, and it has to carry the flex gap as well as the count's width —
+         the gap sits between title and count and nowhere else, so leaving it
+         out lands the title half a gap (4.8px) to the left, which is visible on
+         a centred line. Both terms are variables so the three cannot drift. */
+      #title {
+        flex: 1 1 auto;
+        min-inline-size: 0;
+        margin: 0;
+        padding-inline-start: calc(var(--count-w) + var(--top-gap));
+        font: inherit;
+        font-weight: 600;
+        line-height: var(--top-content);
+        color: var(--ink);
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #bar button, a.btn {
+        font: inherit;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #bar button {
+        flex: 0 0 auto;
+        min-inline-size: var(--tap);
+        block-size: var(--tap);
+        padding: 0;
+        font-size: 1.05rem;
+        line-height: 1;
+      }
+      /* Styled as a button but an anchor, so it works with no JS and offers a real
+         target for open-in-new-tab. It sits among the gate buttons now rather
+         than beside the title, so it takes --ink with them: --muted next to a
+         row of ink glyphs reads as disabled. */
+      a.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        block-size: var(--tap);
+        /* The only elastic control in the bar. Seven 44px targets plus gaps need
+           about 358px, so this is what buys the last few pixels on a narrow
+           phone before anything has to be clipped. */
+        padding-inline: clamp(0.2rem, 1.4vw, 0.55rem);
+        text-decoration: none;
+      }
+      /* The lit glyph is the only thing on screen saying a gate is armed, so it is
+         a solid fill, not a tint — color-mix would drop the cue entirely where it
+         is unsupported. */
+      #bar button[aria-pressed="true"] {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: var(--paper);
+      }
+      #bar button:disabled { opacity: 0.3; cursor: default; }
+      @media (hover: hover) and (pointer: fine) {
+        #bar button:hover:not(:disabled):not([aria-pressed="true"]),
+        a.btn:hover { border-color: var(--accent); color: var(--accent); }
+      }
+      :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+      .gates { display: flex; gap: clamp(0.2rem, 1.2vw, 0.35rem); order: 1; }
+      #prev { order: 0; }
+      #next { order: 2; }
+      /* 右綴じ: the next page lies to the left, so its control does too. Flexbox
+         order does not move DOM order, so the tab sequence stays 前 → ふ → 訳 → 意
+         → 設 → 次, which is the reading order in either binding. */
+      body.bind-right #prev { order: 2; }
+      body.bind-right #next { order: 0; }
+
+      /* ---- the disclosure sheet ------------------------------------------- */
+      /* A sibling of #track, never a descendant, and horizontal even when the page
+         is 縦書き: this is chrome, not text. Physical insets throughout — logical
+         inset-* resolve against the containing block's writing mode while logical
+         margins resolve against the element's own.
+
+         It sits ABOVE #bar, not under it: arming 意 with a word already open is
+         the shortest route to its meaning, so the nav has to stay reachable and
+         the sheet has to survive the tap (see data-keep-sheet). */
+      #sheet {
+        position: fixed;
+        z-index: var(--z-sheet);
+        left: max(0.75rem, var(--safe-l));
+        right: max(0.75rem, var(--safe-r));
+        bottom: calc(var(--bar-h) + 0.5rem);
+        max-width: 34rem;
+        margin-left: auto;
+        margin-right: auto;
+        writing-mode: horizontal-tb;
+        direction: ltr;
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        background: var(--paper);
+        color: var(--ink);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+        font-family: var(--sans);
+        font-size: 0.85rem;
+        line-height: 1.55;
+        /* Never engages on the shipped corpus — glosses are capped at 120 chars and
+           the longest translation is 146 — but a large OS text size is the one case
+           where losing the bottom of a gloss would matter. contain stops any scroll
+           chaining to the locked document. */
+        max-height: 40vh;
+        max-height: 40dvh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+        /* The track is user-select: none on touch, so this is the only place a
+           selection can start — and copying a gloss into Anki is a real use. */
+        -webkit-user-select: text;
+        user-select: text;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.16s ease, transform 0.16s ease, bottom 0.22s ease;
+      }
+      /* With the bars faded there is nothing to clear, so the sheet takes the
+         space they were sitting in rather than floating a bar's height above
+         empty paper. The page box still reserves --bar-h either way, so moving
+         down covers less text, never more. The transition matches the bars'
+         0.22s, so the two move together when a drag hides the chrome. */
+      body.chrome-off #sheet { bottom: max(0.5rem, var(--safe-b)); }
+      #sheet.on { opacity: 1; transform: none; }
+      #sheet-head { display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; }
+      #sheet-word { font-family: var(--serif); font-size: 1.35rem; line-height: 1.25; }
+      #sheet-kana { color: var(--accent); font-size: 0.95rem; }
+      #sheet-tags { display: flex; gap: 0.3rem; margin-left: auto; }
+      #sheet-tags .tag {
+        font-size: 0.66rem;
+        letter-spacing: 0.05em;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        padding: 0.05rem 0.45rem;
+      }
+      #sheet-tags .tag.weak { color: var(--weak); }
+      #sheet-tags .tag.new { color: var(--new); }
+      /* A third of glosses are truncated mid-word at 120 chars and none of them is
+         guaranteed to carry a break opportunity. */
+      #sheet-body { margin: 0.4rem 0 0; overflow-wrap: anywhere; }
+      #sheet-hint { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.72rem; }
+
+      /* ---- settings ------------------------------------------------------- */
+      /* A <dialog>, for the free focus trap, backdrop, Escape and inert-ing of the
+         page behind it — which also stops the track's pointer handlers firing.
+         Where showModal is missing it opens non-modally over #veil instead. */
+      #settings {
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: var(--z-panel);
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        inline-size: 100%;
+        max-inline-size: 27rem;
+        max-block-size: min(86vh, 44rem);
+        max-block-size: min(86dvh, 44rem);
+        padding: 0;
+        border: 0;
+        border-radius: 14px 14px 0 0;
+        background: var(--paper);
+        color: var(--ink);
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.22);
+        font-family: var(--sans);
+        font-size: 0.92rem;
+        writing-mode: horizontal-tb;
+        direction: ltr;
+        overflow: hidden;
+      }
+      /* display:flex above beats the UA's dialog:not([open]) rule, so the panel
+         ships open without this. */
+      #settings:not([open]) { display: none; }
+      /* Opened with focus on the panel itself, so no control wears a keyboard ring
+         the moment a thumb opens it. */
+      #settings:focus { outline: none; }
+      /* The var() fallback covers engines where ::backdrop does not inherit custom
+         properties from the element it belongs to. */
+      #settings::backdrop { background: var(--veil, rgba(20, 18, 16, 0.4)); }
+      #veil {
+        position: fixed;
+        inset: 0;
+        z-index: var(--z-veil);
+        background: var(--veil);
+      }
+
+      .phead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex: 0 0 auto;
+        padding: 0.7rem 1rem;
+        border-block-end: 1px solid var(--rule);
+      }
+      .phead h2 { margin: 0; font: inherit; font-size: 1rem; font-weight: 600; }
+      #settings-close {
+        font: inherit;
+        inline-size: var(--tap);
+        block-size: var(--tap);
+        padding: 0;
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* The one place in the reader that may scroll. */
+      .pbody {
+        flex: 1 1 auto;
+        min-block-size: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+        padding: 0 1rem calc(1rem + var(--safe-b));
+      }
+      .pbody h3 {
+        margin: 0.8rem 0 0.1rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-block: 0.35rem;
+      }
+      .row + .row { border-block-start: 1px solid var(--rule); }
+      .rlabel { flex: 0 1 auto; color: var(--ink); }
+      .rlabel small { display: block; font-size: 0.76rem; color: var(--muted); }
+
+      .seg {
+        display: flex;
+        flex: 0 1 auto;
+        border: 1px solid var(--rule);
+        border-radius: 9px;
+        overflow: hidden;
+      }
+      .seg label { position: relative; display: block; flex: 0 1 auto; }
+      /* Kept rendered and focusable — display:none or visibility:hidden would take
+         the radios out of the tab order and lose native arrow-key group
+         navigation. */
+      .seg input {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .seg span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-block-size: var(--tap);
+        padding-inline: 0.72rem;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .seg label + label span { border-inline-start: 1px solid var(--rule); }
+      .seg input:checked + span { background: var(--accent); color: var(--paper); }
+      .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -3px; }
+
+      input.sw {
+        appearance: none;
+        -webkit-appearance: none;
+        flex: 0 0 auto;
+        inline-size: 44px;
+        block-size: 24px;
+        margin: 0;
+        border: 1px solid var(--rule);
+        border-radius: 999px;
+        background: transparent;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+      }
+      input.sw::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--muted);
+        transition: left 0.15s ease, background-color 0.15s ease;
+      }
+      input.sw:checked { border-color: var(--accent); background: var(--accent); }
+      input.sw:checked::after { left: 22px; background: var(--paper); }
+
+      .step { display: flex; align-items: center; gap: 0.3rem; flex: 0 0 auto; }
+      .step button {
+        font: inherit;
+        inline-size: var(--tap);
+        block-size: var(--tap);
+        padding: 0;
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--ink);
+        font-size: 1.1rem;
+        line-height: 1;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .step button:disabled { opacity: 0.3; cursor: default; }
+      #fs-val { min-inline-size: 3.6rem; text-align: center; font-variant-numeric: tabular-nums; }
+
+      .stats { padding-block: 0.2rem 0.4rem; }
+      .srow {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-block: 0.2rem;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+      .srow b { font-weight: 600; color: var(--ink); text-align: end; font-variant-numeric: tabular-nums; }
+
+      /* Only meaningful where there is a keyboard. */
+      .keys { display: none; }
+      @media (hover: hover) and (pointer: fine) {
+        .keys { display: block; margin-block: 0.5rem 0; color: var(--muted); font-size: 0.8rem; line-height: 1.75; }
+      }
+      .keys kbd {
+        font: inherit;
+        font-size: 0.76rem;
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        padding: 0.05rem 0.3rem;
+        color: var(--ink);
+      }
+
+      /* reduce means reduce, not remove: the live drag translate is direct
+         manipulation following a finger and is unaffected (it is an imperative
+         transform set with transitions off). 1ms rather than none, so that any
+         transitionend a snap waits on still fires. */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          transition-duration: 1ms !important;
+          animation-duration: 1ms !important;
+        }
+      }
