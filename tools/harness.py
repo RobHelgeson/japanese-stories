@@ -1666,8 +1666,11 @@ def suite_manage(br, rep, base):
         # Import is a merge, not a replace: pasting yesterday's export must not
         # pull a story backwards.
         stale = {slug: rec(2, 1)}
+        # The box is revealed first, deliberately. 読み込み on a hidden box only
+        # opens and clears it, so the two-click idiom parses an empty string and
+        # the import under test never happens.
+        br.eval("document.getElementById('box').hidden = false")
         br.eval("document.getElementById('box').value = " + json.dumps(json.dumps(stale)))
-        br.eval("document.getElementById('imp').click()")
         br.eval("document.getElementById('imp').click()")
         got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
         rep.add("manage", "import-merges-rather-than-replaces", got[slug]["page"] == 24, got)
@@ -1791,7 +1794,9 @@ def suite_review(br, rep, base):
                 got[slug]["note"] == note, got)
         rep.add("review", "and-does-not-disturb-the-rating", got[slug]["stars"] == 3, got)
         # Debounced, so the box is flushed by the blur rather than by waiting.
-        br.eval(f"{ta}.dispatchEvent(new Event('focusout', {{bubbles: true}}))")
+        # blur() alone does not deliver focusout to a window that does not have
+        # focus, which is what headless is, so the event is dispatched too.
+        br.eval(f"{ta}.blur(); {ta}.dispatchEvent(new FocusEvent('focusout', {{bubbles: true}}))")
         br.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
         remote = br.eval("window.GIST.revs") or {}
         rep.add("review", "and-the-note-reaches-the-gist",
@@ -1833,16 +1838,16 @@ def suite_review(br, rep, base):
                 and slug in dump.get("progress", {}), list(dump.keys()))
 
         pasted = {"progress": {}, "reviews": {slug: {"stars": 1, "note": "pasted", "at": ahead + 1}}}
+        br.eval("document.getElementById('box').hidden = false")
         br.eval("document.getElementById('box').value = " + json.dumps(json.dumps(pasted)))
-        br.eval("document.getElementById('imp').click()")
         br.eval("document.getElementById('imp').click()")
         rep.add("review", "import-merges-reviews-too", br.eval(lit) == 1, br.eval(revs))
 
         # A bare progress map is what an export looked like before reviews
         # existed, and it must still import as progress rather than as nothing.
+        br.eval("document.getElementById('box').hidden = false")
         br.eval("document.getElementById('box').value = "
                 + json.dumps(json.dumps({slug: rec(20, ahead + 2)})))
-        br.eval("document.getElementById('imp').click()")
         br.eval("document.getElementById('imp').click()")
         got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
         rep.add("review", "a-pre-reviews-export-still-imports", got[slug]["page"] == 20, got)
@@ -1869,10 +1874,44 @@ def suite_review(br, rep, base):
         rep.add("review", "clearing-one-story-leaves-its-rating-standing",
                 br.eval(lit) == 4 and br.eval(revs)[slug]["stars"] == 4, br.eval(revs))
 
+        # ---- a note typed while a push is open is not rolled back -------------
+        # push() reads the store after its GET rather than before it. Reading
+        # first and merging against that snapshot writes the pre-keystroke copy
+        # back over the box, one keystroke at a time, and PATCHes the loss.
+        connect(br, None, {"shuden": {"stars": 5, "at": ahead + 20}})
+        gist(br, delay=1200)
+        br.eval(f"{cell}.querySelector('.notebtn').click()") if br.eval(f"{ta}.hidden") else None
+        br.eval(f"{ta}.focus()")
+        br.eval(f"{ta}.value = 'first'")
+        br.eval(f"{ta}.dispatchEvent(new Event('input', {{bubbles: true}}))")
+        br.eval("window.__p = Sync.push()")
+        br.eval(f"{ta}.value = 'first and second'")
+        br.eval(f"{ta}.dispatchEvent(new Event('input', {{bubbles: true}}))")
+        br.eval("window.__p", await_promise=True)
+        rep.add("review", "a-keystroke-during-an-open-push-is-not-rolled-back",
+                br.eval(revs)[slug]["note"] == "first and second", br.eval(revs)[slug])
+        gist(br, delay=0)
+
+        # ---- a note arriving while the box sits empty and focused --------------
+        # The box is skipped by the repaint while it holds focus, so without a
+        # repaint on the way out the next keystroke would send the empty box —
+        # and the merged note with it — straight back to the gist.
+        br.eval(f"{ta}.focus()")
+        br.eval(f"{ta}.value = ''")
+        connect(br, None, {slug: {"stars": 4, "note": "typed on the laptop", "at": ahead + 30}})
+        br.eval("Sync.pull()", await_promise=True)
+        rep.add("review", "a-focused-box-is-left-alone-while-it-is-focused",
+                br.eval(f"{ta}.value") == "", br.eval(f"{ta}.value"))
+        br.eval(f"{ta}.blur(); {ta}.dispatchEvent(new FocusEvent('focusout', {{bubbles: true}}))")
+        rep.add("review", "the-box-really-did-give-up-focus",
+                br.eval(f"document.activeElement !== {ta}"), None)
+        rep.add("review", "and-the-blur-brings-the-merged-note-in",
+                br.eval(f"{ta}.value") == "typed on the laptop", br.eval(f"{ta}.value"))
+
         # ---- a repaint must not take a half-typed sentence away ---------------
         br.eval(f"{ta}.focus()")
         br.eval(f"{ta}.value = 'half a sen'")
-        connect(br, None, {slug: {"stars": 2, "note": "overwritten", "at": ahead + 9}})
+        connect(br, None, {slug: {"stars": 2, "note": "overwritten", "at": ahead + 40}})
         r = br.eval("Sync.pull()", await_promise=True)
         rep.add("review", "the-pull-under-test-really-did-deliver-a-note",
                 (r["reviews"].get(slug) or {}).get("note") == "overwritten", r["reviews"])

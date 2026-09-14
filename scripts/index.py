@@ -663,7 +663,9 @@ __CARDS__
             var note = ok && typeof rec.note === "string" ? rec.note : "";
             var ta = cell.querySelector("textarea.note");
             // A pull landing mid-sentence must not take the sentence away, so a
-            // focused box is left exactly as it is and repainted when it blurs.
+            // focused box is left exactly as it is. The blur repaints it, which
+            // is what stops a note merged in while it sat focused-and-empty
+            // from being overwritten by the next keystroke.
             if (ta && ta !== document.activeElement && ta.value !== note) ta.value = note;
             var btn = cell.querySelector(".notebtn");
             if (btn) btn.classList.toggle("has", !!note);
@@ -785,7 +787,9 @@ __CARDS__
         });
 
         main.addEventListener("focusout", function (e) {
-          if (e.target.closest && e.target.closest("textarea.note") && flush) pushNow();
+          if (!e.target.closest || !e.target.closest("textarea.note")) return;
+          if (flush) pushNow();
+          paintR(readR());
         });
 
         // The tab away, the app switch and the Home Screen swipe all land here,
