@@ -48,7 +48,20 @@ The store is a plain JSON file on github.com, so correcting a bad record is some
 
 **Then add it to the Home Screen.** That is what stops the seven-day eviction, because a standalone web app gets its own counter of days of use. Do it after connecting, not before: the install begins with an empty store, so it will read as zero progress until you paste the token into it and let it pull.
 
-編集 on the contents page opens per-story controls — mark 読了 or 未読, move the resume page, clear one story — alongside 書き出し / 読み込み for the whole record as JSON. Import merges by the same rule the gist does, so pasting an older export cannot pull a story backwards. Clearing writes a dated empty record rather than deleting the key, because a deletion merges back to whatever the gist still holds and would undo itself on the next pull.
+編集 on the contents page opens per-story controls — mark 読了 or 未読, move the resume page, clear one story — alongside 書き出し / 読み込み for the whole record as JSON. Import merges by the same rule the gist does, so pasting an older export cannot pull a story backwards. Clearing writes a dated empty record rather than deleting the key, because a deletion merges back to whatever the gist still holds and would undo itself on the next pull. 消去 clears the place, not the rating.
+
+## Rating a story
+
+Every row on the contents page carries five stars and a 感想 box, and neither sits behind 編集 — the rating is given on the way out of a story, not sat down to. Tapping a star sets the rating; tapping the star that is already lit takes it back off, which is the only undo there is. The note is free text, capped at 2000 characters, saved as you type and pushed on a short debounce.
+
+Ratings travel in the same secret gist as progress, in a `reviews` map beside `progress` rather than as fields on the progress record. That separation is the whole point: a progress record is replaced whole by whichever side carries the later timestamp, and every page turn bumps that timestamp, so a rating stored there would be erased the next time another device turned a page in the same story.
+
+```bash
+python3 reviews.py                  # the ratings and notes, joined to corpus.json
+python3 reviews.py --file exp.json  # from a 書き出し export instead, no network
+```
+
+`reviews.py` is the reading end, and it is what a new story's brief is chosen against: it prints each rating beside the level, register and length it was a verdict on, then the averages by level and by register, with their counts, and every note in full. A rating is one number and the note underneath it is where the reason lives. It reads the gist through `gh`, which already holds a token with the gist scope, so nothing has to be kept in step with the phone.
 
 ## Layout
 
@@ -96,6 +109,7 @@ So editing the reader's styling or behaviour now rewrites two files in about a s
 | `python3 check.py ../stories/<slug>.txt` | every content token is known or decomposes into known pieces (slow) |
 | `python3 have.py 単語1 単語2`            | quick known / unknown / leech lookup                                |
 | `python3 brief.py`                       | resolve and print a story brief before drafting                     |
+| `python3 reviews.py`                     | star ratings and notes, joined to level, register and length        |
 | `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki               |
 | `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                |
 
