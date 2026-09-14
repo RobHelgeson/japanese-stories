@@ -1390,7 +1390,9 @@ GIST_STUB = r"""
   const load = () => {
     try { return JSON.parse(sessionStorage.getItem(KEY)) || null; } catch (e) { return null; }
   };
-  const G = load() || { id: "g1", doc: null, calls: [], status: 0, delay: 0, rev: 1 };
+  // `doc` is the progress half and `revs` the reviews half, kept as two fields
+  // so every existing test that drives `doc` still means what it meant.
+  const G = load() || { id: "g1", doc: null, revs: null, calls: [], status: 0, delay: 0, rev: 1 };
   const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify(G)); } catch (e) {} };
   // Which document made a call. The outgoing document gets a pagehide flush on
   // every reload, and that flush pushes — so a log cleared before a reload still
@@ -1414,9 +1416,14 @@ GIST_STUB = r"""
     return G.delay ? new Promise((r) => setTimeout(() => r(res), G.delay)) : Promise.resolve(res);
   };
 
-  const wrap = (map) => ({
+  const wrap = (map, revs) => ({
     id: G.id,
-    files: { [FILE]: { content: JSON.stringify({ v: 1, progress: map || {} }, null, 2) } },
+    files: {
+      [FILE]: {
+        content: JSON.stringify(
+          { v: 1, progress: map || {}, reviews: revs || {} }, null, 2),
+      },
+    },
   });
 
   window.fetch = (url, opts) => {
@@ -1435,13 +1442,15 @@ GIST_STUB = r"""
     if (m === "GET") {
       save();
       if (h["If-None-Match"] && h["If-None-Match"] === etag) return reply(304, null, etag);
-      return reply(200, wrap(G.doc), etag);
+      return reply(200, wrap(G.doc, G.revs), etag);
     }
     if (m === "POST" || m === "PATCH") {
-      G.doc = JSON.parse(sent.files[FILE].content).progress;
+      const doc = JSON.parse(sent.files[FILE].content);
+      G.doc = doc.progress;
+      G.revs = doc.reviews;
       G.rev++;
       save();
-      return reply(m === "POST" ? 201 : 200, wrap(G.doc), 'W/"' + G.rev + '"');
+      return reply(m === "POST" ? 201 : 200, wrap(G.doc, G.revs), 'W/"' + G.rev + '"');
     }
     save();
     return reply(404, {}, null);
@@ -1462,9 +1471,9 @@ def gist(br, **fields):
     br.eval("window.GISTsave()")
 
 
-def connect(br, doc=None):
+def connect(br, doc=None, revs=None):
     """Put the device in the connected state without going through the UI."""
-    gist(br, doc=doc, calls=[], rev=1)
+    gist(br, doc=doc, revs=revs, calls=[], rev=1)
     br.eval(
         "localStorage.setItem('japanese-stories:sync',"
         " JSON.stringify({token: 't', gist: 'g1', etag: ''}))"
@@ -1693,6 +1702,183 @@ def suite_manage(br, rep, base):
                 br.eval("document.getElementById('glink').href"))
         rep.add("manage", "and-the-token-does-not-stay-in-the-field",
                 br.eval("document.getElementById('tok').value") == "", None)
+
+        # Two taps inside one millisecond used to carry the same `at`, and the
+        # merge gives a tie to the remote — so the second tap lost to the gist's
+        # copy of the first and silently undid itself. The clock is frozen
+        # rather than raced: a defect that reproduces half the time is not a
+        # test, and this is exactly the condition, not an approximation of it.
+        br.eval("window.__now = Date.now; Date.now = function () { return 4e12; };")
+        try:
+            br.eval(f"{cell}.querySelector('[data-act=\"dec\"]').click()")
+            br.eval(f"{cell}.querySelector('[data-act=\"dec\"]').click()")
+            br.eval("new Promise(r => setTimeout(r, 500))", await_promise=True)
+            got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+            rep.add("manage", "two-taps-in-one-millisecond-both-count",
+                    got[slug]["page"] == 24, got)
+        finally:
+            br.eval("Date.now = window.__now")
+    finally:
+        br.drop_init_script(ident)
+
+
+
+def suite_review(br, rep, base):
+    """Star ratings and notes on the contents page, and their own merge."""
+    ident = br.init_script(sync_stub())
+    try:
+        br.emulate(*PHONE[1:])
+        slug = "tokei-no-oto"
+        br.goto_plain(f"{base}/blank.html")
+        br.eval("localStorage.clear()")
+        connect(br)
+        br.goto_plain(f"{base}/index.html")
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+
+        cell = f"document.querySelector('.cell[data-slug=\"{slug}\"]')"
+        star = lambda n: f"{cell}.querySelector('[data-act=\"star\"][data-n=\"{n}\"]')"
+        lit = f"{cell}.querySelectorAll('[data-act=\"star\"][aria-pressed=\"true\"]').length"
+        revs = "JSON.parse(localStorage.getItem('japanese-stories:reviews'))"
+
+        # ---- the merge rule, as a pure function -----------------------------
+        M = "Sync.mergeReviews(%s, %s)"
+        a, b = {slug: {"stars": 5, "note": "a", "at": 1000}}, {slug: {"stars": 2, "note": "b", "at": 2000}}
+        got = br.eval(M % (json.dumps(a), json.dumps(b)))
+        rep.add("review", "merge-takes-the-later-stamp", got[slug]["stars"] == 2, got)
+        got = br.eval(M % (json.dumps(b), json.dumps(a)))
+        rep.add("review", "merge-is-order-independent", got[slug]["stars"] == 2, got)
+        # A rating and a position have nothing to say to each other, so the
+        # `done` resolution must not leak into a map that has no `done`.
+        rep.add("review", "merge-adds-no-done-field", "done" not in got[slug], got)
+        got = br.eval(M % (json.dumps({slug: {"stars": 5, "at": 1}}), json.dumps({"v": 1})))
+        rep.add("review", "merge-drops-a-non-record-key", "v" not in got, got)
+
+        # ---- rating, by hand -------------------------------------------------
+        br.eval(f"{star(4)}.click()")
+        got = br.eval(revs)
+        rep.add("review", "a-star-writes-a-rating-and-a-stamp",
+                got[slug]["stars"] == 4 and got[slug].get("at", 0) > 0, got)
+        rep.add("review", "and-lights-that-many-stars", br.eval(lit) == 4, br.eval(lit))
+
+        # Nothing else can undo a mis-tap: the lit star is the only way back.
+        br.eval(f"{star(4)}.click()")
+        got = br.eval(revs)
+        rep.add("review", "tapping-the-lit-star-clears-the-rating", got[slug]["stars"] == 0, got)
+        rep.add("review", "and-unlights-the-row", br.eval(lit) == 0, br.eval(lit))
+        br.eval(f"{star(3)}.click()")
+        rep.add("review", "re-rating-after-a-clear-works", br.eval(lit) == 3, br.eval(revs))
+
+        # ---- the rating reaches the gist ------------------------------------
+        br.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
+        remote = br.eval("window.GIST.revs") or {}
+        rep.add("review", "a-rating-reaches-the-gist",
+                (remote.get(slug) or {}).get("stars") == 3, remote)
+        # Progress never moved here, so a no-op skip that only compared the
+        # progress half would have thrown this PATCH away.
+        rep.add("review", "and-does-so-with-the-position-unchanged",
+                not (br.eval("window.GIST.doc") or {}).get(slug, {}).get("page"),
+                br.eval("window.GIST.doc"))
+
+        # ---- the note --------------------------------------------------------
+        note = "Page 12 needed a re-read."
+        ta = f"{cell}.querySelector('textarea.note')"
+        br.eval(f"{cell}.querySelector('.notebtn').click()")
+        rep.add("review", "the-note-button-reveals-the-box", br.eval(f"{ta}.hidden") is False, None)
+        br.eval(f"{ta}.value = " + json.dumps(note))
+        br.eval(f"{ta}.dispatchEvent(new Event('input', {{bubbles: true}}))")
+        got = br.eval(revs)
+        rep.add("review", "typing-writes-the-note-locally-at-once",
+                got[slug]["note"] == note, got)
+        rep.add("review", "and-does-not-disturb-the-rating", got[slug]["stars"] == 3, got)
+        # Debounced, so the box is flushed by the blur rather than by waiting.
+        br.eval(f"{ta}.dispatchEvent(new Event('focusout', {{bubbles: true}}))")
+        br.eval("new Promise(r => setTimeout(r, 400))", await_promise=True)
+        remote = br.eval("window.GIST.revs") or {}
+        rep.add("review", "and-the-note-reaches-the-gist",
+                (remote.get(slug) or {}).get("note") == note, remote)
+        rep.add("review", "a-written-note-is-marked-on-the-button",
+                br.eval(f"{cell}.querySelector('.notebtn').classList.contains('has')"), None)
+
+        # ---- the whole reason the two maps are separate ----------------------
+        # A progress record is replaced whole by whichever side carries the
+        # later `at`, and every page turn bumps it. On one record, this pull
+        # would take the rating with it.
+        ahead = int(time.time() * 1000) + 60000
+        # Re-connecting rather than moving GIST.doc under a live ETag: the stub
+        # answers 304 to a matching conditional request, so a remote changed in
+        # place would never be fetched and the case would pass vacuously.
+        connect(br, {slug: rec(9, ahead)})
+        r = br.eval("Sync.pull()", await_promise=True)
+        got = br.eval(revs)
+        rep.add("review", "a-newer-remote-position-does-not-erase-a-rating",
+                got[slug]["stars"] == 3 and got[slug]["note"] == note, got)
+        rep.add("review", "and-the-position-is-still-adopted",
+                r["map"][slug]["page"] == 9, r["map"][slug])
+
+        # ---- a rating arriving from elsewhere paints -------------------------
+        landed = {slug: {"stars": 5, "note": "from the laptop", "at": ahead}}
+        gist(br, revs=landed, calls=[])
+        br.reload_plain()
+        br.eval("new Promise(r => setTimeout(r, 500))", await_promise=True)
+        rep.add("review", "a-rating-made-elsewhere-paints-on-arrival",
+                br.eval(lit) == 5, br.eval(revs))
+        rep.add("review", "and-so-does-its-note",
+                br.eval(f"{ta}.value") == "from the laptop", br.eval(f"{ta}.value"))
+
+        # ---- export and import carry both halves -----------------------------
+        br.eval("document.getElementById('exp').click()")
+        dump = json.loads(br.eval("document.getElementById('box').value"))
+        rep.add("review", "export-carries-progress-and-reviews",
+                dump.get("reviews", {}).get(slug, {}).get("stars") == 5
+                and slug in dump.get("progress", {}), list(dump.keys()))
+
+        pasted = {"progress": {}, "reviews": {slug: {"stars": 1, "note": "pasted", "at": ahead + 1}}}
+        br.eval("document.getElementById('box').value = " + json.dumps(json.dumps(pasted)))
+        br.eval("document.getElementById('imp').click()")
+        br.eval("document.getElementById('imp').click()")
+        rep.add("review", "import-merges-reviews-too", br.eval(lit) == 1, br.eval(revs))
+
+        # A bare progress map is what an export looked like before reviews
+        # existed, and it must still import as progress rather than as nothing.
+        br.eval("document.getElementById('box').value = "
+                + json.dumps(json.dumps({slug: rec(20, ahead + 2)})))
+        br.eval("document.getElementById('imp').click()")
+        br.eval("document.getElementById('imp').click()")
+        got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+        rep.add("review", "a-pre-reviews-export-still-imports", got[slug]["page"] == 20, got)
+        rep.add("review", "and-leaves-the-rating-alone",
+                br.eval(revs)[slug]["stars"] == 1, br.eval(revs))
+
+        # ---- 全消去 clears the opinion as well as the place -------------------
+        # From a clean remote. Every stamp above is deliberately a minute in the
+        # future so the "arrived from elsewhere" cases have something to win
+        # with, and a tombstone written now cannot beat a clock that has not
+        # happened yet — which is the merge rule working, not the wipe failing.
+        connect(br)
+        br.eval("document.getElementById('wipe').click()")
+        br.eval("document.getElementById('wipe').click()")
+        got = br.eval(revs)
+        rep.add("review", "a-wipe-tombstones-the-rating",
+                got[slug]["stars"] == 0 and got[slug]["note"] == "" and got[slug]["at"] > 0, got)
+        rep.add("review", "and-the-row-repaints-unrated", br.eval(lit) == 0, None)
+
+        # ---- 消去 on one row is about the place, not the verdict --------------
+        br.eval(f"{star(4)}.click()")
+        br.eval("document.getElementById('edit').click()")
+        br.eval(f"{cell}.querySelector('[data-act=\"clear\"]').click()")
+        rep.add("review", "clearing-one-story-leaves-its-rating-standing",
+                br.eval(lit) == 4 and br.eval(revs)[slug]["stars"] == 4, br.eval(revs))
+
+        # ---- a repaint must not take a half-typed sentence away ---------------
+        br.eval(f"{ta}.focus()")
+        br.eval(f"{ta}.value = 'half a sen'")
+        connect(br, None, {slug: {"stars": 2, "note": "overwritten", "at": ahead + 9}})
+        r = br.eval("Sync.pull()", await_promise=True)
+        rep.add("review", "the-pull-under-test-really-did-deliver-a-note",
+                (r["reviews"].get(slug) or {}).get("note") == "overwritten", r["reviews"])
+        br.eval("new Promise(r => setTimeout(r, 200))", await_promise=True)
+        rep.add("review", "a-focused-note-is-not-stomped-by-a-pull",
+                br.eval(f"{ta}.value") == "half a sen", br.eval(f"{ta}.value"))
     finally:
         br.drop_init_script(ident)
 
@@ -2006,6 +2192,8 @@ def main():
             suite_sync(br, rep, base)
             print("\n===== manage =====")
             suite_manage(br, rep, base)
+            print("\n===== review =====")
+            suite_review(br, rep, base)
         if "--matrix" in args:
             print("\n===== matrix: 4 mode x density, 3 viewports, 22/28/36/40px =====")
             suite_matrix(br, rep)

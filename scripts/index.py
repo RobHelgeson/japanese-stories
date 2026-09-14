@@ -40,6 +40,16 @@ def version_links(slug, versions):
     return f'        <div class="vers"><span>版</span>{links}<span class="cur">現行</span></div>\n'
 
 
+# Rating is not a correction, so it does not sit behind 編集 with the progress
+# stepper. Finishing a story and saying what it was worth is one gesture on the
+# page you land on when you close the reader, or it does not happen.
+STARS = "".join(
+    f'\n          <button type="button" data-act="star" data-n="{n}" '
+    f'aria-pressed="false" aria-label="星{n}つ">★</button>'
+    for n in range(1, 6)
+)
+
+
 def card(story, summary, versions=()):
     href = html.escape(story["file"])
     title = html.escape(story["title"])
@@ -75,6 +85,14 @@ def card(story, summary, versions=()):
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
+      <div class="rate">
+        <span class="stars" role="group" aria-label="評価">{STARS}
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" class="notebtn" data-act="note" aria-expanded="false">感想</button>
+      </div>
+      <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
+                placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
 {version_links(slug, versions)}    </div>
 """
 
@@ -327,7 +345,51 @@ TEMPLATE = """<!doctype html>
         color: var(--muted);
         font-variant-numeric: tabular-nums;
       }
-      .btn, .manage button, .sync button {
+      /* Always visible, unlike .manage: a rating is something you give on the
+         way out of a story, not a correction you sit down to make. Outside
+         a.card for the same reason .manage is — a button inside an anchor is a
+         tap the anchor eats. */
+      .rate {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0.1rem 0 0 3.2rem;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.75rem;
+      }
+      .rate .mspacer { flex: 1; }
+      .stars { display: inline-flex; align-items: center; }
+      /* No pill: five bordered buttons in a row read as a toolbar rather than
+         as one control. The 44px target is still there, in the hit area. */
+      .stars button {
+        font: inherit;
+        font-size: 1.05rem;
+        line-height: 1;
+        background: transparent;
+        border: 0;
+        padding: 0 0.1rem;
+        min-width: 32px;
+        min-height: 44px;
+        color: var(--rule);
+        cursor: pointer;
+      }
+      .stars button[aria-pressed="true"] { color: var(--accent); }
+      .stars button:hover { color: color-mix(in srgb, var(--accent) 55%, var(--rule)); }
+      .note {
+        font: 0.8rem/1.6 -apple-system, system-ui, sans-serif;
+        width: calc(100% - 3.2rem);
+        margin: 0.1rem 0 0 3.2rem;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        padding: 0.5rem 0.6rem;
+        resize: vertical;
+      }
+      .note[hidden] { display: none; }
+      .note:focus { outline: none; border-color: var(--accent); }
+
+      .btn, .manage button, .rate .notebtn, .sync button {
         font: inherit;
         white-space: nowrap;
         font-family: -apple-system, system-ui, sans-serif;
@@ -343,8 +405,14 @@ TEMPLATE = """<!doctype html>
         cursor: pointer;
       }
       .manage .step button { min-width: 44px; }
-      .btn:hover, .manage button:hover, .sync button:hover { border-color: var(--accent); color: var(--accent); }
+      .btn:hover, .manage button:hover, .rate .notebtn:hover, .sync button:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
       .btn[aria-pressed="true"] { background: var(--rule); }
+      /* After the base button rule, not before it: same specificity, so the
+         later selector is the one that decides the colour. */
+      .rate .notebtn.has { color: var(--accent); border-color: var(--accent); }
       .cell.done .manage [data-act="done"] { color: var(--new); border-color: var(--new); }
 
       .sync {
@@ -481,20 +549,59 @@ __CARDS__
         var S = window.Sync;
         var $ = function (id) { return document.getElementById(id); };
         var cells = [].slice.call(document.querySelectorAll(".cell[data-slug]"));
-        var now = function () { return Date.now(); };
+        // Date.now() is the clock; this is the order. Two edits inside one
+        // millisecond carry the same `at`, the merge gives a tie to the remote,
+        // and the second edit then loses to the copy of the first that its own
+        // push has already put in the gist — a stepper tap that silently undoes
+        // itself. Only this page edits fast enough to tie with itself, so the
+        // monotonic stamp lives here rather than in the merge rule, which still
+        // gives the remote a genuine tie so two devices converge.
+        var last = 0;
+        var now = function () {
+          var t = Date.now();
+          last = t > last ? t : last + 1;
+          return last;
+        };
 
-        var read = function () {
-          if (S) return S.local();
-          try { return JSON.parse(localStorage.getItem("japanese-stories:progress")) || {}; }
+        // A note long enough to be a document is a note that belongs in the
+        // vault, not in a gist every reader on every device pulls on boot.
+        var NOTE_MAX = 2000;
+
+        var slot = function (key) {
+          try { return JSON.parse(localStorage.getItem("japanese-stories:" + key)) || {}; }
           catch (e) { return {}; }
         };
 
-        // Every mutation goes through here, so the push and the repaint cannot
-        // be forgotten at one call site and not another.
-        var save = function (map) {
-          if (S) { S.saveLocal(map); paint(map); S.push().then(function (r) { paint(r.map); }); return; }
-          try { localStorage.setItem("japanese-stories:progress", JSON.stringify(map)); } catch (e) {}
-          paint(map);
+        var read = function () { return S ? S.local() : slot("progress"); };
+        var readR = function () { return S ? S.reviews() : slot("reviews"); };
+
+        var put = function (key, map) {
+          if (S) { if (key === "progress") S.saveLocal(map); else S.saveReviews(map); return; }
+          try { localStorage.setItem("japanese-stories:" + key, JSON.stringify(map)); } catch (e) {}
+        };
+
+        // One push, debounced or not, and it repaints both halves. Typing in a
+        // note must not fire a pull-merge-push per keystroke, and a star must
+        // not wait a second and a half to leave the device.
+        var flush = null;
+        var pushNow = function () {
+          if (flush) { clearTimeout(flush); flush = null; }
+          if (!S) return;
+          S.push().then(function (r) { paint(r.map); paintR(r.reviews); });
+        };
+        var pushSoon = function () {
+          if (!S) return;
+          if (flush) clearTimeout(flush);
+          flush = setTimeout(pushNow, 1500);
+        };
+
+        // Every mutation goes through one of these, so the push and the repaint
+        // cannot be forgotten at one call site and not another.
+        var save = function (map) { put("progress", map); paint(map); pushNow(); };
+        var saveR = function (map, soon) {
+          put("reviews", map);
+          paintR(map);
+          if (soon) pushSoon(); else pushNow();
         };
 
         var total = function (cell) { return Number(cell.dataset.pages) || 1; };
@@ -540,6 +647,55 @@ __CARDS__
           $("readtot").textContent = done ? " · 読了 " + done + "/" + cells.length : "";
         }
 
+        function paintR(all) {
+          if (!all || typeof all !== "object") all = {};
+          for (var i = 0; i < cells.length; i++) {
+            var cell = cells[i], rec = all[cell.dataset.slug];
+            var ok = rec && typeof rec === "object" && !Array.isArray(rec);
+            var stars = ok ? Math.round(Number(rec.stars)) : NaN;
+            if (!isFinite(stars) || stars < 1) stars = 0;
+            else if (stars > 5) stars = 5;
+            var buttons = cell.querySelectorAll('[data-act="star"]');
+            for (var j = 0; j < buttons.length; j++) {
+              buttons[j].setAttribute(
+                "aria-pressed", Number(buttons[j].dataset.n) <= stars ? "true" : "false");
+            }
+            var note = ok && typeof rec.note === "string" ? rec.note : "";
+            var ta = cell.querySelector("textarea.note");
+            // A pull landing mid-sentence must not take the sentence away, so a
+            // focused box is left exactly as it is and repainted when it blurs.
+            if (ta && ta !== document.activeElement && ta.value !== note) ta.value = note;
+            var btn = cell.querySelector(".notebtn");
+            if (btn) btn.classList.toggle("has", !!note);
+          }
+        }
+
+        // A hand-set review carries `at` for the same reason a hand-set record
+        // does: it is what outranks a stale device on the merge.
+        function review(slug, fn, soon) {
+          var all = readR();
+          var rec = all[slug] && typeof all[slug] === "object" && !Array.isArray(all[slug])
+            ? all[slug] : {};
+          var next = fn(Object.assign({}, rec));
+          if (typeof next.note === "string" && next.note.length > NOTE_MAX) {
+            next.note = next.note.slice(0, NOTE_MAX);
+          }
+          next.at = now();
+          all[slug] = next;
+          saveR(all, soon);
+        }
+
+        function star(cell, n) {
+          if (!(n >= 1 && n <= 5)) return;
+          var slug = cell.dataset.slug;
+          var rec = readR()[slug];
+          var cur = rec && typeof rec === "object" ? Number(rec.stars) : 0;
+          // Tapping the star that is already lit takes the rating back off.
+          // Nothing else can undo a mis-tap, and a star nobody meant is a
+          // verdict the generator would read as real.
+          review(slug, function (r) { r.stars = cur === n ? 0 : n; return r; }, false);
+        }
+
         // A hand-set record carries `at` so it outranks a stale device on the
         // merge, and `doneAt` whenever it touches 読了 — that stamp is the only
         // thing that can take a 読了 away, since reading alone only ever ORs it
@@ -556,6 +712,8 @@ __CARDS__
         function act(cell, what) {
           var slug = cell.dataset.slug, n = total(cell);
           if (what === "clear") {
+            // Position only. Losing your place in a story is not withdrawing
+            // what you thought of it; the lit star is its own undo.
             // A tombstone, not a deletion. An absent slug merges to whatever the
             // gist still holds, so deleting the key would undo itself on the very
             // next pull. A dated record with no page is what actually travels,
@@ -595,12 +753,44 @@ __CARDS__
 
         // One delegated listener rather than a handler per row, so adding a
         // story adds no wiring.
-        document.querySelector("main").addEventListener("click", function (e) {
-          var btn = e.target.closest ? e.target.closest(".manage button[data-act]") : null;
+        var main = document.querySelector("main");
+
+        main.addEventListener("click", function (e) {
+          var btn = e.target.closest ? e.target.closest("button[data-act]") : null;
           if (!btn) return;
           var cell = btn.closest(".cell[data-slug]");
-          if (cell) act(cell, btn.dataset.act);
+          if (!cell) return;
+          var what = btn.dataset.act;
+          if (what === "star") { star(cell, Number(btn.dataset.n)); return; }
+          if (what === "note") {
+            var ta = cell.querySelector("textarea.note");
+            if (!ta) return;
+            var show = ta.hidden;
+            ta.hidden = !show;
+            btn.setAttribute("aria-expanded", show ? "true" : "false");
+            if (show) ta.focus();
+            return;
+          }
+          act(cell, what);
         });
+
+        // Typed straight into localStorage and pushed on a debounce: the local
+        // write is what makes a lost push harmless, since the page pushes again
+        // on its next load anyway.
+        main.addEventListener("input", function (e) {
+          var ta = e.target.closest ? e.target.closest("textarea.note") : null;
+          if (!ta) return;
+          var cell = ta.closest(".cell[data-slug]");
+          if (cell) review(cell.dataset.slug, function (r) { r.note = ta.value; return r; }, true);
+        });
+
+        main.addEventListener("focusout", function (e) {
+          if (e.target.closest && e.target.closest("textarea.note") && flush) pushNow();
+        });
+
+        // The tab away, the app switch and the Home Screen swipe all land here,
+        // and only this one is reliable on iOS.
+        window.addEventListener("pagehide", function () { if (flush) pushNow(); });
 
         $("edit").addEventListener("click", function () {
           var on = $("edit").getAttribute("aria-pressed") !== "true";
@@ -612,6 +802,7 @@ __CARDS__
         });
 
         paint(read());
+        paintR(readR());
 
         // ------------------------------------------------------------ sync --
         if (!S) return;
@@ -650,6 +841,7 @@ __CARDS__
             // well only widens where it can be read off a shoulder.
             $("tok").value = "";
             paint((r && r.map) || read());
+            paintR((r && r.reviews) || readR());
           }, function () { $("tok").value = ""; });
         });
 
@@ -657,7 +849,10 @@ __CARDS__
 
         $("exp").addEventListener("click", function () {
           box.hidden = false;
-          box.value = JSON.stringify(read(), null, 2);
+          // The envelope the gist holds, so an export and the store read the
+          // same. A bare progress map still imports, for anything exported
+          // before reviews existed.
+          box.value = JSON.stringify({ v: 1, progress: read(), reviews: readR() }, null, 2);
           box.focus();
           box.select();
           if (navigator.clipboard) navigator.clipboard.writeText(box.value).catch(function () {});
@@ -679,8 +874,21 @@ __CARDS__
             stat.className = "sstat bad";
             return;
           }
-          save(S.merge(read(), incoming.progress && S.plain(incoming.progress)
-            ? incoming.progress : incoming));
+          var enveloped = S.plain(incoming.progress) || S.plain(incoming.reviews);
+          var prog = enveloped
+            ? (S.plain(incoming.progress) ? incoming.progress : {})
+            : incoming;
+          var revs = enveloped && S.plain(incoming.reviews) ? incoming.reviews : {};
+          // Written together and pushed once: two saves would each pull, merge
+          // and PATCH, and the first PATCH would be a revision saying half of
+          // what the paste meant.
+          var mergedP = S.merge(read(), prog);
+          var mergedR = S.mergeReviews(readR(), revs);
+          put("progress", mergedP);
+          put("reviews", mergedR);
+          paint(mergedP);
+          paintR(mergedR);
+          pushNow();
           box.hidden = true;
         });
 
@@ -708,7 +916,17 @@ __CARDS__
               out[k] = { sub: 0, done: false, doneAt: now(), at: now() };
             }
           }
-          save(out);
+          var allR = readR(), outR = {};
+          for (var j in allR) {
+            if (Object.prototype.hasOwnProperty.call(allR, j)) {
+              outR[j] = { stars: 0, note: "", at: now() };
+            }
+          }
+          put("progress", out);
+          put("reviews", outR);
+          paint(out);
+          paintR(outR);
+          pushNow();
         });
 
         // Asking is free where it is honoured and a no-op where it is not.
@@ -716,7 +934,7 @@ __CARDS__
           navigator.storage.persist().catch(function () {});
         }
 
-        S.push().then(function (r) { paint(r.map); });
+        S.push().then(function (r) { paint(r.map); paintR(r.reviews); });
       })();
     </script>
   </body>
