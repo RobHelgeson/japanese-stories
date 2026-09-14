@@ -1,4 +1,5 @@
-// Reading progress, kept in a secret gist so it survives the device.
+// Reading progress and story reviews, kept in a secret gist so they survive
+// the device.
 //
 // localStorage alone loses this three ways, and only one of them is "no sync":
 // iOS Safari deletes all script-writable storage after seven days of Safari use
@@ -37,6 +38,11 @@ window.Sync = (() => {
   const listeners = new Set();
 
   const plain = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+
+  // What a remote with nothing in it looks like. Frozen because it is handed
+  // straight to merge() and cached, and a caller that mutated it would be
+  // editing every later "the gist is empty" answer.
+  const EMPTY = Object.freeze({ progress: {}, reviews: {} });
 
   // ------------------------------------------------------------- storage --
   const read = (key) => {
@@ -80,6 +86,15 @@ window.Sync = (() => {
   const local = () => read("progress") || {};
   const saveLocal = (map) => write("progress", map);
 
+  // Reviews are a second map rather than fields on the progress record, and the
+  // merge rule is why. A progress record is replaced whole by whichever side
+  // carries the later `at`, and `at` is bumped by every page turn — so a rating
+  // typed on the phone would be erased the next time the laptop turned a page
+  // in that story. Separate maps means separate stamps, and a rating and a
+  // position can move independently without either having to win.
+  const reviews = () => read("reviews") || {};
+  const saveReviews = (map) => write("reviews", map);
+
   // --------------------------------------------------------------- merge --
   // Per slug, the record with the later `at` wins outright — except `done`,
   // which resolves on its own.
@@ -108,17 +123,26 @@ window.Sync = (() => {
     return isFinite(t) ? t : -Infinity;
   };
 
-  const merge = (a, b) => {
+  // The union walk both maps share: a slug is visited once, anything that is
+  // not a record is dropped rather than carried — a version field added at the
+  // top level later would otherwise read as a slug — and the later `at` wins.
+  // What a collision *means* is the only part that differs, so it is passed in.
+  const fold = (a, b, resolve) => {
     const out = {};
     const seen = Object.keys(plain(a) ? a : {}).concat(Object.keys(plain(b) ? b : {}));
     for (const slug of seen) {
       if (Object.prototype.hasOwnProperty.call(out, slug)) continue;
       const ra = plain(a) && plain(a[slug]) ? a[slug] : null;
       const rb = plain(b) && plain(b[slug]) ? b[slug] : null;
-      // Anything that is not a record is dropped rather than carried: a version
-      // field added at the top level later would otherwise read as a slug.
       if (!ra && !rb) continue;
       const win = !ra ? rb : !rb ? ra : when(ra) > when(rb) ? ra : rb;
+      out[slug] = resolve ? resolve(ra, rb, win) : win;
+    }
+    return out;
+  };
+
+  const merge = (a, b) =>
+    fold(a, b, (ra, rb, win) => {
       const da = ra ? Number(ra.doneAt) : NaN;
       const db = rb ? Number(rb.doneAt) : NaN;
       let done;
@@ -133,17 +157,19 @@ window.Sync = (() => {
       // NaN never equals itself, so "neither side has a stamp" has to compare as
       // equal explicitly or the clone below fires on every untouched record.
       const stamped = (x) => (isFinite(x) ? x : null);
-      if (done === win.done && stamped(Number(win.doneAt)) === stamped(doneAt)) {
-        out[slug] = win;
-      } else {
-        const rec = Object.assign({}, win, { done: done });
-        if (isFinite(doneAt)) rec.doneAt = doneAt;
-        else delete rec.doneAt;
-        out[slug] = rec;
-      }
-    }
-    return out;
-  };
+      if (done === win.done && stamped(Number(win.doneAt)) === stamped(doneAt)) return win;
+      const rec = Object.assign({}, win, { done: done });
+      if (isFinite(doneAt)) rec.doneAt = doneAt;
+      else delete rec.doneAt;
+      return rec;
+    });
+
+  // A rating and a note are authored rather than accumulated, so the later edit
+  // is simply the right one and there is nothing to resolve the way `done` has
+  // to be resolved. Clearing a rating writes `stars: 0` with a fresh stamp for
+  // the same reason a cleared story writes a tombstone: an absent key merges to
+  // whatever the other side still holds, so a deletion cannot travel.
+  const mergeReviews = (a, b) => fold(a, b, null);
 
   // Key order is not data. merge() emits slugs in the order it happened to see
   // them, so a plain JSON.stringify comparison would call an identical map
@@ -234,9 +260,15 @@ window.Sync = (() => {
   // 304 as well and the device would never sync again.
   const cond = (c) => (cached && c.etag ? { "If-None-Match": c.etag } : null);
 
-  const body = (map) => ({
+  // `v` stays 1: `reviews` is additive and nothing has ever read the version,
+  // so bumping it would only mean a number two code paths have to agree about.
+  const body = (map, revs) => ({
     description: DESC,
-    files: { [FILE]: { content: JSON.stringify({ v: V, progress: map }, null, 2) + "\n" } },
+    files: {
+      [FILE]: {
+        content: JSON.stringify({ v: V, progress: map, reviews: revs }, null, 2) + "\n",
+      },
+    },
   });
 
   // The gist is the only shape we accept, so a file that is missing, truncated
@@ -246,7 +278,7 @@ window.Sync = (() => {
   // failure that would be indistinguishable from real data loss.
   const unwrap = (gist) => {
     const f = gist && gist.files && gist.files[FILE];
-    if (!f) return {};
+    if (!f) return EMPTY;
     if (f.truncated) {
       set("error", "gist が大きすぎます");
       return null;
@@ -258,7 +290,11 @@ window.Sync = (() => {
       set("error", "gist の JSON が壊れています");
       return null;
     }
-    return plain(doc) && plain(doc.progress) ? doc.progress : {};
+    if (!plain(doc)) return EMPTY;
+    return {
+      progress: plain(doc.progress) ? doc.progress : {},
+      reviews: plain(doc.reviews) ? doc.reviews : {},
+    };
   };
 
   // ------------------------------------------------------------ commands --
@@ -292,9 +328,12 @@ window.Sync = (() => {
         .then((r) => {
           const hit = (r.json || []).find((g) => g && g.files && g.files[FILE]);
           if (hit) return hit.id;
-          return call("POST", "/gists", t, Object.assign({ public: false }, body(local()))).then(
-            (c) => c.json.id
-          );
+          return call(
+            "POST",
+            "/gists",
+            t,
+            Object.assign({ public: false }, body(local(), reviews()))
+          ).then((c) => c.json.id);
         })
         .then((id) => {
           saveCreds({ token: t, gist: id, etag: "" });
@@ -308,21 +347,28 @@ window.Sync = (() => {
   // path: a reader that cannot reach GitHub is a reader that reads.
   const corePull = () => {
     const c = creds();
-    if (off || !c.token || !c.gist) return Promise.resolve({ ok: false, map: local(), moved: false });
     const before = local();
+    const beforeR = reviews();
+    const still = { ok: false, map: before, reviews: beforeR, moved: false };
+    if (off || !c.token || !c.gist) return Promise.resolve(still);
     return call("GET", "/gists/" + c.gist, c.token, null, cond(c))
       .then((r) => {
         const remote = r.code === 304 ? cached : unwrap(r.json);
-        if (remote === null) return { ok: false, map: before, moved: false };
-        cached = remote || {};
+        if (remote === null) return still;
+        cached = remote;
         if (r.etag) saveCreds({ etag: r.etag });
-        const merged = merge(before, cached);
-        const moved = !same(merged, before);
-        if (moved) saveLocal(merged);
+        const merged = merge(before, cached.progress);
+        const mergedR = mergeReviews(beforeR, cached.reviews);
+        const grew = !same(merged, before);
+        const grewR = !same(mergedR, beforeR);
+        if (grew) saveLocal(merged);
+        if (grewR) saveReviews(mergedR);
         set("ok", "");
-        return { ok: true, map: merged, moved: moved };
+        // `moved` is what the reader keys its adopt-the-remote-position path
+        // on, so a review arriving alone must not read as a position change.
+        return { ok: true, map: merged, reviews: mergedR, moved: grew };
       })
-      .catch(() => ({ ok: false, map: before, moved: false }));
+      .catch(() => still);
   };
 
   const pull = () => queue(corePull);
@@ -335,29 +381,36 @@ window.Sync = (() => {
     queue(() => {
       const c = creds();
       const mine = local();
-      if (off || !c.token || !c.gist) return Promise.resolve({ ok: false, wrote: false, map: mine });
+      const mineR = reviews();
+      if (off || !c.token || !c.gist)
+        return Promise.resolve({ ok: false, wrote: false, map: mine, reviews: mineR });
       return call("GET", "/gists/" + c.gist, c.token, null, cond(c))
         .then((r) => {
           const remote = r.code === 304 ? cached : unwrap(r.json);
-          if (remote === null) return { ok: false, wrote: false, map: mine };
+          if (remote === null) return { ok: false, wrote: false, map: mine, reviews: mineR };
           if (r.etag) saveCreds({ etag: r.etag });
-          const merged = merge(mine, remote || {});
+          const merged = merge(mine, remote.progress);
+          const mergedR = mergeReviews(mineR, remote.reviews);
           if (!same(merged, mine)) saveLocal(merged);
-          if (same(merged, remote || {})) {
-            cached = merged;
+          if (!same(mergedR, mineR)) saveReviews(mergedR);
+          const next = { progress: merged, reviews: mergedR };
+          // Both halves have to match before the PATCH is skipped: a rating
+          // added while the position stood still is still something to say.
+          if (same(merged, remote.progress) && same(mergedR, remote.reviews)) {
+            cached = next;
             set("ok", "");
-            return { ok: true, wrote: false, map: merged };
+            return { ok: true, wrote: false, map: merged, reviews: mergedR };
           }
-          return call("PATCH", "/gists/" + c.gist, c.token, body(merged)).then((w) => {
-            cached = merged;
+          return call("PATCH", "/gists/" + c.gist, c.token, body(merged, mergedR)).then((w) => {
+            cached = next;
             // The PATCH response carries the new ETag; keeping it is what stops
             // the next pull from being handed a 200 for a change we just made.
             if (w.etag) saveCreds({ etag: w.etag });
             set("ok", "");
-            return { ok: true, wrote: true, map: merged };
+            return { ok: true, wrote: true, map: merged, reviews: mergedR };
           });
         })
-        .catch(() => ({ ok: false, wrote: false, map: local() }));
+        .catch(() => ({ ok: false, wrote: false, map: local(), reviews: reviews() }));
     });
 
   // Drops the credentials and leaves progress alone. Disconnecting a device is
@@ -373,7 +426,10 @@ window.Sync = (() => {
     plain,
     local,
     saveLocal,
+    reviews,
+    saveReviews,
     merge,
+    mergeReviews,
     connect,
     pull,
     push,
