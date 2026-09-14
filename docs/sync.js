@@ -347,14 +347,15 @@ window.Sync = (() => {
   // path: a reader that cannot reach GitHub is a reader that reads.
   const corePull = () => {
     const c = creds();
-    const before = local();
-    const beforeR = reviews();
-    const still = { ok: false, map: before, reviews: beforeR, moved: false };
-    if (off || !c.token || !c.gist) return Promise.resolve(still);
+    const still = () => ({ ok: false, map: local(), reviews: reviews(), moved: false });
+    if (off || !c.token || !c.gist) return Promise.resolve(still());
     return call("GET", "/gists/" + c.gist, c.token, null, cond(c))
       .then((r) => {
         const remote = r.code === 304 ? cached : unwrap(r.json);
-        if (remote === null) return still;
+        if (remote === null) return still();
+        // After the round trip, for the reason push() gives.
+        const before = local();
+        const beforeR = reviews();
         cached = remote;
         if (r.etag) saveCreds({ etag: r.etag });
         const merged = merge(before, cached.progress);
@@ -368,7 +369,7 @@ window.Sync = (() => {
         // on, so a review arriving alone must not read as a position change.
         return { ok: true, map: merged, reviews: mergedR, moved: grew };
       })
-      .catch(() => still);
+      .catch(() => still());
   };
 
   const pull = () => queue(corePull);
@@ -380,13 +381,18 @@ window.Sync = (() => {
   const push = () =>
     queue(() => {
       const c = creds();
-      const mine = local();
-      const mineR = reviews();
       if (off || !c.token || !c.gist)
-        return Promise.resolve({ ok: false, wrote: false, map: mine, reviews: mineR });
+        return Promise.resolve({ ok: false, wrote: false, map: local(), reviews: reviews() });
       return call("GET", "/gists/" + c.gist, c.token, null, cond(c))
         .then((r) => {
           const remote = r.code === 304 ? cached : unwrap(r.json);
+          // Read after the round trip, never before it. A page turned or a note
+          // typed while the GET was open is newer than anything this push set
+          // out to send, and merging against a snapshot taken beforehand writes
+          // the stale copy straight back over it — for a note, one keystroke at
+          // a time, with the loss PATCHed to the gist behind it.
+          const mine = local();
+          const mineR = reviews();
           if (remote === null) return { ok: false, wrote: false, map: mine, reviews: mineR };
           if (r.etag) saveCreds({ etag: r.etag });
           const merged = merge(mine, remote.progress);
