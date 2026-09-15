@@ -210,17 +210,16 @@ To work on the reader UI rather than a story, `python3 build.py <story> --split 
 
 ## Where a story lands
 
-Five places. Miss one and the corpus is inconsistent in a way only some of them report:
+Four places. Miss one and the corpus is inconsistent in a way only some of them report:
 
 1. `stories/<slug>.txt` — the story
 2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise`, `new_words`, in reading order
-3. `stories/stories-index.md` `## Summaries` — one bullet. `index.py` hard-errors without it
+3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
-5. `stories/stories-index.md` `## Reading Order` — one row, hand-maintained
 
 ## Modes
 
-- **new** — the default, all five steps above.
+- **new** — the default, all four steps above.
 - **revise `<slug>`** — edit the `.txt` in place. The brief already exists; re-run `stats.py --strict` against it.
 - **version `<slug>`** — archive the current text to `stories/versions/<slug>.vN.txt`, add `vN` to that entry's `versions[]`, then write the new current. `rebuild.py` builds archived versions too, so A/B comparison stays available via `stats.py --diff`.
 
