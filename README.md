@@ -24,11 +24,11 @@ Text is vertical by default, as Japanese literary prose is, and a page never scr
 | `f`                        | reveal every reading at once (also 設 → ふりがな)    |
 | Swipe                      | turn the page (touch; on a mouse use the arrows)     |
 | `←` `→`                    | turn pages, following the binding direction          |
-| Tap the top or bottom edge | bring the bars back after they fade                  |
+| Tap the top or bottom edge | show the bars; tap it again to put them away         |
 | `設`                       | writing mode, 改行, 綴じ, type size, theme, ふりがな |
 | `目次`                     | back to the contents page                            |
 
-Kana, particles and punctuation are not wrapped as words, so "between words" is about half of every line and easy to hit with a thumb. Which is also why the bars have their own gesture: every tap on the text now means something, so the strip the bars occupy is what is left to summon them with.
+Kana, particles and punctuation are not wrapped as words, so "between words" is about half of every line and easy to hit with a thumb. Which is also why the bars have their own gesture: every tap on the text now means something, so the strip the bars occupy is what is left to summon them with. It is a toggle rather than a summons, because it is the only gesture that can be — there is nowhere else to tap that does not already belong to a word or a sentence.
 
 On a mouse, hovering a word reveals its reading and a double click opens the sheet. `Tab` reaches every kanji word and every translated sentence, and `Enter` opens the sheet directly — a sentence with no translation is not a tab stop, because there would be nothing to open.
 

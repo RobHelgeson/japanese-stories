@@ -1331,11 +1331,17 @@
         // The full reset: nothing lit, nothing open, and the tap sequence
         // forgotten. Everything that interrupts the gesture stream calls this —
         // a drag going live, a page turn, Escape, a tap away, 設.
+        //
+        // Reports whether it actually took something down, because the bare-paper
+        // tap is now a chrome toggle and one tap may only mean one thing: a tap
+        // that closes a sheet has spent itself on the sheet.
         function dismiss() {
+          const had = lit !== null || subject !== null;
           lastNode = null;
           lastAt = 0;
           light(null);
           closeSheet();
+          return had;
         }
 
         function showWord(w) {
@@ -1441,17 +1447,18 @@
         // A .w always wins over the sentence around it: it is the smaller, more
         // specific subject, and it is what the finger was aiming at. Returns true
         // when the tap was consumed — Track.tap reads false as "that was bare
-        // paper" and summons the chrome.
+        // paper" and toggles the chrome. Clearing a reading or a sheet counts as
+        // consumed: otherwise the tap that puts a gloss away would also take the
+        // page count away with it.
         function route(target, x, y) {
-          if (!target || !target.closest) { dismiss(); return false; }
+          if (!target || !target.closest) return dismiss();
           if (el.contains(target)) return true;
-          if (!track.contains(target)) { dismiss(); return false; }
+          if (!track.contains(target)) return dismiss();
           const w = target.closest(".w");
           if (w) return gesture(w);
           const s = sentenceAt(target, x, y);
           if (s) return gesture(s);
-          dismiss();
-          return false;
+          return dismiss();
         }
 
         function start() {
@@ -1592,6 +1599,16 @@
           setInert(els.bar, true);
         }
 
+        // The bare-paper tap is a toggle, not a summons. The same gesture has to
+        // put the bars away again, because there is no other one: every other
+        // surface on the page belongs to a word or a sentence, so a reader who
+        // brought the chrome up to check the page count has nowhere to tap to
+        // get the page back. hide() keeps its own veto while settings are open.
+        function toggle() {
+          if (shown) hide();
+          else show();
+        }
+
         const announce = (text) => { if (els.live) els.live.textContent = text || ""; };
 
         // Called after every settled turn and on boot. The label is the
@@ -1726,6 +1743,19 @@
         }
 
         function bind() {
+          // The strip is the gesture's other half. #track is inset: 0, so while
+          // the bars are hidden a tap there falls through to it and shows them —
+          // but once shown they are opaque overlays above the track with handlers
+          // only on their own buttons, so the second tap landed on nothing and
+          // the bars could not be dismissed from the place that raised them.
+          // Anything that is not a control puts them away.
+          for (const strip of [els.top, els.bar]) {
+            strip.addEventListener("pointerdown", (e) => {
+              if (e.target.closest(FOCUSABLE)) return;
+              hide();
+            });
+          }
+
           els.prev.addEventListener("click", () => { show(); Track.step(-1); });
           els.next.addEventListener("click", () => { show(); Track.step(1); });
           els.set.addEventListener("click", openSettings);
@@ -1796,7 +1826,7 @@
         }
 
         return {
-          init, show, hide, update, announce, syncControls,
+          init, show, hide, toggle, update, announce, syncControls,
           syncThemeColor, openSettings, closeSettings, isSettingsOpen,
           isShown: () => shown,
         };
@@ -1996,7 +2026,7 @@
           // A control inside the track keeps its own click; text does not.
           if (d.down && d.down.closest && d.down.closest(INTERACTIVE)) return;
           suppressClick = true;
-          if (!Sheet.tap(d.down, d.x0, d.y0)) Chrome.show();
+          if (!Sheet.tap(d.down, d.x0, d.y0)) Chrome.toggle();
         }
 
         function onDown(e) {

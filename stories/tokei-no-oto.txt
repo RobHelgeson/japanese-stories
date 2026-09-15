@@ -150,12 +150,8 @@
 そこには、この店に来た客の名前が書いてあった。
 > In it were the names of the customers who had come to the shop.
 
-「あなたの祖父も、よくここに来たよ」
-> "Your grandfather used to come in here often."
-「何も買わないで、店の時計の音を聞いていた」
-> "He never bought anything. He would stand and listen to the clocks."
-「｜二十年《にじゅうねん》、そうだった」
-> "Twenty years, it was like that."
+「あなたの祖父も、よくここに来たよ。何も買わないで、店の時計の音を聞いていた。｜二十年《にじゅうねん》、そうだった」
+> "Your grandfather used to come in here often. He never bought anything. He would stand and listen to the clocks. Twenty years, it was like that."
 私はその話を知らなかった。
 > I had not known that.
 

@@ -28,7 +28,24 @@ KANJI_RUN = re.compile(r"[一-鿿々]+")
 
 # Attribution markers. A quoted line carrying none of these leaves the speaker to
 # be inferred from register and content, which is the difficulty 終電 claims.
-TAGGED = re.compile(r"(言った|言う|聞いた|聞く|答えた|答える|呼んだ|叫んだ|続けた|と[、。])")
+TAGGED = re.compile(
+    r"(言った|言う|言って|聞いた|聞く|答えた|答える|尋ねた|尋ねる|呼んだ|叫んだ|続けた|と[、。])"
+)
+
+
+def tag_of(line):
+    """The narrative tag on a quoted line: whatever follows the closing 」.
+
+    This used to run against the whole line, which was sound while a line held one
+    sentence and stopped being so when a line became a whole turn. 城の鐘's
+    「…次の鐘を作れと言った。私は作らされた」 is reported speech *inside* the quote,
+    and matching it counted an unattributed turn as attributed — which is backwards,
+    because the untagged lines are exactly the ones whose speaker has to be inferred.
+    """
+    if not line.startswith("「"):
+        return ""
+    end = line.rfind("」")
+    return line[end + 1:] if end >= 0 else ""
 
 GRAMMAR_PATTERNS = {
     "ている": r"てい[るたまなかっ]|でい[るたまなかっ]",
@@ -124,7 +141,15 @@ def read(path):
         "file": Path(path).name,
         "title": d["title"],
         "pages": len(d["pages"]),
-        "sentences": sum(len(p) for p in d["pages"]),
+        # 文 means sentences. A built unit is a line, and since a line may be a
+        # whole quoted turn the two diverge — counting units advertised 906 文
+        # for a corpus holding 950 sentences.
+        "sentences": sum(
+            len(prose_sentences(["".join(t["t"] for t in sent["toks"])]))
+            for page in d["pages"]
+            for sent in page
+        ),
+        "units": sum(len(p) for p in d["pages"]),
         "words": d["stats"]["words"],
         "weak": d["stats"]["weak"],
         "stats": d["stats"],
@@ -139,6 +164,27 @@ def sentences(path):
         if not line or line.startswith(">") or line.startswith("#"):
             continue
         out.append(furigana.strip(line))
+    return out
+
+
+SENT_END = re.compile(r"[。！？]+")
+
+
+def prose_sentences(lines):
+    """The 。-terminated sentences inside the source lines.
+
+    A line is one sentence or one whole quoted turn, so the two stopped being the
+    same thing when turns were merged. Every rhythm measure below wants sentences:
+    counting turns instead rescaled the lot without a word changing — 城の鐘's
+    stdev went 6.9 to 9.7 on identical prose — and `min_sentence_stdev` is a floor
+    calibrated in the old units, so the drift would have quietly relaxed it.
+
+    A line with no terminator at all is still one sentence (「それは」).
+    """
+    out = []
+    for line in lines:
+        parts = [p for p in SENT_END.split(line) if p.strip("「」『』（）　 ")]
+        out.extend(parts or [line])
     return out
 
 
@@ -265,15 +311,25 @@ def analyze(path):
 
 
 def measure(jp, pg=None):
-    """Every structural axis, from a sentence list alone.
+    """Every structural axis, from a list of source lines alone.
 
     Split out of analyze() so a reference text can be put through the same
     implementation rather than a second one written to match it. A band from a
     parallel implementation would drift from the numbers it sits beside, and the
     drift would look like a finding. `pg` is optional because only this project's
     sources carry pages; a reference text has none and reports them as 0.
+
+    `jp` is source LINES — one sentence, or one whole quoted turn — and every
+    rhythm measure runs on prose_sentences(jp) instead, for the reason that
+    function documents. That split is NOT a no-op on a reference text: Aozora
+    normalisation keeps 「…。」と言った。 whole, and prose_sentences divides inside
+    the quote, so 宮沢賢治's サガレンと八月 goes 92 elements to 113. That is the
+    point of routing both through here rather than measuring each its own way —
+    whatever the rule is, it is one rule, and the two corpora stay in the same
+    units. It does mean the band has to be re-measured whenever this changes.
     """
-    lens = [len(s) for s in jp]
+    sn = prose_sentences(jp)
+    lens = [len(s) for s in sn]
     body = "\n".join(jp)
     toks, real = vocabulary(jp)
     lem_toks, _ = vocabulary(jp, basis="lemma")
@@ -285,28 +341,29 @@ def measure(jp, pg=None):
         lem_types[t] = lem_types.get(t, 0) + 1
 
     quotes = [s for s in jp if s.startswith("「")]
-    untagged = [s for s in quotes if not TAGGED.search(s)]
+    untagged = [s for s in quotes if not TAGGED.search(tag_of(s))]
     run = best = 0
     for s in jp:
-        if s.startswith("「") and not TAGGED.search(s):
+        if s.startswith("「") and not TAGGED.search(tag_of(s)):
             run += 1
             best = max(best, run)
         else:
             run = 0
 
     found = {k: len(re.findall(v, body)) for k, v in GRAMMAR_PATTERNS.items()}
-    sub_share, sub_full = subordination(jp)
+    sub_share, sub_full = subordination(sn)
     return {
         "slug": None,
         "subordinate_share": sub_share,
         "subordinate_full": sub_full,
-        "sentences": len(jp),
+        "sentences": len(sn),
+        "lines": len(jp),
         "pages": len(pg) if pg else 0,
         "mean_len": st.mean(lens),
         "stdev_len": st.pstdev(lens),
         "pct_over_30": 100 * sum(1 for n in lens if n > 30) / len(lens),
         "pct_under_10": 100 * sum(1 for n in lens if n < 10) / len(lens),
-        "sent_per_page": len(jp) / len(pg) if pg else 0.0,
+        "sent_per_page": len(sn) / len(pg) if pg else 0.0,
         "chars": sum(lens),
         "tokens": len(toks),
         "types": len(types),
@@ -432,12 +489,70 @@ def table(analyses, labels):
         print(f"  {key:<22}" + "".join(str(budgets(a["tokens"])[key]).rjust(w) for a in analyses))
 
 
+def turns(path):
+    """Every run of adjacent quoted lines, with its translations.
+
+    Whether two neighbouring 「」 are two speakers or one speaker cut in half is
+    the one thing in this format no script can decide: the source carries no
+    speaker marks, so alternation is the whole of the attribution. What it can do
+    is put the run in front of the author, because a split turn is invisible one
+    line at a time and obvious as a block. A page break ends a run, since a turn
+    never crosses one.
+    """
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    units = []
+    for i, line in enumerate(lines):
+        s = line.strip()
+        if s.startswith(">"):
+            continue
+        if not s or s.startswith("#"):
+            units.append(None)
+            continue
+        nxt = lines[i + 1].strip() if i + 1 < len(lines) else ""
+        en = nxt.lstrip("> ").strip() if nxt.startswith(">") else ""
+        # The translations carry annotations too — personal names, mostly — and
+        # 行かなかった人の地図 is both the story with the most of them and the one
+        # whose runs are hardest to attribute.
+        units.append((i + 1, furigana.strip(s), furigana.strip(en)))
+
+    runs, run = [], []
+    for u in units + [None]:
+        if u and u[1].startswith("「"):
+            run.append(u)
+        else:
+            if len(run) > 1:
+                runs.append(run)
+            run = []
+    return runs
+
+
+def print_turns(path):
+    """One block per run. Read down it and name a speaker for every line.
+
+    A tagged line states its own speaker and closes the turn, so the line under
+    it opens a new one whoever says it. Everything else has to alternate; two
+    adjacent lines you would give to the same speaker are one turn wrongly split,
+    and belong on one line inside one 「」.
+    """
+    runs = turns(path)
+    print(f"\n{Path(path).stem} — {len(runs)} runs of adjacent quoted lines")
+    for run in runs:
+        print()
+        for n, ja, en in run:
+            print(f"  {'tagged' if TAGGED.search(tag_of(ja)) else '      '} {n:>4}  {en or ja}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("paths", nargs="*", type=Path)
     ap.add_argument("--diff", nargs=2, metavar=("A", "B"))
     ap.add_argument("--strict", action="store_true", help="exit nonzero on an unmet target")
+    ap.add_argument("--turns", action="store_true",
+                    help="print adjacent quoted lines so speaker alternation can be checked")
     args = ap.parse_args()
+
+    if args.diff and args.turns:
+        ap.error("--turns reads a story's own runs; --diff compares two sets of metrics")
 
     if args.diff:
         a, b = (analyze(p) for p in args.diff)
@@ -445,6 +560,15 @@ def main():
         return
 
     paths = args.paths or [STORIES / f"{s['slug']}.txt" for s in CORPUS["stories"]]
+
+    if args.turns:
+        for path in paths:
+            print_turns(path)
+        # A report, not a mode: --strict still has to run, or an author who asked
+        # for both would read "no output" as "the gate passed".
+        if not args.strict:
+            return
+        print()
     analyses = [analyze(p) for p in paths]
     entries = {s["slug"]: s for s in CORPUS["stories"]}
     table(analyses, [a["slug"][:14] for a in analyses])
