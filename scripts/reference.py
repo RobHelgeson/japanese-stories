@@ -30,7 +30,7 @@ A floor. AUTHORING.md's "metrics are floors, not targets" clause is load-bearing
 two of the four documented failure modes were *caused* by optimising a metric.
 A reference band converted into a gate is that same failure wearing a better
 disguise, and it would be worse than the failures it replaced, because "real
-authors score 21.5" is a far more persuasive argument for chasing a number than
+authors score 21.2" is a far more persuasive argument for chasing a number than
 "our lowest story scored 6.7" ever was. Nothing here writes to corpus.json and
 nothing here exits nonzero.
 
@@ -365,10 +365,16 @@ def corpus_bins():
 
     Computed rather than hardcoded so the bins follow the corpus as it grows.
     Characters, not tokens — see point 2 in the module docstring.
+
+    Counted over prose_sentences, which is what stats.measure reports `chars`
+    over. Counting source lines here instead put the edges in different units
+    from the value binned against them, and once a line became a whole speech
+    turn upstream the two drifted far enough that a story fell outside its own
+    corpus's range and binned as None.
     """
     sizes = []
     for s in stats.CORPUS["stories"]:
-        jp = stats.sentences(stats.STORIES / f"{s['slug']}.txt")
+        jp = stats.prose_sentences(stats.sentences(stats.STORIES / f"{s['slug']}.txt"))
         sizes.append(sum(len(x) for x in jp))
     lo, hi = min(sizes), max(sizes)
     a = lo + (hi - lo) / 3
@@ -496,6 +502,7 @@ def compare():
     man = json.loads(MANIFEST.read_text(encoding="utf-8"))
     texts = man["texts"]
 
+    edges, _ = corpus_bins()
     ref = []
     for i, w in enumerate(texts, 1):
         print(f"segmenting {i}/{len(texts)} {w['author']} {w['title']}", flush=True)
@@ -514,8 +521,13 @@ def compare():
                 "comparable; set ICHIRAN_URL and re-run."
             )
         a["dialogue_any_pct"] = dialogue_any_pct(jp)
-        a["author"], a["title"], a["bin"] = w["author"], w["title"], w["bin"]
+        a["author"], a["title"] = w["author"], w["title"]
         a["thin"] = a["tokens"] < MIN_TOKENS
+        # Binned live off the measured value rather than read from the manifest.
+        # The manifest records what --sample measured, and a change to the
+        # sentence split moves both corpora; trusting it would compare a
+        # freshly-measured story against a stale bin.
+        a["bin"] = bin_of(a["chars"], edges)
         ref.append(a)
 
     thin = [r for r in ref if r["thin"]]
@@ -525,7 +537,6 @@ def compare():
         for r in thin:
             print(f"  {r['author']} {r['title']} — {r['tokens']} tokens, {r['chars']} chars")
 
-    edges, _ = corpus_bins()
     ours = []
     for s in stats.CORPUS["stories"]:
         path = stats.STORIES / f"{s['slug']}.txt"
@@ -556,7 +567,7 @@ def compare():
     # are about a third above it.
     print(f"{'metric':<{w1}}" + "".join(f"{('L%d' % levels[a['slug']]):>8}" for a in ours)
           + f"{'│':>3}" + "".join(f"{('ref ' + b):>9}" for b in bins))
-    print(f"{'(our story bin)':<{w1}}" + "".join(f"{a['bin'][:5]:>8}" for a in ours)
+    print(f"{'(our story bin)':<{w1}}" + "".join(f"{(a['bin'] or '—')[:5]:>8}" for a in ours)
           + f"{'│':>3}" + "".join(f"{('n=%d' % len(pool('mean_len', b))):>9}" for b in bins))
     for key, fmt in BAND:
         row = f"{key:<{w1}}" + "".join(fmt.format(a[key]).rjust(8) for a in ours)
@@ -603,6 +614,12 @@ def compare():
           f"(corpus {man['corpus_chars']['min']}-{man['corpus_chars']['max']}, "
           f"bins are equal-WIDTH thirds, not terciles: we split "
           f"{'/'.join(str(sum(1 for a in ours if a['bin'] == b)) for b in bins)} across them)")
+    stray = [r for r in ref if r["bin"] is None]
+    if stray:
+        print(f"{len(stray)} reference text(s) now outside the corpus character range, "
+              "pooled only:")
+        for r in stray:
+            print(f"  {r['author']} {r['title']} — {r['chars']} chars")
     print("NOTHING HERE IS A GATE. No corpus.json threshold is written by this script.")
 
 
