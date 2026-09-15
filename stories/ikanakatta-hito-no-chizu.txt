@@ -40,21 +40,15 @@
 
 ｜祖父《そふ》は｜指《ゆび》で、｜地図《ちず》の｜終《お》わりの｜木《き》に｜触《さわ》った。
 > Her grandfather touched the tree at the end of the map with his finger.
-「わしの｜父《ちち》が、｜若《わか》い｜頃《ころ》にこの｜道《みち》を｜歩《ある》いた」
-> "My father walked this road when he was young."
-「｜戻《もど》ってきてから、｜死《し》ぬまで、｜同《おな》じ｜話《はなし》をした」
-> "After he came back, he told the same story until the day he died."
-「わしはそれを｜聞《き》いて、｜描《か》いただけだ」
-> "All I did was listen to it and draw."
+「わしの｜父《ちち》が、｜若《わか》い｜頃《ころ》にこの｜道《みち》を｜歩《ある》いた。｜戻《もど》ってきてから、｜死《し》ぬまで、｜同《おな》じ｜話《はなし》をした。わしはそれを｜聞《き》いて、｜描《か》いただけだ」
+> "My father walked this road when he was young. After he came back, he told the same story until the day he died. All I did was listen to it and draw."
 ｜祖父《そふ》にとって、その｜紙《かみ》は｜地図《ちず》ではなく、｜父《ちち》の｜声《こえ》だった。
 > For her grandfather, that sheet of paper was not a map. It was his father's voice.
 
 「｜行《い》ってくれ」と｜祖父《そふ》は｜言《い》った。
 > "Go for me," he said.
-「｜宝《たから》を｜取《と》ってこいというわけではない」
-> "I am not asking you to bring back a treasure."
-「ただ、あの｜木《き》がまだ｜立《た》っているかどうか、｜見《み》てきてほしい」
-> "I only want you to see whether that tree is still standing."
+「｜宝《たから》を｜取《と》ってこいというわけではない。ただ、あの｜木《き》がまだ｜立《た》っているかどうか、｜見《み》てきてほしい」
+> "I am not asking you to bring back a treasure. I only want you to see whether that tree is still standing."
 ｜梓《あずさ》は｜何《なに》も｜言《い》わずに｜頷《うなず》いたが、それは｜断《ことわ》ることができる｜話《はなし》ではなかった。
 > ｜梓《あずさ》 nodded without saying anything. It was not the kind of request she could refuse.
 
@@ -182,12 +176,8 @@
 ｜二日《ふつか》｜目《め》、｜蓮《れん》が｜口《くち》を｜開《ひら》いた。
 > On the second day, ｜蓮《れん》 spoke up.
 
-「｜橋《はし》がないのに、｜橋《はし》を｜描《か》いた」
-> "There is no bridge, and he drew a bridge."
-「｜岩《いわ》や｜木《き》が｜合《あ》っていたのは、｜誰《だれ》かに｜聞《き》いたからでしょう」
-> "The rock and the tree matched because somebody told him about them."
-「｜聞《き》いた｜話《はなし》だけで｜描《か》いたなら、｜合《あ》うところも｜合《あ》わないところもあるはずだ」
-> "If he drew it only from what he was told, then some of it fits and some of it does not."
+「｜橋《はし》がないのに、｜橋《はし》を｜描《か》いた。｜岩《いわ》や｜木《き》が｜合《あ》っていたのは、｜誰《だれ》かに｜聞《き》いたからでしょう。｜聞《き》いた｜話《はなし》だけで｜描《か》いたなら、｜合《あ》うところも｜合《あ》わないところもあるはずだ」
+> "There is no bridge, and he drew a bridge. The rock and the tree matched because somebody told him about them. If he drew it only from what he was told, then some of it fits and some of it does not."
 ｜梓《あずさ》は｜答《こた》えなかった。
 > ｜梓《あずさ》 did not answer.
 ｜甚平《じんべえ》にとって、この｜道《みち》は｜四十年《よんじゅうねん》｜歩《ある》いてきた｜庭《にわ》のようなもので、｜紙《かみ》ではなく｜経験《けいけん》に｜頼《たよ》って、どこで｜川《かわ》が｜浅《あさ》くなるかを｜知《し》っていた。
@@ -206,12 +196,8 @@
 ｜甚平《じんべえ》は｜冗談《じょうだん》を｜言《い》う｜男《おとこ》ではない。
 > ｜甚平《じんべえ》 was not a man who made jokes.
 
-「｜主《ぬし》は、｜通《とお》る｜者《もの》に｜一《ひと》つだけ｜問《と》う。｜何《なに》をしに｜来《き》たか、とな」
-> "The master asks anyone who passes one question. What did you come here to do."
-「｜答《こた》えられれば｜通《とお》してくれる。｜答《こた》えられなければ、｜通《とお》してくれん」
-> "Answer, and it lets you through. Fail to answer, and it does not."
-「｜嘘《うそ》は｜聞《き》こえるそうだ」
-> "They say it can hear a lie."
+「｜主《ぬし》は、｜通《とお》る｜者《もの》に｜一《ひと》つだけ｜問《と》う。｜何《なに》をしに｜来《き》たか、とな。｜答《こた》えられれば｜通《とお》してくれる。｜答《こた》えられなければ、｜通《とお》してくれん。｜嘘《うそ》は｜聞《き》こえるそうだ」
+> "The master asks anyone who passes one question. What did you come here to do. Answer, and it lets you through. Fail to answer, and it does not. They say it can hear a lie."
 ｜梓《あずさ》は、｜祖父《そふ》の｜言葉《ことば》をもう｜一度《いちど》｜思《おも》い｜出《だ》した。
 > ｜梓《あずさ》 thought once more of what her grandfather had said.
 
@@ -302,10 +288,8 @@
 > ｜蓮《れん》 looked at ｜梓《あずさ》, but this time he was not laughing.
 「もう｜言《い》わないつもりでしたけど」と｜蓮《れん》は｜言《い》った。
 > "I was not going to say it again," ｜蓮《れん》 said.
-「｜家《いえ》から｜出《で》なかった｜年寄《としよ》りが、｜話《はなし》だけで｜道《みち》を｜描《か》いたんです」
-> "An old man who never left his house drew a road out of stories."
-「｜岩《いわ》が｜合《あ》ったのは、たまたまです」
-> "The rock matching was chance."
+「｜家《いえ》から｜出《で》なかった｜年寄《としよ》りが、｜話《はなし》だけで｜道《みち》を｜描《か》いたんです。｜岩《いわ》が｜合《あ》ったのは、たまたまです」
+> "An old man who never left his house drew a road out of stories. The rock matching was chance."
 ここまで｜頼《たよ》ってきた｜地図《ちず》を｜持《も》ったまま、｜梓《あずさ》は｜岩《いわ》の｜山《やま》を｜見《み》ていたが、｜反対《はんたい》することができなかった。
 > Still holding the map she had relied on all this way, ｜梓《あずさ》 looked at the heap of rock, and could not argue.
 
@@ -359,19 +343,15 @@
 > When ｜梓《あずさ》 showed her the map, ｜千代《ちよ》 looked at it for a long time.
 ｜指《ゆび》が、｜川《かわ》のところで｜止《と》まった。
 > Her finger stopped at the river.
-「｜橋《はし》が｜描《か》いてある」
-> "There is a bridge drawn here."
-「｜懐《なつ》かしい」
-> "I have not seen that in a long while."
+「｜橋《はし》が｜描《か》いてある。｜懐《なつ》かしい」
+> "There is a bridge drawn here. I have not seen that in a long while."
 
 ｜梓《あずさ》は｜息《いき》を｜止《と》めた。
 > ｜梓《あずさ》 held her breath.
 「｜橋《はし》を、｜知《し》っているんですか」
 > "You know the bridge?"
-「｜子供《こども》の｜頃《ころ》、あれを｜渡《わた》って｜向《む》こうへ｜行《い》った。｜落《お》ちたのは、｜大雪《おおゆき》の｜年《とし》だ」
-> "When I was a child I crossed it to the other side. It came down the year of the great snow."
-「わたしが｜十五《じゅうご》の｜時《とき》だから、もう｜七十五年《ななじゅうごねん》｜経《た》つ」
-> "I was fifteen, so that is seventy-five years ago now."
+「｜子供《こども》の｜頃《ころ》、あれを｜渡《わた》って｜向《む》こうへ｜行《い》った。｜落《お》ちたのは、｜大雪《おおゆき》の｜年《とし》だ。わたしが｜十五《じゅうご》の｜時《とき》だから、もう｜七十五年《ななじゅうごねん》｜経《た》つ」
+> "When I was a child I crossed it to the other side. It came down the year of the great snow. I was fifteen, so that is seventy-five years ago now."
 
 ｜部屋《へや》の｜中《なか》が、｜静《しず》かになった。
 > The room went quiet.

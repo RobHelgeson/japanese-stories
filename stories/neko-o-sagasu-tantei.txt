@@ -86,12 +86,8 @@
 > He came here every day, he said.
 「｜十日《とおか》前」と、その｜人《ひと》は｜空《そら》を見ながら言った。
 > "Ten days ago," he said, looking up at the sky.
-「そう言われても、私は昨日のことも忘れる」
-> "You can ask, but I forget yesterday too."
-「でも、毎日のことなら覚えている」
-> "The things that happen every day, though, those I keep."
-「学校が終わる時間に、子供が｜一人《ひとり》来て、｜中《なか》には入らないで｜行《い》く」
-> "A kid comes on his own when school lets out, doesn't come in, and goes on past."
+「そう言われても、私は昨日のことも忘れる。でも、毎日のことなら覚えている。学校が終わる時間に、子供が｜一人《ひとり》来て、｜中《なか》には入らないで｜行《い》く」
+> "You can ask, but I forget yesterday too. The things that happen every day, though, those I keep. A kid comes on his own when school lets out, doesn't come in, and goes on past."
 
 ｜三日目《みっかめ》、私は学校が終わる時間に公園へ｜行《い》った。
 > On the third day I went to the park at the hour school lets out.
@@ -182,10 +178,8 @@
 
 少年の名前は聞かないで、代わりに、なぜ猫をここに置いたのかを聞いた。
 > I did not ask the boy's name. I asked instead why he had put the cat here.
-「来週、引っ越すんだ」
-> "We're moving next week."
-「父さんが、猫は連れて｜行《い》けないって」
-> "Dad says we can't take a cat."
+「来週、引っ越すんだ。父さんが、猫は連れて｜行《い》けないって」
+> "We're moving next week. Dad says we can't take a cat."
 家で動物を飼ったことは一度もないらしい。
 > They had never kept an animal at home, it seemed.
 
@@ -251,10 +245,8 @@
 > "He's my cat," Matsuda said.
 少年は｜下《した》を向いた。
 > The boy looked down.
-「でも、この子はあなたのことも覚えています」
-> "But he remembers you too."
-「引っ越しても、休みに来ればいいでしょう」
-> "Even after you move, you can come in the holidays, can't you."
+「でも、この子はあなたのことも覚えています。引っ越しても、休みに来ればいいでしょう」
+> "But he remembers you too. Even after you move, you can come in the holidays, can't you."
 長く飼って来た猫だが、松田さんはもう、自分の猫だとは言わなかった。
 > She had kept him a long time, and she did not say again that he was her cat.
 

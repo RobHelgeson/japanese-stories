@@ -85,34 +85,20 @@
 「塔の鐘の話をする」
 > "I will tell you about the bell in the tower."
 
-「あの鐘は、私が四十の時に作った」
-> "I made that bell when I was forty."
-「当時の王の命令だ。戦争のための鐘だった」
-> "It was an order from the king of that day. A bell for war."
-「前の戦争で、この国は三万人を失っている」
-> "In the last war this country lost thirty thousand men."
-「それなのに王は、次の鐘を作れと言った」
-> "And even so the king told me to cast the next one."
-「私は作らされた」
-> "I was made to do it."
+「あの鐘は、私が四十の時に作った。当時の王の命令だ。戦争のための鐘だった。前の戦争で、この国は三万人を失っている。それなのに王は、次の鐘を作れと言った。私は作らされた」
+> "I made that bell when I was forty. It was an order from the king of that day. A bell for war. In the last war this country lost thirty thousand men. And even so the king told me to cast the next one. I was made to do it."
 
 私は黙って聞いていた。
 > I listened without speaking.
-「私は型を、少しだけ違う形にした」
-> "I made the mould a little different."
-「｜上《うえ》の金属を薄くして、｜下《した》を厚くした」
-> "I made the metal thin at the top and thick at the bottom."
-「あの鐘は、強く打てば必ず割れる。弱く打てば、良い音がする」
-> "Strike that bell hard and it will crack without fail. Strike it softly and it gives a good sound."
+「私は型を、少しだけ違う形にした。｜上《うえ》の金属を薄くして、｜下《した》を厚くした。あの鐘は、強く打てば必ず割れる。弱く打てば、良い音がする」
+> "I made the mould a little different. I made the metal thin at the top and thick at the bottom. Strike that bell hard and it will crack without fail. Strike it softly and it gives a good sound."
 
 音だけを覚えてきた私にとって、それは聞くまでもないことだった。
 > For someone who had spent ten years learning nothing but sound, it was not a thing that needed asking.
 薄い金属に力が集まる。
 > The force gathers where the metal is thin.
-「けれど戦争の時、｜人《ひと》は弱く打たない」
-> "But in war, no one strikes softly."
-「力の全部を使う。それが戦争というものだ」
-> "They use everything they have. That is what war is."
+「けれど戦争の時、｜人《ひと》は弱く打たない。力の全部を使う。それが戦争というものだ」
+> "But in war, no one strikes softly. They use everything they have. That is what war is."
 
 師匠は四十年前に、戦争が始まる日の音を決めていたのだ。
 > Forty years earlier, my master had decided what sound the first day of a war would make.
@@ -120,19 +106,15 @@
 > It was the one stratagem of a man who had worked sixty years.
 「これは罪だ」と師匠は言った。
 > "This is a crime," my master said.
-「王の命令に逆らった。私は裏切り者だ」
-> "I defied the king's order. I am a traitor."
-「死んでからでも、｜罰《ばつ》を受けるのだろう」
-> "Even after I am dead, I expect I will take the punishment."
+「王の命令に逆らった。私は裏切り者だ。死んでからでも、｜罰《ばつ》を受けるのだろう」
+> "I defied the king's order. I am a traitor. Even after I am dead, I expect I will take the punishment."
 
 「なぜ私に話すんですか」と私は聞いた。
 > "Why are you telling me?" I asked.
 師匠は初めて私の｜方《ほう》を見た。
 > For the first time, my master turned to look at me.
-「お前が次の職人だからだ」
-> "Because you are the next founder."
-「あの鐘の修理を命じられて、知らないまま直してしまえば、私の六十年が無くなる」
-> "You will be ordered to repair that bell, and if you fix it without knowing, my sixty years are gone."
+「お前が次の職人だからだ。あの鐘の修理を命じられて、知らないまま直してしまえば、私の六十年が無くなる」
+> "Because you are the next founder. You will be ordered to repair that bell, and if you fix it without knowing, my sixty years are gone."
 
 その夜、師匠は死んだ。
 > My master died that night.
@@ -259,10 +241,8 @@
 > The captain was silent for a long time.
 それから、低い声で言った。
 > Then he spoke in a low voice.
-「私の父は、前の戦争で死んだ」
-> "My father died in the last war."
-「私は騎士だ。命令には従う」
-> "I am a knight. I follow orders."
+「私の父は、前の戦争で死んだ。私は騎士だ。命令には従う」
+> "My father died in the last war. I am a knight. I follow orders."
 
 「だが、割れた鐘の音を国が聞けば」
 > "But if the country hears the sound of a cracked bell..."

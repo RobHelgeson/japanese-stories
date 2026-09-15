@@ -127,8 +127,29 @@ Leech words come from `vocab.weak_forms()` — kanji words tagged leech in Anki 
 ```
 
 - **One Japanese sentence per line, each immediately followed by its translation on a `>` line.** The 1:1 coupling is load-bearing and nothing checks it at build time. Split a Japanese sentence and you must write the second translation.
+- **One quoted turn per line, however many sentences it holds.** 「」 brackets a turn — everything one speaker says before anybody else speaks or the narration resumes — not a sentence. Sentences inside a turn are divided by 。 as usual, and the last one drops its 。 before the 」. This is the only place the one-sentence-per-line rule yields, and it has to: the alternative is a closing 」 in the middle of somebody still talking.
 - Blank line separates pages. Aim for four to five sentences a page.
 - **This format once became a style rule by accident.** The 1:1 coupling made long multi-clause sentences awkward to keep aligned, so the first five stories were written almost entirely in short declaratives: mean 17 characters, standard deviation 4.6, and three of the five contained no sentence over 30 characters at all. Vary length deliberately. The stdev floor exists to catch exactly this.
+### 「」 is the speaker attribution
+
+Most quoted lines carry no dialogue tag, so a reader has nothing but the brackets to go on: a new 「 means a new speaker, and turns alternate. Splitting one speaker's turn across several 「」 therefore does not merely look wrong, it *says* something false, and there is no other cue to contradict it.
+
+```
+✗ 「初めてです」        ✓ 「初めてです。ずっとこの町にいました。｜二十年《にじゅうねん》、一度も出ていません」
+  「ずっとこの町にいました」
+  「｜二十年《にじゅうねん》、一度も出ていません」
+```
+
+The ✗ column is three speakers answering one question. It is one woman, and it shipped that way in ｜終電《しゅうでん》 — the September 2026 audit found 28 turns split like this across all seven stories, produced by reading the one-sentence-per-line rule as though it outranked the brackets.
+
+**A narrative tag closes the turn.** 「｜海《うみ》は」と｜祖父《そふ》は｜言《い》った。「｜青《あお》かったか」 is right and stays two lines: the tag interrupts, so the same speaker's continuation opens a fresh 「. So does a page break, which is why a turn never spans one.
+
+```bash
+python3 stats.py ../stories/<slug>.txt --turns   # every run of adjacent quoted lines
+```
+
+Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest must alternate. Two neighbours you would give to the same speaker are one turn wrongly split. Nothing gates this — speaker identity is not recoverable from the text, so the script prints and you judge.
+
 - **The coupling is not a reason to write short.** Write the long sentence and translate it as one long sentence. What the coupling really discourages is **subordination** — 連用形 chaining, relative clauses, ので / のに / ながら — and those are the level ladder's own constructions, so writing around it works against the ladder. `stats.py` reports `subordinate_share` for this; it is measured and not yet gated.
 
 ## Furigana
@@ -159,6 +180,7 @@ Four failure modes, each found the expensive way. Run this against every draft.
 | Flat short declaratives          | mean 17 chars, stdev 4.6; 3 of 5 had nothing over 30          | Is every sentence one clause?                              |
 | Variance bought long-only        | ｜猫《ねこ》 +24%, ｜城《しろ》の｜鐘《かね》 +14% over brief | Are the long sentences long from structure, or more nouns? |
 | Circumlocution to dodge unknowns | 一緒に暮らしている人 for ｜飼《か》い｜主《ぬし》             | Is a phrase working around a word rather than using one?   |
+| One turn split across several 「」 | 28 turns, all seven stories, Sept 2026                    | `stats.py --turns`; does a 」 close where nobody else speaks? |
 
 ## Metrics are floors, not targets
 

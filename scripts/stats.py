@@ -397,11 +397,63 @@ def table(analyses, labels):
         print(f"  {key:<22}" + "".join(str(budgets(a["tokens"])[key]).rjust(w) for a in analyses))
 
 
+def turns(path):
+    """Every run of adjacent quoted lines, with its translations.
+
+    Whether two neighbouring 「」 are two speakers or one speaker cut in half is
+    the one thing in this format no script can decide: the source carries no
+    speaker marks, so alternation is the whole of the attribution. What it can do
+    is put the run in front of the author, because a split turn is invisible one
+    line at a time and obvious as a block. A page break ends a run, since a turn
+    never crosses one.
+    """
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    units = []
+    for i, line in enumerate(lines):
+        s = line.strip()
+        if s.startswith(("#", ">")):
+            continue
+        if not s:
+            units.append(None)
+            continue
+        nxt = lines[i + 1].strip() if i + 1 < len(lines) else ""
+        en = nxt.lstrip("> ").strip() if nxt.startswith(">") else ""
+        units.append((i + 1, furigana.strip(s), en))
+
+    runs, run = [], []
+    for u in units + [None]:
+        if u and u[1].startswith("「"):
+            run.append(u)
+        else:
+            if len(run) > 1:
+                runs.append(run)
+            run = []
+    return runs
+
+
+def print_turns(path):
+    """One block per run. Read down it and name a speaker for every line.
+
+    A tagged line states its own speaker and closes the turn, so the line under
+    it opens a new one whoever says it. Everything else has to alternate; two
+    adjacent lines you would give to the same speaker are one turn wrongly split,
+    and belong on one line inside one 「」.
+    """
+    runs = turns(path)
+    print(f"\n{Path(path).stem} — {len(runs)} runs of adjacent quoted lines")
+    for run in runs:
+        print()
+        for n, ja, en in run:
+            print(f"  {'tagged' if TAGGED.search(ja) else '      '} {n:>4}  {en or ja}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("paths", nargs="*", type=Path)
     ap.add_argument("--diff", nargs=2, metavar=("A", "B"))
     ap.add_argument("--strict", action="store_true", help="exit nonzero on an unmet target")
+    ap.add_argument("--turns", action="store_true",
+                    help="print adjacent quoted lines so speaker alternation can be checked")
     args = ap.parse_args()
 
     if args.diff:
@@ -410,6 +462,11 @@ def main():
         return
 
     paths = args.paths or [STORIES / f"{s['slug']}.txt" for s in CORPUS["stories"]]
+
+    if args.turns:
+        for path in paths:
+            print_turns(path)
+        return
     analyses = [analyze(p) for p in paths]
     entries = {s["slug"]: s for s in CORPUS["stories"]}
     table(analyses, [a["slug"][:14] for a in analyses])

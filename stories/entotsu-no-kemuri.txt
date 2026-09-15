@@ -154,12 +154,8 @@
 > He was quiet for a while.
 それから、棚の方を見た。
 > Then he looked towards the shelf.
-「｜常連《じょうれん》が一人、いるんだ」
-> "There is one regular."
-「工場の仕事が終わってから来るから、いつも遅い」
-> "He comes after his shift at the factory, so he is always late."
-「待っていれば、来る」
-> "If I wait, he comes."
+「｜常連《じょうれん》が一人、いるんだ。工場の仕事が終わってから来るから、いつも遅い。待っていれば、来る」
+> "There is one regular. He comes after his shift at the factory, so he is always late. If I wait, he comes."
 
 私は何も言えなかった。
 > I could not say anything.
@@ -208,12 +204,8 @@
 > "I came to tell you about my father."
 主人は顔を上げた。
 > He raised his face.
-「工場の、常連の人です」
-> "The regular. The one from the factory."
-「三ヶ月前に、亡くなりました」
-> "He died three months ago."
-「すみません。誰も、知らせなくて」
-> "I am sorry. Nobody told you."
+「工場の、常連の人です。三ヶ月前に、亡くなりました。すみません。誰も、知らせなくて」
+> "The regular. The one from the factory. He died three months ago. I am sorry. Nobody told you."
 
 主人は何も言わなかった。
 > The owner said nothing.
