@@ -172,7 +172,7 @@ This clause is load-bearing rather than decorative: two of the four failures abo
 python3 reference.py --compare    # our numbers beside authentic 児童文学
 ```
 
-Every floor in `corpus.json` is calibrated from this project's own output — `min_repeated_share` 0.4 from an observed 44-62% spread, `min_sentence_stdev` 6.0 from the best value any story has hit. A corpus measured against itself can be no better than its own best member, so `reference.py` reads the same structural axes off public-domain children's literature from 青空文庫 (新美南吉, 宮沢賢治, 小川未明, in 新字新仮名, NDC K913), sampled per author and binned against the corpus's own character terciles.
+Every floor in `corpus.json` is calibrated from this project's own output — `min_repeated_share` 0.4 from an observed 44-62% spread, `min_sentence_stdev` 6.0 from just under the lowest stdev any story had recorded. A corpus measured against itself can be no better than its own best member, so `reference.py` reads the same structural axes off public-domain children's literature from 青空文庫 (新美南吉, 宮沢賢治, 小川未明, in 新字新仮名, NDC K913), sampled per author and binned against the corpus's own character terciles.
 
 **It reports a band. It gates nothing, and it must not become a gate.** The danger here is larger than the one this section already describes: "real authors score 15.8" is a far more persuasive argument for chasing a number than "our best story scored 6.5" ever was, and writing to the band would buy the same variance the same dishonest way. `reference.py` writes no threshold, never touches `corpus.json`, and exits zero regardless.
 
