@@ -25,6 +25,10 @@ import stats
 CORPUS = json.loads((Path(__file__).resolve().parent / "corpus.json").read_text(encoding="utf-8"))
 ORDER = [s["slug"] for s in CORPUS["stories"]]
 VERSIONS = {s["slug"]: s.get("versions", []) for s in CORPUS["stories"]}
+# The level was in stories-index.md's Reading Order table until that table was
+# deleted; the card is the only place it is shown now. data-level is also what a
+# later level filter would key on.
+LEVELS = {s["slug"]: s.get("level") for s in CORPUS["stories"]}
 
 summaries = indexmd.summaries
 
@@ -57,25 +61,41 @@ def card(story, summary, versions=()):
     st = story["stats"]
     # One slug for the row's identity and its version hrefs, so they cannot disagree.
     slug = Path(story["file"]).stem
+    lv = LEVELS.get(slug)
     chips = ""
     if st["weak"]:
         chips += f'<span class="chip weak">苦手 {html.escape("、".join(st["weak"]))}</span>'
     if st.get("approved"):
         chips += f'<span class="chip new">新出 {html.escape("、".join(st["approved"]))}</span>'
-    return f"""    <div class="cell" data-slug="{html.escape(slug)}" data-pages="{story["pages"]}">
+    # An unsummarised story still gets a card. index.py used to exit instead,
+    # which made adding a story a two-file operation with a hard stop in the
+    # middle of a rebuild; the gap is now visible on the page and in a warning.
+    rt = f'<div class="rt">{html.escape(reading)}</div>\n        ' if reading else ""
+    sum_p = f'<p class="sum">{html.escape(text)}</p>' if text else '<p class="sum none">—</p>'
+    # data-title rather than reading the <h2> back: the heading carries the
+    # level chip too, so its textContent is not the title.
+    return f"""    <div class="cell" data-slug="{html.escape(slug)}" data-pages="{story["pages"]}" data-title="{title}"{f' data-level="{lv}"' if lv is not None else ""}>
       <a class="card" href="{href}">
-        <div class="rt">{html.escape(reading)}</div>
-        <h2>{title}</h2>
-        <p class="sum">{html.escape(text)}</p>
-        <div class="meta">
-          <span>{story["pages"]} ページ</span>
-          <span>{story["sentences"]} 文</span>
-          <span>{st["words"]} 漢字語</span>
-        </div>
-        <div class="chips">{chips}</div>
+        {rt}<h2>{title}{f'<span class="lv">Lv{lv}</span>' if lv is not None else ""}</h2>
+        {sum_p}
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
-      <div class="manage" hidden>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>{story["pages"]} ページ</span>
+        <span>{story["sentences"]} 文</span>
+        <span>{st["words"]} 漢字語</span>
+      </div>
+      <div class="chips">{chips}</div>
+      <div class="rate">
+        <span class="stars" role="group" aria-label="評価">{STARS}
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" class="notebtn" data-act="note" aria-expanded="false">感想</button>
+      </div>
+      <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
+                placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
+{version_links(slug, versions)}      <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
           <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
@@ -85,15 +105,7 @@ def card(story, summary, versions=()):
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
-      <div class="rate">
-        <span class="stars" role="group" aria-label="評価">{STARS}
-        </span>
-        <span class="mspacer"></span>
-        <button type="button" class="notebtn" data-act="note" aria-expanded="false">感想</button>
-      </div>
-      <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
-                placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
-{version_links(slug, versions)}    </div>
+    </div>
 """
 
 
@@ -115,12 +127,17 @@ def main():
 
     built = [read(out_dir / f"{n}.html") for n in names]
     sums = summaries(args.src / "stories-index.md")
+    # A missing summary is a gap to fill, not a reason to stop a rebuild that
+    # has already spent a minute per story in Ichiran. The card renders with an
+    # em dash where the blurb goes, so the gap is visible on the page too.
     missing = [s["title"] for s in built if s["title"] not in sums]
     if missing:
-        sys.exit(f"No summary in stories-index.md for: {', '.join(missing)}")
+        print(f"warning: no summary in stories-index.md for: {', '.join(missing)}",
+              file=sys.stderr)
 
     cards = "".join(
-        card(s, sums[s["title"]], VERSIONS.get(Path(s["file"]).stem, [])) for s in built
+        card(s, sums.get(s["title"], ("", "")), VERSIONS.get(Path(s["file"]).stem, []))
+        for s in built
     )
     known = built[0]["stats"]["knownVocab"]
     totals = (
@@ -129,7 +146,13 @@ def main():
     )
 
     out = out_dir / "index.html"
-    out.write_text(TEMPLATE.replace("__CARDS__", cards).replace("__TOTALS__", totals), encoding="utf-8")
+    out.write_text(
+        TEMPLATE.replace("__CARDS__", cards)
+        .replace("__TOTALS__", totals)
+        # Hand-kept until 2026-09-14, and one story short of the count printed
+        # in the header the whole time.
+        .replace("__TITLES__", html.escape(" · ".join(s["title"] for s in built))),
+        encoding="utf-8")
     print(f"{out}\n  {len(built)} stories · {totals}")
 
 
@@ -220,28 +243,33 @@ TEMPLATE = """<!doctype html>
         margin: 0 0 2rem;
       }
 
-      /* The version row sits outside the card's anchor — nesting a link inside
-         a link is invalid and browsers silently close the outer one. */
-      .cell { margin-bottom: 0.9rem; }
-      .cell .card { margin-bottom: 0; }
-      .cell .vers { margin: 0.4rem 0 0 3.4rem; }
-
       /* Reading order is the point of the list, so the cards are a single
-         column and carry their position rather than being a grid to scan. */
-      .card {
-        display: block;
+         column and carry their position rather than being a grid to scan.
+
+         The box is drawn on .cell rather than on the a.card inside it. Every
+         control — the stepper, the stars, the 感想 box, the version links —
+         has to sit outside the anchor, because a button or a link nested in a
+         link is invalid and browsers silently close the outer one. With the
+         border on the anchor those controls all fell outside the box they
+         belong to, and the 詳細 disclosure had revealed content on both sides
+         of itself. One box per story, and the anchor is just the part of it
+         that navigates. */
+      .cell {
         position: relative;
         padding: 1.3rem 1.5rem 1.2rem 3.4rem;
         margin-bottom: 0.9rem;
         border: 1px solid var(--rule);
         border-radius: 10px;
-        text-decoration: none;
-        color: inherit;
         counter-increment: story;
         transition: border-color 0.12s ease, background 0.12s ease;
       }
+      .card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+      }
       main { counter-reset: story; }
-      .card::before {
+      .cell::before {
         content: counter(story);
         position: absolute;
         left: 1.4rem;
@@ -251,7 +279,10 @@ TEMPLATE = """<!doctype html>
         font-variant-numeric: tabular-nums;
         color: var(--muted);
       }
-      .card:hover {
+      /* Keyed on the anchor, not on the box. The box is the whole row now, but
+         only a.card navigates — lighting the row up while the pointer sits on
+         the stars or the 感想 box promises a click that does nothing. */
+      .cell:has(a.card:hover) {
         border-color: var(--accent);
         background: color-mix(in srgb, var(--accent) 6%, transparent);
       }
@@ -279,11 +310,12 @@ TEMPLATE = """<!doctype html>
         color: var(--muted);
         font-variant-numeric: tabular-nums;
       }
+      .meta { margin-top: 0.45rem; }
       .chips { gap: 0.5rem; margin-top: 0.5rem; }
       /* Earlier drafts, so a rewrite can be read against what it replaced. */
       .vers {
         display: flex; align-items: center; gap: 0.4rem;
-        margin-top: 0.65rem; font-size: 0.72rem; opacity: 0.7;
+        margin-top: 0.55rem; font-size: 0.72rem; opacity: 0.7;
       }
       .vers .ver, .vers .cur {
         border: 1px solid var(--rule); border-radius: 999px; padding: 0.05rem 0.5rem;
@@ -298,6 +330,88 @@ TEMPLATE = """<!doctype html>
       }
       .chip.weak { color: var(--weak); border-color: color-mix(in srgb, var(--weak) 40%, transparent); }
       .chip.new { color: var(--new); border-color: color-mix(in srgb, var(--new) 40%, transparent); }
+
+      /* The level was the one column of the deleted Reading Order table that
+         nothing else showed. */
+      .lv {
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.62rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        border: 1px solid var(--rule);
+        border-radius: 999px;
+        padding: 0.1rem 0.45rem;
+        margin-inline-start: 0.6rem;
+        vertical-align: 0.35em;
+      }
+      .sum.none { color: var(--muted); }
+
+      /* Collapsed is the default, and the line it draws is what you need to
+         PICK a story against what you need to FINISH with one. Title, reading,
+         level, blurb and the bar stay; the counts, the marked words, the stars,
+         the 感想 box and the version links wait behind 詳細. At seven stories
+         this is tidiness; the list is what it is protecting at fifty. */
+      .cell:not(.open) .meta,
+      .cell:not(.open) .chips,
+      .cell:not(.open) .rate,
+      .cell:not(.open) .note,
+      .cell:not(.open) .vers { display: none; }
+      .disc {
+        display: block;
+        margin: 0.1rem 0 0;
+        /* Same trade the .btn pills make: 44px of hit area, nowhere near 44px
+           of ink. This one gates every detail on every row, so it is the last
+           control on the page that should be hard to hit with a thumb. */
+        padding: 0.6rem 0.7rem 0.6rem 0;
+        min-height: 44px;
+        border: 0;
+        background: none;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.72rem;
+        color: var(--muted);
+        text-align: start;
+        cursor: pointer;
+      }
+      .disc:hover { color: var(--accent); }
+      .disc::before { content: "▸ "; }
+      .cell.open .disc::before { content: "▾ "; }
+
+      /* Continue reading. The catalogue is a ladder you walk down once, so the
+         one row that matters on almost every visit is the story already open —
+         which is otherwise however far down the list you have got. Built from
+         the progress map at paint time, so it costs nothing at build time and
+         is simply absent on a device that has never read anything. */
+      .resume {
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+        margin: 0 0 1.6rem;
+        padding: 0.9rem 1.1rem;
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--accent) 7%, transparent);
+        text-decoration: none;
+        color: inherit;
+      }
+      .resume[hidden] { display: none; }
+      .resume:hover { background: color-mix(in srgb, var(--accent) 13%, transparent); }
+      .resume .rlabel {
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        white-space: nowrap;
+      }
+      .resume .rtitle { font-size: 1.15rem; font-weight: 600; }
+      .resume .rpct {
+        margin-inline-start: auto;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.72rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
 
       .prog {
         display: flex;
@@ -332,7 +446,7 @@ TEMPLATE = """<!doctype html>
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin: 0.4rem 0 0 3.4rem;
+        margin: 0.55rem 0 0;
         font-family: -apple-system, system-ui, sans-serif;
         font-size: 0.75rem;
       }
@@ -353,7 +467,7 @@ TEMPLATE = """<!doctype html>
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin: 0.1rem 0 0 3.2rem;
+        margin: 0.55rem 0 0;
         font-family: -apple-system, system-ui, sans-serif;
         font-size: 0.75rem;
       }
@@ -377,8 +491,8 @@ TEMPLATE = """<!doctype html>
       .stars button:hover { color: color-mix(in srgb, var(--accent) 55%, var(--rule)); }
       .note {
         font: 0.8rem/1.6 -apple-system, system-ui, sans-serif;
-        width: calc(100% - 3.2rem);
-        margin: 0.1rem 0 0 3.2rem;
+        width: 100%;
+        margin: 0.45rem 0 0;
         color: var(--ink);
         background: transparent;
         border: 1px solid var(--rule);
@@ -487,6 +601,12 @@ TEMPLATE = """<!doctype html>
         The order is graded by what the prose asks of you, not by vocabulary. Read down the list.
       </p>
 
+      <a class="resume" id="resume" href="#" hidden>
+        <span class="rlabel"></span>
+        <span class="rtitle"></span>
+        <span class="rpct"></span>
+      </a>
+
 __CARDS__
       <p class="keys">
         In a story: tap a kanji word for its reading, in place. Tap it twice for its
@@ -534,7 +654,7 @@ __CARDS__
     </main>
 
     <footer>
-      <span>時計の音 · 迷子の手紙 · 終電 · 煙突の煙 · 猫を探す探偵 · 城の鐘</span>
+      <span>__TITLES__</span>
       <span class="spacer"></span>
       <span>known-word-reader</span>
     </footer>
@@ -609,6 +729,9 @@ __CARDS__
         function paint(all) {
           if (!all || typeof all !== "object") all = {};
           var done = 0;
+          // The row the 続き block will point at: whichever unfinished story was
+          // touched last, falling back to the first one not yet finished.
+          var open = null, openAt = -1, openPage = 0, next = null;
           for (var i = 0; i < cells.length; i++) {
             var cell = cells[i], rec = all[cell.dataset.slug];
             var prog = cell.querySelector(".prog");
@@ -641,10 +764,77 @@ __CARDS__
             }
             cell.classList.toggle("done", !!fin);
             if (fin) done++;
+            else {
+              if (!next) next = cell;
+              var at = ok ? Number(rec.at) : NaN;
+              if (isFinite(page) && isFinite(at) && at > openAt) {
+                open = cell; openAt = at; openPage = page;
+              }
+            }
             if (out) out.textContent = isFinite(page) ? page + " / " + n : "—";
             if (mark) mark.textContent = fin ? "未読" : "読了";
           }
           $("readtot").textContent = done ? " · 読了 " + done + "/" + cells.length : "";
+          resume(open, openPage, next);
+          autoOpen(all, null);
+        }
+
+        // 続き on the story already in hand, 次へ on the first one not yet
+        // finished — first in reading order, not first after the last one
+        // finished, so skipping ahead leaves the skipped story offered.
+        // Gone entirely once the corpus is read out.
+        function resume(open, page, next) {
+          var el = $("resume");
+          if (!el) return;
+          var cell = open || next;
+          if (!cell) { el.hidden = true; return; }
+          var a = cell.querySelector("a.card");
+          el.setAttribute("href", a ? a.getAttribute("href") : "#");
+          el.querySelector(".rlabel").textContent = open ? "続き" : "次へ";
+          el.querySelector(".rtitle").textContent = cell.dataset.title || "";
+          el.querySelector(".rpct").textContent =
+            open ? page + " / " + total(cell) : total(cell) + " ページ";
+          el.hidden = false;
+        }
+
+        // A story you have finished and not yet rated opens itself, so the
+        // stars are still in front of you on the way out — which is the whole
+        // reason they do not sit behind 編集. A row the reader has opened or
+        // closed by hand is left alone; a preference beats a default.
+        // Both callers already hold the map they painted from, and a push or a
+        // pull paints from the merged result rather than from the store — so
+        // going back to localStorage here can disagree with what is on screen.
+        // A write that silently failed on quota is enough to produce it.
+        function autoOpen(prog, revs) {
+          prog = prog || read();
+          revs = revs || readR();
+          for (var i = 0; i < cells.length; i++) {
+            var cell = cells[i];
+            if (shut[cell.dataset.slug] || cell.classList.contains("open")) continue;
+            var p = prog[cell.dataset.slug], r = revs[cell.dataset.slug];
+            var fin = p && typeof p === "object" && p.done === true;
+            var rated = r && typeof r === "object" && Number(r.stars) >= 1;
+            if (fin && !rated) disclose(cell, true);
+          }
+        }
+
+        function disclose(cell, on) {
+          cell.classList.toggle("open", on);
+          var btn = cell.querySelector(".disc");
+          if (btn) btn.setAttribute("aria-expanded", on ? "true" : "false");
+        }
+
+        // Which rows have been shut by hand, so the auto-open does not undo the
+        // correction on the next load. A Home Screen install relaunches on
+        // every visit, so an in-memory flag would mean it never held at all.
+        // Device-local and out of the gist deliberately: this is where this
+        // screen is scrolled to, not anything about the reading.
+        var shut = slot("shut");
+        function remember(slug, on) {
+          if (on) delete shut[slug]; else shut[slug] = 1;
+          try {
+            localStorage.setItem("japanese-stories:shut", JSON.stringify(shut));
+          } catch (e) {}
         }
 
         function paintR(all) {
@@ -670,6 +860,7 @@ __CARDS__
             var btn = cell.querySelector(".notebtn");
             if (btn) btn.classList.toggle("has", !!note);
           }
+          autoOpen(null, all);
         }
 
         // A hand-set review carries `at` for the same reason a hand-set record
@@ -763,11 +954,24 @@ __CARDS__
           var cell = btn.closest(".cell[data-slug]");
           if (!cell) return;
           var what = btn.dataset.act;
+          // Ahead of act(): an unrecognised action falls through to its
+          // stepper branch, so a disclosure tap would turn a page.
+          if (what === "more") {
+            var on = !cell.classList.contains("open");
+            disclose(cell, on);
+            remember(cell.dataset.slug, on);
+            return;
+          }
           if (what === "star") { star(cell, Number(btn.dataset.n)); return; }
           if (what === "note") {
             var ta = cell.querySelector("textarea.note");
             if (!ta) return;
             var show = ta.hidden;
+            // A collapsed row puts the box in a display:none subtree, where it
+            // cannot take focus and so is not skipped by paintR's focused-box
+            // guard — the next pull would overwrite what was being typed.
+            // Revealing the box opens the row that holds it.
+            if (show) disclose(cell, true);
             ta.hidden = !show;
             btn.setAttribute("aria-expanded", show ? "true" : "false");
             if (show) ta.focus();
