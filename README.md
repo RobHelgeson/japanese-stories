@@ -38,6 +38,14 @@ Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose use
 
 Preferences and your place in each story are remembered per device.
 
+## The contents page
+
+One row per story in reading order, with its level, and the whole thing is generated — `index.py` takes the order, the level and the archived versions from `corpus.json`, the blurb from `stories-index.md`, and the pages, sentences, 漢字語 counts and marked words back out of each built reader. Nothing about a story is stated twice, so a rebuilt story cannot leave the page stale. A story with no blurb still gets a row, without its kana reading either since both come from the same bullet; `index.py` warns rather than stopping a rebuild that has already spent a minute per story in Ichiran. Nothing else checks, so the warning is the only notice.
+
+The row shows what you need to **pick** a story: the title, its reading, its level, the blurb and how far in you are. 詳細 opens what you need to **finish** with one — the counts, the 苦手 and 新出 words, the stars, the 感想 box and the links to earlier drafts. At seven stories that is tidiness; the list is what it is protecting at fifty.
+
+続き at the top is the story already in hand, whichever was read most recently, or 次へ on the first one not yet finished. It is built from the progress record at paint time, so it is simply absent on a device that has never read anything, and gone once the set is read out.
+
 ## Keeping your place
 
 Progress is written to `localStorage` as you read, and that is the working copy. Browsers throw it away, though: WebKit deletes all script-writable storage after seven days of browser use without a visit, and a Home Screen web app starts with a storage container of its own rather than the Safari tab's. Two things address that, and they are meant to be done in this order.
@@ -52,7 +60,7 @@ The store is a plain JSON file on github.com, so correcting a bad record is some
 
 ## Rating a story
 
-Every row on the contents page carries five stars and a 感想 box, and neither sits behind 編集 — the rating is given on the way out of a story, not sat down to. Tapping a star sets the rating; tapping the star that is already lit takes it back off, which is the only undo there is. The note is free text, capped at 2000 characters, saved as you type and pushed on a short debounce.
+Every row on the contents page carries five stars and a 感想 box, and a story you have finished without rating opens itself so the stars are in front of you — the rating is given on the way out of a story, not sat down to. The note stays behind its own button, because a star is the ask and a written note is the extra. Tapping a star sets the rating; tapping the star that is already lit takes it back off, which is the only undo there is. The note is free text, capped at 2000 characters, saved as you type and pushed on a short debounce.
 
 Ratings travel in the same secret gist as progress, in a `reviews` map beside `progress` rather than as fields on the progress record. That separation is the whole point: a progress record is replaced whole by whichever side carries the later timestamp, and every page turn bumps that timestamp, so a rating stored there would be erased the next time another device turned a page in the same story.
 
@@ -60,6 +68,8 @@ Ratings travel in the same secret gist as progress, in a `reviews` map beside `p
 python3 reviews.py                  # the ratings and notes, joined to corpus.json
 python3 reviews.py --file exp.json  # from a 書き出し export instead, no network
 ```
+
+A row you open or close by hand stays that way, across reloads — the auto-open is a default, and a default that reasserts itself is not one. That one flag is kept in `localStorage` and deliberately not in the gist: it is where this screen is scrolled to, not anything about the reading.
 
 `reviews.py` is the reading end, and it is what a new story's brief is chosen against: it prints each rating beside the level, register and length it was a verdict on, then the averages by level and by register, with their counts, and every note in full. A rating is one number and the note underneath it is where the reason lives. It reads the gist through `gh`, which already holds a token with the gist scope, so nothing has to be kept in step with the phone.
 
