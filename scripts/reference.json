@@ -1,0 +1,215 @@
+{
+ "_comment": "Reference texts for the structural band, chosen by reference.py --sample. Stratified by author and by the corpus's own character terciles. This is a band to read beside our numbers, never a floor: see reference.py's docstring and AUTHORING.md's 'Metrics are floors, not targets'.",
+ "seed": 20260914,
+ "per_cell": 3,
+ "corpus_chars": {
+  "min": 1646,
+  "max": 4958
+ },
+ "bin_edges": [
+  2750,
+  3854
+ ],
+ "texts": [
+  {
+   "id": "045657",
+   "author": "宮沢賢治",
+   "title": "手紙　四",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/45657_ruby_35394.zip",
+   "chars": 1722,
+   "bin": "short"
+  },
+  {
+   "id": "002656",
+   "author": "宮沢賢治",
+   "title": "ざしき童子のはなし",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/2656_ruby_29622.zip",
+   "chars": 1814,
+   "bin": "short"
+  },
+  {
+   "id": "001077",
+   "author": "宮沢賢治",
+   "title": "めくらぶどうと虹",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/1077_ruby.zip",
+   "chars": 2465,
+   "bin": "short"
+  },
+  {
+   "id": "045652",
+   "author": "宮沢賢治",
+   "title": "泉ある家",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/45652_ruby_35575.zip",
+   "chars": 3009,
+   "bin": "mid"
+  },
+  {
+   "id": "050762",
+   "author": "宮沢賢治",
+   "title": "耕耘部の時計",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/50762_ruby_39497.zip",
+   "chars": 3376,
+   "bin": "mid"
+  },
+  {
+   "id": "000460",
+   "author": "宮沢賢治",
+   "title": "インドラの網",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/460_ruby_1416.zip",
+   "chars": 3669,
+   "bin": "mid"
+  },
+  {
+   "id": "000469",
+   "author": "宮沢賢治",
+   "title": "さるのこしかけ",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/469_ruby_19942.zip",
+   "chars": 3990,
+   "bin": "long"
+  },
+  {
+   "id": "045473",
+   "author": "宮沢賢治",
+   "title": "みじかい木ぺん",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/45473_ruby_35666.zip",
+   "chars": 4729,
+   "bin": "long"
+  },
+  {
+   "id": "004600",
+   "author": "宮沢賢治",
+   "title": "タネリはたしかにいちにち噛んでいたようだった",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/4600_ruby_11839.zip",
+   "chars": 4866,
+   "bin": "long"
+  },
+  {
+   "id": "051682",
+   "author": "小川未明",
+   "title": "窓の内と外",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/51682_ruby_63515.zip",
+   "chars": 1939,
+   "bin": "short"
+  },
+  {
+   "id": "052585",
+   "author": "小川未明",
+   "title": "はまねこ",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/52585_ruby_67699.zip",
+   "chars": 2270,
+   "bin": "short"
+  },
+  {
+   "id": "053135",
+   "author": "小川未明",
+   "title": "街の幸福",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/53135_ruby_75443.zip",
+   "chars": 2697,
+   "bin": "short"
+  },
+  {
+   "id": "053023",
+   "author": "小川未明",
+   "title": "老工夫と電灯",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/53023_ruby_72091.zip",
+   "chars": 2989,
+   "bin": "mid"
+  },
+  {
+   "id": "052975",
+   "author": "小川未明",
+   "title": "すみれとうぐいすの話",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/52975_ruby_72995.zip",
+   "chars": 3759,
+   "bin": "mid"
+  },
+  {
+   "id": "051524",
+   "author": "小川未明",
+   "title": "汽車は走る",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/51524_ruby_63199.zip",
+   "chars": 3820,
+   "bin": "mid"
+  },
+  {
+   "id": "054998",
+   "author": "小川未明",
+   "title": "北風にたこは上がる",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/54998_ruby_59974.zip",
+   "chars": 4220,
+   "bin": "long"
+  },
+  {
+   "id": "053465",
+   "author": "小川未明",
+   "title": "白いくま",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/53465_ruby_69510.zip",
+   "chars": 4478,
+   "bin": "long"
+  },
+  {
+   "id": "052615",
+   "author": "小川未明",
+   "title": "生きた人形",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/52615_ruby_57385.zip",
+   "chars": 4892,
+   "bin": "long"
+  },
+  {
+   "id": "055356",
+   "author": "新美南吉",
+   "title": "ひよりげた",
+   "url": "https://www.aozora.gr.jp/cards/000121/files/55356_txt_49141.zip",
+   "chars": 2252,
+   "bin": "short"
+  },
+  {
+   "id": "042299",
+   "author": "新美南吉",
+   "title": "のら犬",
+   "url": "https://www.aozora.gr.jp/cards/000121/files/42299_ruby_14524.zip",
+   "chars": 3392,
+   "bin": "mid"
+  },
+  {
+   "id": "042300",
+   "author": "新美南吉",
+   "title": "花をうめる",
+   "url": "https://www.aozora.gr.jp/cards/000121/files/42300_ruby_14523.zip",
+   "chars": 3530,
+   "bin": "mid"
+  },
+  {
+   "id": "045213",
+   "author": "新美南吉",
+   "title": "かぶと虫",
+   "url": "https://www.aozora.gr.jp/cards/000121/files/45213_ruby_18714.zip",
+   "chars": 3540,
+   "bin": "mid"
+  },
+  {
+   "id": "000636",
+   "author": "新美南吉",
+   "title": "正坊とクロ",
+   "url": "https://www.aozora.gr.jp/cards/000121/files/636_ruby_21635.zip",
+   "chars": 4403,
+   "bin": "long"
+  },
+  {
+   "id": "000633",
+   "author": "新美南吉",
+   "title": "張紅倫",
+   "url": "https://www.aozora.gr.jp/cards/000121/files/633_ruby.zip",
+   "chars": 4426,
+   "bin": "long"
+  },
+  {
+   "id": "000634",
+   "author": "新美南吉",
+   "title": "久助君の話",
+   "url": "https://www.aozora.gr.jp/cards/000121/files/634_ruby_21621.zip",
+   "chars": 4674,
+   "bin": "long"
+  }
+ ]
+}

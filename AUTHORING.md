@@ -166,6 +166,23 @@ Four failure modes, each found the expensive way. Run this against every draft.
 
 This clause is load-bearing rather than decorative: two of the four failures above were _caused_ by optimising a metric. Sentence variance was bought by writing long, and driving the unknown-word count to zero is what produced the circumlocutions.
 
+### The reference band is not a floor either
+
+```bash
+python3 reference.py --compare    # our numbers beside authentic 児童文学
+```
+
+Every floor in `corpus.json` is calibrated from this project's own output — `min_repeated_share` 0.4 from an observed 44-62% spread, `min_sentence_stdev` 6.0 from the best value any story has hit. A corpus measured against itself can be no better than its own best member, so `reference.py` reads the same structural axes off public-domain children's literature from 青空文庫 (新美南吉, 宮沢賢治, 小川未明, in 新字新仮名, NDC K913), sampled per author and binned against the corpus's own character terciles.
+
+**It reports a band. It gates nothing, and it must not become a gate.** The danger here is larger than the one this section already describes: "real authors score 15.8" is a far more persuasive argument for chasing a number than "our best story scored 6.5" ever was, and writing to the band would buy the same variance the same dishonest way. `reference.py` writes no threshold, never touches `corpus.json`, and exits zero regardless.
+
+Four things about it that are easy to get wrong, all recorded at length in the script's docstring:
+
+- **Never run the vocabulary checks against it.** `new_words`, `leech_seeds` and unknown-token counts are meaningless on a text nobody wrote to Rob's known set. `reference.py` never imports `vocab` or `check`, and asserts it rather than trusting anyone to remember.
+- **Orthography is a real confound, not a detail.** Children's books write verbs in kana; this project writes them in kanji, because kanji recognition is the point. On 新美南吉's ｜飴《あめ》だま only 18% of tokens carry kanji on the surface against 48-52% here, so `repeated_share` and `hapax_rate` are reported on both a surface and a lemma basis. Compare like with like or not at all.
+- **`untagged_pct` does not transfer.** Aozora sets the attribution in the sentence _after_ the quote, so every quote reads untagged. That is typography, not difficulty.
+- **Level and length are collinear across all seven stories**, so "does the gap close as the ladder rises" cannot currently be answered: every metric that rises with level also rises with token count. Breaking that needs a level 1 story at ~1100 tokens or a level 5 at ~400, which is a brief rather than an analysis.
+
 ## Validate, then build
 
 ```bash

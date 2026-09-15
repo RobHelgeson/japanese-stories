@@ -10,3 +10,6 @@ scripts/.segcache/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Reference-text downloads for the structural band. Machine-local, re-fetchable.
+scripts/.refcache/

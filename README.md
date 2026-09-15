@@ -91,6 +91,8 @@ docs/             what GitHub Pages serves
 AUTHORING.md      the craft spec a new story is written against
 ```
 
+`scripts/reference.json` is the odd one out: a manifest of public-domain 青空文庫 children's stories used as an external yardstick for sentence rhythm and subordination, because every other threshold in the project is calibrated from the project's own output. It is read by `reference.py` and by nothing else, and it gates nothing. See AUTHORING.md § The reference band is not a floor either.
+
 A story source is plain text: a `# title` line, then alternating Japanese sentences and `>` English translations, with a blank line between pages. Furigana is authored inline as `｜漢字《かんじ》`. Everything else — level, brief, new-word budget, reading order — lives in `scripts/corpus.json`.
 
 ## Building
@@ -105,26 +107,27 @@ python3 rebuild.py          # rebuild stale stories in reading order, then the i
 
 A live story is three outputs with three different inputs, and only the first is expensive:
 
-| Output               | Stale against                                     | Needs Ichiran + Anki |
-| -------------------- | ------------------------------------------------- | -------------------- |
-| `data/<slug>.js`     | the story `.txt`, the afterword, the `.py` engine | yes                  |
-| `<slug>.html`        | `reader.html`, `build.py`                         | no                   |
-| `reader.css` / `.js` / `sync.js` | `reader.css`, `reader.js`, `sync.js`, `build.py` | no       |
+| Output                           | Stale against                                     | Needs Ichiran + Anki |
+| -------------------------------- | ------------------------------------------------- | -------------------- |
+| `data/<slug>.js`                 | the story `.txt`, the afterword, the `.py` engine | yes                  |
+| `<slug>.html`                    | `reader.html`, `build.py`                         | no                   |
+| `reader.css` / `.js` / `sync.js` | `reader.css`, `reader.js`, `sync.js`, `build.py`  | no                   |
 
 So editing the reader's styling or behaviour now rewrites two files in about a second, and re-segments nothing.
 
 `docs/versions/` is left out of all of this. An archived draft is self-contained and **frozen** — it keeps the engine it published with, because an archive that re-renders with today's code preserves the story and not the reading it shipped with. `--versions` rebuilds them anyway.
 
-| Command                                  | What it does                                                        |
-| ---------------------------------------- | ------------------------------------------------------------------- |
-| `python3 stats.py --strict`              | level ladder, brief compliance, sentence rhythm, word recycling     |
-| `python3 check.py ../stories/<slug>.txt` | every content token is known or decomposes into known pieces (slow) |
-| `python3 have.py 単語1 単語2`            | quick known / unknown / leech lookup                                |
-| `python3 brief.py`                       | resolve and print a story brief before drafting                     |
-| `python3 reviews.py`                     | star ratings and notes, joined to level, register and length        |
-| `python3 progress.py`                    | snapshot the progress gist; `--restore` puts one back               |
-| `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki               |
-| `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                |
+| Command                                  | What it does                                                          |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `python3 stats.py --strict`              | level ladder, brief compliance, sentence rhythm, word recycling       |
+| `python3 check.py ../stories/<slug>.txt` | every content token is known or decomposes into known pieces (slow)   |
+| `python3 have.py 単語1 単語2`            | quick known / unknown / leech lookup                                  |
+| `python3 brief.py`                       | resolve and print a story brief before drafting                       |
+| `python3 reviews.py`                     | star ratings and notes, joined to level, register and length          |
+| `python3 progress.py`                    | snapshot the progress gist; `--restore` puts one back                 |
+| `python3 reference.py --compare`         | our structural numbers beside authentic 児童文学 — a band, not a gate |
+| `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki                 |
+| `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                  |
 
 ### Requirements
 
