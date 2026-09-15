@@ -1441,7 +1441,7 @@
         // A .w always wins over the sentence around it: it is the smaller, more
         // specific subject, and it is what the finger was aiming at. Returns true
         // when the tap was consumed — Track.tap reads false as "that was bare
-        // paper" and summons the chrome.
+        // paper" and toggles the chrome.
         function route(target, x, y) {
           if (!target || !target.closest) { dismiss(); return false; }
           if (el.contains(target)) return true;
@@ -1590,6 +1590,16 @@
           document.body.classList.add("chrome-off");
           setInert(els.top, true);
           setInert(els.bar, true);
+        }
+
+        // The bare-paper tap is a toggle, not a summons. The same gesture has to
+        // put the bars away again, because there is no other one: every other
+        // surface on the page belongs to a word or a sentence, so a reader who
+        // brought the chrome up to check the page count has nowhere to tap to
+        // get the page back. hide() keeps its own veto while settings are open.
+        function toggle() {
+          if (shown) hide();
+          else show();
         }
 
         const announce = (text) => { if (els.live) els.live.textContent = text || ""; };
@@ -1796,7 +1806,7 @@
         }
 
         return {
-          init, show, hide, update, announce, syncControls,
+          init, show, hide, toggle, update, announce, syncControls,
           syncThemeColor, openSettings, closeSettings, isSettingsOpen,
           isShown: () => shown,
         };
@@ -1996,7 +2006,7 @@
           // A control inside the track keeps its own click; text does not.
           if (d.down && d.down.closest && d.down.closest(INTERACTIVE)) return;
           suppressClick = true;
-          if (!Sheet.tap(d.down, d.x0, d.y0)) Chrome.show();
+          if (!Sheet.tap(d.down, d.x0, d.y0)) Chrome.toggle();
         }
 
         function onDown(e) {
