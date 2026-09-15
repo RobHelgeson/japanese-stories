@@ -80,7 +80,7 @@ def card(story, summary, versions=()):
         {sum_p}
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
-      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <button type="button" class="disc" data-act="more" aria-expanded="false" aria-label="詳細"><span class="dlabel">詳細</span><span class="fin">了</span></button>
       <div class="meta">
         <span>{story["pages"]} ページ</span>
         <span>{story["sentences"]} 文</span>
@@ -376,6 +376,62 @@ TEMPLATE = """<!doctype html>
       .disc:hover { color: var(--accent); }
       .disc::before { content: "▸ "; }
       .cell.open .disc::before { content: "▾ "; }
+      .disc .fin { display: none; }
+
+      /* A story you have finished is a line, not a card. Collapsed is already
+         the default, but the default still spends a reading, a title, three
+         lines of blurb and a full bar on something there is nothing left to
+         decide about — and the list is a ladder walked down once, so what is
+         behind you is most of what you scroll past. 了 is the whole of what a
+         finished row still has to say.
+
+         The title stays a link, because finishing a story is not the same as
+         being done with it. Everything else on the line — from the title's end
+         to the right edge — is the disclosure, which is why .disc takes the
+         rest of the row rather than sitting under it. */
+      .cell.done:not(.open) {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding-top: 0.15rem;
+        padding-bottom: 0.15rem;
+      }
+      /* The row is one 44px line now, so the counter's fixed top would sit it
+         above the title. Not 50% — 編集 wraps .manage onto a second line, and a
+         centred number would then float between the two. */
+      .cell.done:not(.open)::before { top: 1rem; }
+      .cell.done:not(.open) .rt,
+      .cell.done:not(.open) .sum,
+      .cell.done:not(.open) .prog { display: none; }
+      .cell.done:not(.open) .card { min-width: 0; }
+      .cell.done:not(.open) h2 { font-size: 1.05rem; margin: 0; }
+      .cell.done:not(.open) .manage { flex: 0 0 100%; }
+      /* flex: 1 is the hit area. The 44px the tall form buys with padding, this
+         form buys by spanning the row — the same trade, and a bigger target. */
+      .cell.done:not(.open) .disc {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.35rem;
+        margin: 0;
+        padding: 0 0 0 0.7rem;
+      }
+      .cell.done:not(.open) .disc::before { content: "▸"; }
+      .cell.done:not(.open) .disc .dlabel { display: none; }
+      /* Reads as a .chip.new, because that is what it is: a mark on the story
+         rather than a label on the control. */
+      .cell.done:not(.open) .disc .fin {
+        display: inline-block;
+        font-size: 0.78rem;
+        color: var(--new);
+        border: 1px solid color-mix(in srgb, var(--new) 40%, transparent);
+        border-radius: 4px;
+        padding: 0.12rem 0.5rem;
+      }
+      .cell.done:not(.open) .disc:hover .fin {
+        background: color-mix(in srgb, var(--new) 12%, transparent);
+      }
 
       /* Continue reading. The catalogue is a ladder you walk down once, so the
          one row that matters on almost every visit is the story already open —

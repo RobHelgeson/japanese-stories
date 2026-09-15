@@ -1887,6 +1887,42 @@ def suite_index(br, rep, base):
         rep.add("index", "and-the-box-really-does-hold-focus",
                 br.eval(f"document.activeElement === {c}.querySelector('textarea.note')"), None)
 
+        # ---- 読了 -------------------------------------------------------------
+        # Measured against the same row unread, on the same viewport, because
+        # the claim is about what a finished story costs the scroll — not about
+        # which elements happen to be display:none.
+        load()
+        tall = br.eval(f"{c}.getBoundingClientRect().height")
+        load({first: rec(25, 1000, done=True, doneAt=1000)},
+             {first: {"stars": 4, "at": 1000}})
+        short = br.eval(f"{c}.getBoundingClientRect().height")
+        rep.add("index", "a-finished-row-drops-the-blurb-the-reading-and-the-bar",
+                br.eval(vis(".sum")) is False and br.eval(vis(".prog")) is False
+                and br.eval(vis(".rt")) is False, None)
+        rep.add("index", "and-is-flagged-read",
+                br.eval(vis(".disc .fin"))
+                and br.eval(f"{c}.querySelector('.disc .fin').textContent") == "了", None)
+        rep.add("index", "and-costs-less-than-half-the-scroll",
+                short < tall / 2, [short, tall])
+        # Finishing a story is not being done with it, and the flag sits in a
+        # button while the title sits in the anchor precisely so both survive.
+        rep.add("index", "with-the-title-still-linking-into-the-story",
+                br.eval(f"{c}.querySelector('a.card').getAttribute('href')")
+                == "tokei-no-oto.html", None)
+        rep.add("index", "and-44px-of-disclosure-to-open-it-with",
+                br.eval(f"{c}.querySelector('.disc').getBoundingClientRect().height") >= 44,
+                br.eval(f"{c}.querySelector('.disc').getBoundingClientRect().height"))
+        br.eval(f"{c}.querySelector('.disc').click()")
+        rep.add("index", "the-disclosure-restores-the-whole-card",
+                br.eval(vis(".sum")) and br.eval(vis(".prog")) and br.eval(vis(".rate")),
+                None)
+        rep.add("index", "and-withdraws-the-flag-with-it",
+                br.eval(vis(".disc .fin")) is False, None)
+        load({first: rec(7, 1000)})
+        rep.add("index", "an-unfinished-row-keeps-its-blurb-and-its-bar",
+                br.eval(vis(".sum")) and br.eval(vis(".prog"))
+                and br.eval(vis(".disc .fin")) is False, None)
+
         # ---- auto-open -------------------------------------------------------
         # The stars do not sit behind 編集 because a rating is given on the way
         # out of a story. A collapsed row would put them back behind a tap.
