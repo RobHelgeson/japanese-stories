@@ -1,5 +1,5 @@
 {
- "_comment": "Reference texts for the structural band, chosen by reference.py --sample. Stratified by author and by the corpus's own character terciles. This is a band to read beside our numbers, never a floor: see reference.py's docstring and AUTHORING.md's 'Metrics are floors, not targets'.",
+ "_comment": "Reference texts for the structural band, chosen by reference.py --sample. Stratified by author and by the corpus's own character equal-width character thirds. This is a band to read beside our numbers, never a floor: see reference.py's docstring and AUTHORING.md's 'Metrics are floors, not targets'.",
  "seed": 20260914,
  "per_cell": 3,
  "corpus_chars": {
@@ -48,7 +48,7 @@
    "author": "宮沢賢治",
    "title": "耕耘部の時計",
    "url": "https://www.aozora.gr.jp/cards/000081/files/50762_ruby_39497.zip",
-   "chars": 3376,
+   "chars": 3373,
    "bin": "mid"
   },
   {
@@ -60,43 +60,43 @@
    "bin": "mid"
   },
   {
-   "id": "000469",
+   "id": "045658",
    "author": "宮沢賢治",
-   "title": "さるのこしかけ",
-   "url": "https://www.aozora.gr.jp/cards/000081/files/469_ruby_19942.zip",
-   "chars": 3990,
+   "title": "サガレンと八月",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/45658_ruby_35347.zip",
+   "chars": 4293,
    "bin": "long"
   },
   {
-   "id": "045473",
+   "id": "043755",
    "author": "宮沢賢治",
-   "title": "みじかい木ぺん",
-   "url": "https://www.aozora.gr.jp/cards/000081/files/45473_ruby_35666.zip",
-   "chars": 4729,
+   "title": "烏の北斗七星",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/43755_ruby_17604.zip",
+   "chars": 4746,
    "bin": "long"
   },
   {
-   "id": "004600",
+   "id": "001949",
    "author": "宮沢賢治",
-   "title": "タネリはたしかにいちにち噛んでいたようだった",
-   "url": "https://www.aozora.gr.jp/cards/000081/files/4600_ruby_11839.zip",
-   "chars": 4866,
+   "title": "ツェねずみ",
+   "url": "https://www.aozora.gr.jp/cards/000081/files/1949_ruby_18363.zip",
+   "chars": 4851,
    "bin": "long"
   },
   {
-   "id": "051682",
+   "id": "051044",
    "author": "小川未明",
-   "title": "窓の内と外",
-   "url": "https://www.aozora.gr.jp/cards/001475/files/51682_ruby_63515.zip",
-   "chars": 1939,
+   "title": "金銀小判",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/51044_ruby_51544.zip",
+   "chars": 2342,
    "bin": "short"
   },
   {
-   "id": "052585",
+   "id": "052066",
    "author": "小川未明",
-   "title": "はまねこ",
-   "url": "https://www.aozora.gr.jp/cards/001475/files/52585_ruby_67699.zip",
-   "chars": 2270,
+   "title": "正ちゃんとおかいこ",
+   "url": "https://www.aozora.gr.jp/cards/001475/files/52066_ruby_56874.zip",
+   "chars": 2397,
    "bin": "short"
   },
   {
@@ -104,7 +104,7 @@
    "author": "小川未明",
    "title": "街の幸福",
    "url": "https://www.aozora.gr.jp/cards/001475/files/53135_ruby_75443.zip",
-   "chars": 2697,
+   "chars": 2685,
    "bin": "short"
   },
   {
@@ -136,7 +136,7 @@
    "author": "小川未明",
    "title": "北風にたこは上がる",
    "url": "https://www.aozora.gr.jp/cards/001475/files/54998_ruby_59974.zip",
-   "chars": 4220,
+   "chars": 4208,
    "bin": "long"
   },
   {
@@ -144,7 +144,7 @@
    "author": "小川未明",
    "title": "白いくま",
    "url": "https://www.aozora.gr.jp/cards/001475/files/53465_ruby_69510.zip",
-   "chars": 4478,
+   "chars": 4477,
    "bin": "long"
   },
   {
@@ -160,7 +160,7 @@
    "author": "新美南吉",
    "title": "ひよりげた",
    "url": "https://www.aozora.gr.jp/cards/000121/files/55356_txt_49141.zip",
-   "chars": 2252,
+   "chars": 1971,
    "bin": "short"
   },
   {
