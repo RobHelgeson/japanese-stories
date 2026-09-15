@@ -1726,6 +1726,132 @@ def suite_manage(br, rep, base):
 
 
 
+def suite_index(br, rep, base):
+    """The contents page's own shape: 続き, the 詳細 disclosure, and auto-open."""
+    ident = br.init_script(sync_stub())
+    try:
+        br.emulate(*PHONE[1:])
+        first, mid, late = "tokei-no-oto", "maigo-no-tegami", "shuden"
+
+        def load(progress=None, reviews=None):
+            br.goto_plain(f"{base}/blank.html")
+            br.eval("localStorage.clear()")
+            for key, val in (("progress", progress), ("reviews", reviews)):
+                if val is not None:
+                    br.eval("localStorage.setItem('japanese-stories:%s', %s)"
+                            % (key, json.dumps(json.dumps(val))))
+            br.goto_plain(f"{base}/index.html")
+            br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+
+        res = "document.getElementById('resume')"
+        label = f"{res}.querySelector('.rlabel').textContent"
+        title = f"{res}.querySelector('.rtitle').textContent"
+        pct = f"{res}.querySelector('.rpct').textContent"
+        cell = lambda slug: f"document.querySelector('.cell[data-slug=\"{slug}\"]')"
+
+        # ---- 続き ------------------------------------------------------------
+        load()
+        rep.add("index", "an-unread-corpus-points-at-the-first-story",
+                br.eval(f"{res}.hidden") is False and br.eval(label) == "次へ"
+                and br.eval(title) == "時計の音", br.eval(title))
+        rep.add("index", "and-links-to-it",
+                br.eval(f"{res}.getAttribute('href')") == "tokei-no-oto.html",
+                br.eval(f"{res}.getAttribute('href')"))
+
+        load({mid: rec(7, 1000, of=16)})
+        rep.add("index", "a-story-in-hand-becomes-the-continue-row",
+                br.eval(label) == "続き" and br.eval(title) == "迷子の手紙", br.eval(title))
+        # 16 is the built page count on the card, not the `of` the record
+        # carries — that is only what some device believed when it last read.
+        rep.add("index", "with-the-position-against-the-built-page-count",
+                br.eval(pct) == "7 / 16", br.eval(pct))
+
+        # Two open at once is the two-device case, and the later stamp is the
+        # one you are actually in the middle of.
+        load({mid: rec(7, 1000, of=16), late: rec(3, 9000, of=23)})
+        rep.add("index", "the-later-of-two-open-stories-wins",
+                br.eval(title) == "終電", br.eval(title))
+
+        # An unfinished story with no page at all — a 消去 tombstone — is not
+        # something to continue, but it is still something to read next.
+        load({mid: {"sub": 0, "of": 16, "done": False, "doneAt": 1000, "at": 1000}})
+        rep.add("index", "a-tombstoned-story-is-next-rather-than-continued",
+                br.eval(label) == "次へ", br.eval(label))
+
+        done = {s: rec(1, 1000, done=True, doneAt=1000) for s in SLUGS}
+        done["ikanakatta-hito-no-chizu"] = rec(1, 1000, done=True, doneAt=1000)
+        load(done)
+        rep.add("index", "a-finished-corpus-withdraws-the-row",
+                br.eval(f"{res}.hidden") is True, None)
+
+        # ---- 詳細 ------------------------------------------------------------
+        load()
+        c = cell(first)
+        vis = lambda sel: f"getComputedStyle({c}.querySelector('{sel}')).display !== 'none'"
+        rep.add("index", "a-row-starts-collapsed",
+                br.eval(f"{c}.classList.contains('open')") is False, None)
+        rep.add("index", "and-the-stars-and-chips-are-not-rendered",
+                br.eval(vis(".rate")) is False and br.eval(vis(".chips")) is False, None)
+        rep.add("index", "the-blurb-and-the-title-stay",
+                br.eval(vis(".sum")) and br.eval(vis("h2")), None)
+        br.eval(f"{c}.querySelector('.disc').click()")
+        rep.add("index", "the-disclosure-opens-the-row",
+                br.eval(vis(".rate")) and br.eval(vis(".chips")), None)
+        rep.add("index", "and-says-so",
+                br.eval(f"{c}.querySelector('.disc').getAttribute('aria-expanded')") == "true",
+                None)
+        # data-act is read by one delegated listener whose last branch is the
+        # page stepper, so an action it does not know turns a page.
+        got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress') || '{}')")
+        rep.add("index", "and-does-not-touch-the-progress-record", got == {}, got)
+        br.eval(f"{c}.querySelector('.disc').click()")
+        rep.add("index", "and-closes-again", br.eval(vis(".rate")) is False, None)
+
+        # The box cannot take focus inside a display:none subtree, so paintR's
+        # focused-box guard would not hold and a pull would overwrite a note
+        # being typed. Revealing the box has to open the row that holds it.
+        load()
+        br.eval(f"{c}.querySelector('.notebtn').click()")
+        rep.add("index", "the-note-button-opens-the-row-it-needs",
+                br.eval(f"{c}.classList.contains('open')"), None)
+        rep.add("index", "and-the-box-really-does-hold-focus",
+                br.eval(f"document.activeElement === {c}.querySelector('textarea.note')"), None)
+
+        # ---- auto-open -------------------------------------------------------
+        # The stars do not sit behind 編集 because a rating is given on the way
+        # out of a story. A collapsed row would put them back behind a tap.
+        load({first: rec(25, 1000, done=True, doneAt=1000)})
+        rep.add("index", "a-finished-unrated-story-opens-itself",
+                br.eval(f"{c}.classList.contains('open')"), None)
+        load({first: rec(25, 1000, done=True, doneAt=1000)},
+             {first: {"stars": 4, "at": 1000}})
+        rep.add("index", "a-rated-one-does-not",
+                br.eval(f"{c}.classList.contains('open')") is False, None)
+        load({first: rec(7, 1000)})
+        rep.add("index", "nor-does-one-still-being-read",
+                br.eval(f"{c}.classList.contains('open')") is False, None)
+
+        # A default that reasserts itself is not a default. The repaint is
+        # driven by the stepper rather than by a star, deliberately: rating the
+        # story would also remove the condition under test, and the assertion
+        # would pass with the guard deleted.
+        load({first: rec(25, 1000, done=True, doneAt=1000)})
+        br.eval(f"{c}.querySelector('.disc').click()")
+        rep.add("index", "the-disclosure-closes-an-auto-opened-row",
+                br.eval(f"{c}.classList.contains('open')") is False, None)
+        br.eval(f"{c}.querySelector('[data-act=\"dec\"]').click()")
+        br.eval("new Promise(r => setTimeout(r, 200))", await_promise=True)
+        rep.add("index", "and-it-stays-closed-through-a-repaint",
+                br.eval(f"{c}.classList.contains('open')") is False, None)
+        rep.add("index", "with-the-story-still-finished-and-unrated",
+                br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+                [first]["done"] is True
+                and not br.eval("JSON.parse(localStorage.getItem('japanese-stories:reviews') || '{}')"),
+                None)
+    finally:
+        br.drop_init_script(ident)
+
+
 def suite_review(br, rep, base):
     """Star ratings and notes on the contents page, and their own merge."""
     ident = br.init_script(sync_stub())
@@ -2229,6 +2355,8 @@ def main():
             suite_degradation(br, rep, base)
             print("\n===== sync =====")
             suite_sync(br, rep, base)
+            print("\n===== index =====")
+            suite_index(br, rep, base)
             print("\n===== manage =====")
             suite_manage(br, rep, base)
             print("\n===== review =====")

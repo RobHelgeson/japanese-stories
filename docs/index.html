@@ -85,28 +85,33 @@
         margin: 0 0 2rem;
       }
 
-      /* The version row sits outside the card's anchor — nesting a link inside
-         a link is invalid and browsers silently close the outer one. */
-      .cell { margin-bottom: 0.9rem; }
-      .cell .card { margin-bottom: 0; }
-      .cell .vers { margin: 0.4rem 0 0 3.4rem; }
-
       /* Reading order is the point of the list, so the cards are a single
-         column and carry their position rather than being a grid to scan. */
-      .card {
-        display: block;
+         column and carry their position rather than being a grid to scan.
+
+         The box is drawn on .cell rather than on the a.card inside it. Every
+         control — the stepper, the stars, the 感想 box, the version links —
+         has to sit outside the anchor, because a button or a link nested in a
+         link is invalid and browsers silently close the outer one. With the
+         border on the anchor those controls all fell outside the box they
+         belong to, and the 詳細 disclosure had revealed content on both sides
+         of itself. One box per story, and the anchor is just the part of it
+         that navigates. */
+      .cell {
         position: relative;
         padding: 1.3rem 1.5rem 1.2rem 3.4rem;
         margin-bottom: 0.9rem;
         border: 1px solid var(--rule);
         border-radius: 10px;
-        text-decoration: none;
-        color: inherit;
         counter-increment: story;
         transition: border-color 0.12s ease, background 0.12s ease;
       }
+      .card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+      }
       main { counter-reset: story; }
-      .card::before {
+      .cell::before {
         content: counter(story);
         position: absolute;
         left: 1.4rem;
@@ -116,7 +121,7 @@
         font-variant-numeric: tabular-nums;
         color: var(--muted);
       }
-      .card:hover {
+      .cell:hover {
         border-color: var(--accent);
         background: color-mix(in srgb, var(--accent) 6%, transparent);
       }
@@ -144,11 +149,12 @@
         color: var(--muted);
         font-variant-numeric: tabular-nums;
       }
+      .meta { margin-top: 0.45rem; }
       .chips { gap: 0.5rem; margin-top: 0.5rem; }
       /* Earlier drafts, so a rewrite can be read against what it replaced. */
       .vers {
         display: flex; align-items: center; gap: 0.4rem;
-        margin-top: 0.65rem; font-size: 0.72rem; opacity: 0.7;
+        margin-top: 0.55rem; font-size: 0.72rem; opacity: 0.7;
       }
       .vers .ver, .vers .cur {
         border: 1px solid var(--rule); border-radius: 999px; padding: 0.05rem 0.5rem;
@@ -163,6 +169,83 @@
       }
       .chip.weak { color: var(--weak); border-color: color-mix(in srgb, var(--weak) 40%, transparent); }
       .chip.new { color: var(--new); border-color: color-mix(in srgb, var(--new) 40%, transparent); }
+
+      /* The level was the one column of the deleted Reading Order table that
+         nothing else showed. */
+      .lv {
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.62rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        border: 1px solid var(--rule);
+        border-radius: 999px;
+        padding: 0.1rem 0.45rem;
+        margin-inline-start: 0.6rem;
+        vertical-align: 0.35em;
+      }
+      .sum.none { color: var(--muted); }
+
+      /* Collapsed is the default, and the line it draws is what you need to
+         PICK a story against what you need to FINISH with one. Title, reading,
+         level, blurb and the bar stay; the counts, the marked words, the stars,
+         the 感想 box and the version links wait behind 詳細. At seven stories
+         this is tidiness; the list is what it is protecting at fifty. */
+      .cell:not(.open) .meta,
+      .cell:not(.open) .chips,
+      .cell:not(.open) .rate,
+      .cell:not(.open) .note,
+      .cell:not(.open) .vers { display: none; }
+      .disc {
+        display: block;
+        margin: 0.35rem 0 0;
+        padding: 0.1rem 0;
+        border: 0;
+        background: none;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.72rem;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .disc:hover { color: var(--accent); }
+      .disc::before { content: "▸ "; }
+      .cell.open .disc::before { content: "▾ "; }
+
+      /* Continue reading. The catalogue is a ladder you walk down once, so the
+         one row that matters on almost every visit is the story already open —
+         which is otherwise however far down the list you have got. Built from
+         the progress map at paint time, so it costs nothing at build time and
+         is simply absent on a device that has never read anything. */
+      .resume {
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+        margin: 0 0 1.6rem;
+        padding: 0.9rem 1.1rem;
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--accent) 7%, transparent);
+        text-decoration: none;
+        color: inherit;
+      }
+      .resume[hidden] { display: none; }
+      .resume:hover { background: color-mix(in srgb, var(--accent) 13%, transparent); }
+      .resume .rlabel {
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        white-space: nowrap;
+      }
+      .resume .rtitle { font-size: 1.15rem; font-weight: 600; }
+      .resume .rpct {
+        margin-inline-start: auto;
+        font-family: -apple-system, system-ui, sans-serif;
+        font-size: 0.72rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
 
       .prog {
         display: flex;
@@ -197,7 +280,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin: 0.4rem 0 0 3.4rem;
+        margin: 0.55rem 0 0;
         font-family: -apple-system, system-ui, sans-serif;
         font-size: 0.75rem;
       }
@@ -218,7 +301,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin: 0.1rem 0 0 3.2rem;
+        margin: 0.55rem 0 0;
         font-family: -apple-system, system-ui, sans-serif;
         font-size: 0.75rem;
       }
@@ -242,8 +325,8 @@
       .stars button:hover { color: color-mix(in srgb, var(--accent) 55%, var(--rule)); }
       .note {
         font: 0.8rem/1.6 -apple-system, system-ui, sans-serif;
-        width: calc(100% - 3.2rem);
-        margin: 0.1rem 0 0 3.2rem;
+        width: 100%;
+        margin: 0.45rem 0 0;
         color: var(--ink);
         background: transparent;
         border: 1px solid var(--rule);
@@ -352,29 +435,26 @@
         The order is graded by what the prose asks of you, not by vocabulary. Read down the list.
       </p>
 
-    <div class="cell" data-slug="tokei-no-oto" data-pages="25">
+      <a class="resume" id="resume" href="#" hidden>
+        <span class="rlabel"></span>
+        <span class="rtitle"></span>
+        <span class="rpct"></span>
+      </a>
+
+    <div class="cell" data-slug="tokei-no-oto" data-pages="25" data-title="時計の音" data-level="1">
       <a class="card" href="tokei-no-oto.html">
         <div class="rt">とけいのおと</div>
-        <h2>時計の音</h2>
+        <h2>時計の音<span class="lv">Lv1</span></h2>
         <p class="sum">Clearing out a grandfather&#x27;s house, the narrator finds a watch that stopped years ago and starts again after midnight.</p>
-        <div class="meta">
-          <span>25 ページ</span>
-          <span>105 文</span>
-          <span>430 漢字語</span>
-        </div>
-        <div class="chips"><span class="chip weak">苦手 修理、手帳、正確、残す、状態、経つ、表、足りる、遅れる、郷愁</span><span class="chip new">新出 振り子、歯車、秒針、部品、針</span></div>
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
-      <div class="manage" hidden>
-        <button type="button" data-act="done">読了</button>
-        <span class="step">
-          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
-          <output data-out="page">—</output>
-          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
-        </span>
-        <span class="mspacer"></span>
-        <button type="button" data-act="clear">消去</button>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>25 ページ</span>
+        <span>105 文</span>
+        <span>430 漢字語</span>
       </div>
+      <div class="chips"><span class="chip weak">苦手 修理、手帳、正確、残す、状態、経つ、表、足りる、遅れる、郷愁</span><span class="chip new">新出 振り子、歯車、秒針、部品、針</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -389,20 +469,6 @@
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
         <div class="vers"><span>版</span><a class="ver" href="versions/tokei-no-oto.v1.html">v1</a><span class="cur">現行</span></div>
-    </div>
-    <div class="cell" data-slug="maigo-no-tegami" data-pages="16">
-      <a class="card" href="maigo-no-tegami.html">
-        <div class="rt">まいごのてがみ</div>
-        <h2>迷子の手紙</h2>
-        <p class="sum">A letter arrives at the right address under the wrong name, and answering it means telling a stranger something he does not know.</p>
-        <div class="meta">
-          <span>16 ページ</span>
-          <span>82 文</span>
-          <span>372 漢字語</span>
-        </div>
-        <div class="chips"><span class="chip weak">苦手 去年、後、後悔、経つ、解釈、訪ねる、返事、配達</span><span class="chip new">新出 便箋、差出人、消印、表札</span></div>
-        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
-      </a>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
@@ -413,6 +479,21 @@
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
+    </div>
+    <div class="cell" data-slug="maigo-no-tegami" data-pages="16" data-title="迷子の手紙" data-level="2">
+      <a class="card" href="maigo-no-tegami.html">
+        <div class="rt">まいごのてがみ</div>
+        <h2>迷子の手紙<span class="lv">Lv2</span></h2>
+        <p class="sum">A letter arrives at the right address under the wrong name, and answering it means telling a stranger something he does not know.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>16 ページ</span>
+        <span>82 文</span>
+        <span>372 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 去年、後、後悔、経つ、解釈、訪ねる、返事、配達</span><span class="chip new">新出 便箋、差出人、消印、表札</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -427,20 +508,6 @@
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
         <div class="vers"><span>版</span><a class="ver" href="versions/maigo-no-tegami.v1.html">v1</a><span class="cur">現行</span></div>
-    </div>
-    <div class="cell" data-slug="shuden" data-pages="23">
-      <a class="card" href="shuden.html">
-        <div class="rt">しゅうでん</div>
-        <h2>終電</h2>
-        <p class="sum">Two strangers on the last train, both leaving something behind, neither asking the other why.</p>
-        <div class="meta">
-          <span>23 ページ</span>
-          <span>133 文</span>
-          <span>485 漢字語</span>
-        </div>
-        <div class="chips"><span class="chip weak">苦手 事情、去年、定期券、後悔、改札、放送、書類、案内、正確、渡る、緊張、表、返事、遅れる、過ぎる、遠慮</span><span class="chip new">新出 乗客、明かり、網棚、車掌</span></div>
-        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
-      </a>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
@@ -451,6 +518,21 @@
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
+    </div>
+    <div class="cell" data-slug="shuden" data-pages="23" data-title="終電" data-level="3">
+      <a class="card" href="shuden.html">
+        <div class="rt">しゅうでん</div>
+        <h2>終電<span class="lv">Lv3</span></h2>
+        <p class="sum">Two strangers on the last train, both leaving something behind, neither asking the other why.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>23 ページ</span>
+        <span>133 文</span>
+        <span>485 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 事情、去年、定期券、後悔、改札、放送、書類、案内、正確、渡る、緊張、表、返事、遅れる、過ぎる、遠慮</span><span class="chip new">新出 乗客、明かり、網棚、車掌</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -465,20 +547,6 @@
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
         <div class="vers"><span>版</span><a class="ver" href="versions/shuden.v1.html">v1</a><span class="cur">現行</span></div>
-    </div>
-    <div class="cell" data-slug="entotsu-no-kemuri" data-pages="27">
-      <a class="card" href="entotsu-no-kemuri.html">
-        <div class="rt">えんとつのけむり</div>
-        <h2>煙突の煙</h2>
-        <p class="sum">A woman clearing her late father&#x27;s flat spends the last week of the neighbourhood bathhouse there, and works out why the water is still being heated after closing.</p>
-        <div class="meta">
-          <span>27 ページ</span>
-          <span>114 文</span>
-          <span>508 漢字語</span>
-        </div>
-        <div class="chips"><span class="chip weak">苦手 工場、残す、渡す、用意、経つ、連絡、過ぎる、遠慮</span><span class="chip new">新出 桶、湯気、湯船、煙突、番台</span></div>
-        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
-      </a>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
@@ -489,6 +557,21 @@
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
+    </div>
+    <div class="cell" data-slug="entotsu-no-kemuri" data-pages="27" data-title="煙突の煙" data-level="3">
+      <a class="card" href="entotsu-no-kemuri.html">
+        <div class="rt">えんとつのけむり</div>
+        <h2>煙突の煙<span class="lv">Lv3</span></h2>
+        <p class="sum">A woman clearing her late father&#x27;s flat spends the last week of the neighbourhood bathhouse there, and works out why the water is still being heated after closing.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>27 ページ</span>
+        <span>114 文</span>
+        <span>508 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 工場、残す、渡す、用意、経つ、連絡、過ぎる、遠慮</span><span class="chip new">新出 桶、湯気、湯船、煙突、番台</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -502,20 +585,6 @@
       </div>
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
-    </div>
-    <div class="cell" data-slug="neko-o-sagasu-tantei" data-pages="30">
-      <a class="card" href="neko-o-sagasu-tantei.html">
-        <div class="rt">ねこをさがすたんてい</div>
-        <h2>猫を探す探偵</h2>
-        <p class="sum">A cheap detective takes a lost-cat job and finds a child who has a reason.</p>
-        <div class="meta">
-          <span>30 ページ</span>
-          <span>129 文</span>
-          <span>636 漢字語</span>
-        </div>
-        <div class="chips"><span class="chip weak">苦手 中身、借りる、内緒、焦る、盗む、経つ、計画、訪ねる、調査、足りる、返事、追いつめる、金額</span><span class="chip new">新出 飼い主、飼う、餌、首輪</span></div>
-        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
-      </a>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
@@ -526,6 +595,21 @@
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
+    </div>
+    <div class="cell" data-slug="neko-o-sagasu-tantei" data-pages="30" data-title="猫を探す探偵" data-level="4">
+      <a class="card" href="neko-o-sagasu-tantei.html">
+        <div class="rt">ねこをさがすたんてい</div>
+        <h2>猫を探す探偵<span class="lv">Lv4</span></h2>
+        <p class="sum">A cheap detective takes a lost-cat job and finds a child who has a reason.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>30 ページ</span>
+        <span>129 文</span>
+        <span>636 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 中身、借りる、内緒、焦る、盗む、経つ、計画、訪ねる、調査、足りる、返事、追いつめる、金額</span><span class="chip new">新出 飼い主、飼う、餌、首輪</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -540,20 +624,6 @@
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
         <div class="vers"><span>版</span><a class="ver" href="versions/neko-o-sagasu-tantei.v1.html">v1</a><span class="cur">現行</span></div>
-    </div>
-    <div class="cell" data-slug="shiro-no-kane" data-pages="41">
-      <a class="card" href="shiro-no-kane.html">
-        <div class="rt">しろのかね</div>
-        <h2>城の鐘</h2>
-        <p class="sum">A bell-founder&#x27;s apprentice inherits the secret that the castle&#x27;s war bell was built to fail, and the new king intends to ring it.</p>
-        <div class="meta">
-          <span>41 ページ</span>
-          <span>174 文</span>
-          <span>818 漢字語</span>
-        </div>
-        <div class="chips"><span class="chip weak">苦手 お前、修理、年月、当時、後、正確、流す、渡す、状態、策、経つ、表、襲う、計画、起きる、過ぎる</span><span class="chip new">新出 二百段、叫ぶ、従う、段、王、罰、金属、響く</span></div>
-        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
-      </a>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
@@ -564,6 +634,21 @@
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
+    </div>
+    <div class="cell" data-slug="shiro-no-kane" data-pages="41" data-title="城の鐘" data-level="5">
+      <a class="card" href="shiro-no-kane.html">
+        <div class="rt">しろのかね</div>
+        <h2>城の鐘<span class="lv">Lv5</span></h2>
+        <p class="sum">A bell-founder&#x27;s apprentice inherits the secret that the castle&#x27;s war bell was built to fail, and the new king intends to ring it.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>41 ページ</span>
+        <span>174 文</span>
+        <span>818 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 お前、修理、年月、当時、後、正確、流す、渡す、状態、策、経つ、表、襲う、計画、起きる、過ぎる</span><span class="chip new">新出 二百段、叫ぶ、従う、段、王、罰、金属、響く</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -578,20 +663,6 @@
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
         <div class="vers"><span>版</span><a class="ver" href="versions/shiro-no-kane.v1.html">v1</a><span class="cur">現行</span></div>
-    </div>
-    <div class="cell" data-slug="ikanakatta-hito-no-chizu" data-pages="48">
-      <a class="card" href="ikanakatta-hito-no-chizu.html">
-        <div class="rt">いかなかったひとのちず</div>
-        <h2>行かなかった人の地図</h2>
-        <p class="sum">A dying man asks his granddaughter to walk the road he spent fifty years drawing and never once travelled, and everything he drew on it turns out to be wrong.</p>
-        <div class="meta">
-          <span>48 ページ</span>
-          <span>213 文</span>
-          <span>1163 漢字語</span>
-        </div>
-        <div class="chips"><span class="chip weak">苦手 位置、年月、折れる、村、案内、正確、渡る、用意、経つ、経験、迎える、返事、遅れる、過ぎる</span><span class="chip new">新出 印、導く、岩、岸、峠、崖、足跡、頼る</span></div>
-        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
-      </a>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
@@ -602,6 +673,21 @@
         <span class="mspacer"></span>
         <button type="button" data-act="clear">消去</button>
       </div>
+    </div>
+    <div class="cell" data-slug="ikanakatta-hito-no-chizu" data-pages="48" data-title="行かなかった人の地図" data-level="5">
+      <a class="card" href="ikanakatta-hito-no-chizu.html">
+        <div class="rt">いかなかったひとのちず</div>
+        <h2>行かなかった人の地図<span class="lv">Lv5</span></h2>
+        <p class="sum">A dying man asks his granddaughter to walk the road he spent fifty years drawing and never once travelled, and everything he drew on it turns out to be wrong.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false">詳細</button>
+      <div class="meta">
+        <span>48 ページ</span>
+        <span>213 文</span>
+        <span>1163 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 位置、年月、折れる、村、案内、正確、渡る、用意、経つ、経験、迎える、返事、遅れる、過ぎる</span><span class="chip new">新出 印、導く、岩、岸、峠、崖、足跡、頼る</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -615,6 +701,16 @@
       </div>
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
     </div>
 
       <p class="keys">
@@ -738,6 +834,9 @@
         function paint(all) {
           if (!all || typeof all !== "object") all = {};
           var done = 0;
+          // The row the 続き block will point at: whichever unfinished story was
+          // touched last, falling back to the first one not yet finished.
+          var open = null, openAt = -1, openPage = 0, next = null;
           for (var i = 0; i < cells.length; i++) {
             var cell = cells[i], rec = all[cell.dataset.slug];
             var prog = cell.querySelector(".prog");
@@ -770,10 +869,57 @@
             }
             cell.classList.toggle("done", !!fin);
             if (fin) done++;
+            else {
+              if (!next) next = cell;
+              var at = ok ? Number(rec.at) : NaN;
+              if (isFinite(page) && isFinite(at) && at > openAt) {
+                open = cell; openAt = at; openPage = page;
+              }
+            }
             if (out) out.textContent = isFinite(page) ? page + " / " + n : "—";
             if (mark) mark.textContent = fin ? "未読" : "読了";
           }
           $("readtot").textContent = done ? " · 読了 " + done + "/" + cells.length : "";
+          resume(open, openPage, next);
+          autoOpen();
+        }
+
+        // 続き on the story already in hand, 次へ on the one after the last
+        // finished — and gone entirely once the corpus is read out.
+        function resume(open, page, next) {
+          var el = $("resume");
+          if (!el) return;
+          var cell = open || next;
+          if (!cell) { el.hidden = true; return; }
+          var a = cell.querySelector("a.card");
+          el.setAttribute("href", a ? a.getAttribute("href") : "#");
+          el.querySelector(".rlabel").textContent = open ? "続き" : "次へ";
+          el.querySelector(".rtitle").textContent = cell.dataset.title || "";
+          el.querySelector(".rpct").textContent =
+            open ? page + " / " + total(cell) : total(cell) + " ページ";
+          el.hidden = false;
+        }
+
+        // A story you have finished and not yet rated opens itself, so the
+        // stars are still in front of you on the way out — which is the whole
+        // reason they do not sit behind 編集. A row the reader has opened or
+        // closed by hand is left alone; a preference beats a default.
+        function autoOpen() {
+          var prog = read(), revs = readR();
+          for (var i = 0; i < cells.length; i++) {
+            var cell = cells[i];
+            if (cell.dataset.user === "1" || cell.classList.contains("open")) continue;
+            var p = prog[cell.dataset.slug], r = revs[cell.dataset.slug];
+            var fin = p && typeof p === "object" && p.done === true;
+            var rated = r && typeof r === "object" && Number(r.stars) >= 1;
+            if (fin && !rated) disclose(cell, true);
+          }
+        }
+
+        function disclose(cell, on) {
+          cell.classList.toggle("open", on);
+          var btn = cell.querySelector(".disc");
+          if (btn) btn.setAttribute("aria-expanded", on ? "true" : "false");
         }
 
         function paintR(all) {
@@ -799,6 +945,7 @@
             var btn = cell.querySelector(".notebtn");
             if (btn) btn.classList.toggle("has", !!note);
           }
+          autoOpen();
         }
 
         // A hand-set review carries `at` for the same reason a hand-set record
@@ -892,11 +1039,23 @@
           var cell = btn.closest(".cell[data-slug]");
           if (!cell) return;
           var what = btn.dataset.act;
+          // Ahead of act(): an unrecognised action falls through to its
+          // stepper branch, so a disclosure tap would turn a page.
+          if (what === "more") {
+            cell.dataset.user = "1";
+            disclose(cell, !cell.classList.contains("open"));
+            return;
+          }
           if (what === "star") { star(cell, Number(btn.dataset.n)); return; }
           if (what === "note") {
             var ta = cell.querySelector("textarea.note");
             if (!ta) return;
             var show = ta.hidden;
+            // A collapsed row puts the box in a display:none subtree, where it
+            // cannot take focus and so is not skipped by paintR's focused-box
+            // guard — the next pull would overwrite what was being typed.
+            // Revealing the box opens the row that holds it.
+            if (show) disclose(cell, true);
             ta.hidden = !show;
             btn.setAttribute("aria-expanded", show ? "true" : "false");
             if (show) ta.focus();
