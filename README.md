@@ -63,6 +63,18 @@ python3 reviews.py --file exp.json  # from a 書き出し export instead, no net
 
 `reviews.py` is the reading end, and it is what a new story's brief is chosen against: it prints each rating beside the level, register and length it was a verdict on, then the averages by level and by register, with their counts, and every note in full. A rating is one number and the note underneath it is where the reason lives. It reads the gist through `gh`, which already holds a token with the gist scope, so nothing has to be kept in step with the phone.
 
+### Snapshots, for when something is about to churn the store
+
+The gist's revision history is the everyday undo, and hand-correcting one record in the gist editor is what a gist was chosen for. `progress.py` is for the other case — a known-good copy taken before a device test that is going to swipe every story to its last page.
+
+```bash
+python3 progress.py                    # save, to ~/Documents/Code/.japanese-stories-backups
+python3 progress.py --restore <file>   # put that snapshot back
+python3 progress.py --restore <file> -n   # print what it would write, change nothing
+```
+
+**A restore is not a paste,** and pasting the file into the gist editor restores nothing. Every record's `at` is bumped to the moment of the restore, because the later stamp takes the record and a device that read while the snapshot sat on disk holds newer stamps than the file does; without the bump the next device to sync merges its own records back over the restore. `doneAt` is bumped too, since it is the only thing that can take a 読了 away. And a slug the gist holds but the snapshot does not gets the same dated, page-less tombstone 消去 writes, because an absent key merges to whatever the other side still has.
+
 ## Layout
 
 ```
@@ -110,6 +122,7 @@ So editing the reader's styling or behaviour now rewrites two files in about a s
 | `python3 have.py 単語1 単語2`            | quick known / unknown / leech lookup                                |
 | `python3 brief.py`                       | resolve and print a story brief before drafting                     |
 | `python3 reviews.py`                     | star ratings and notes, joined to level, register and length        |
+| `python3 progress.py`                    | snapshot the progress gist; `--restore` puts one back               |
 | `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki               |
 | `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                |
 
