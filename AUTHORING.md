@@ -186,7 +186,7 @@ Four places. Miss one and the corpus is inconsistent in a way only some of them 
 
 1. `stories/<slug>.txt` — the story
 2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise`, `new_words`, in reading order
-3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb
+3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
 
 ## Modes

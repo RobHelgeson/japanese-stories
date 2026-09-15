@@ -68,6 +68,10 @@ DESK = ("desktop", 1440, 900, False)
 
 
 # --------------------------------------------------------------------- build --
+ORDER_SLUGS = [x["slug"] for x in json.loads(
+    (REPO / "scripts" / "corpus.json").read_text(encoding="utf-8"))["stories"]]
+
+
 def check_contracts():
     """build.py's substitution contracts, asserted rather than assumed.
 
@@ -109,6 +113,56 @@ def check_contracts():
         raise SystemExit("build contract broken: the engine loads before the story data")
     if "__READER_CSS__" in shell or "__READER_JS__" in shell:
         raise SystemExit("build contract broken: render_shell left a placeholder behind")
+
+
+def check_no_summary(rep):
+    """A story with no Summaries bullet ships a card, and says so on stderr.
+
+    The old behaviour was a hard exit, which was its own test — the build
+    stopped. Its replacement is a warning and a placeholder, so nothing fails
+    if either one regresses. This is not a browser case: it is index.py's
+    output against a doctored stories-index.md, run the way rebuild.py runs it.
+    """
+    gone = "終電"
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        (tmp / "stories").mkdir()
+        (tmp / "docs").mkdir()
+        for f in (REPO / "docs").glob("*.html"):
+            shutil.copy(f, tmp / "docs" / f.name)
+        # stats.read follows each shell to its linked blob, so the data goes too.
+        shutil.copytree(REPO / "docs" / "data", tmp / "docs" / "data")
+        src = (REPO / "stories" / "stories-index.md").read_text(encoding="utf-8")
+        # Scoped to the Summaries section: the same story has a bullet under
+        # Afterwords, and dropping both would test a different thing.
+        kept, inside = [], False
+        for ln in src.splitlines(True):
+            if ln.startswith("## "):
+                inside = ln.strip() == "## Summaries"
+            if inside and ln.startswith("- **") and gone in ln:
+                continue
+            kept.append(ln)
+        rep.add("no-summary", "the-doctored-index-really-did-lose-a-bullet",
+                len(kept) == len(src.splitlines(True)) - 1, len(src.splitlines(True)) - len(kept))
+        (tmp / "stories" / "stories-index.md").write_text("".join(kept), encoding="utf-8")
+
+        r = subprocess.run(
+            [sys.executable, "index.py", str(tmp / "docs"), "--src", str(tmp / "stories")],
+            cwd=REPO / "scripts", capture_output=True, text=True)
+        rep.add("no-summary", "the-build-still-succeeds", r.returncode == 0, r.stderr)
+        rep.add("no-summary", "and-names-the-story-on-stderr",
+                "warning" in r.stderr and gone in r.stderr, r.stderr.strip())
+        out = (tmp / "docs" / "index.html").read_text(encoding="utf-8")
+        rep.add("no-summary", "the-card-is-still-rendered",
+                'data-slug="shuden"' in out, None)
+        rep.add("no-summary", "with-a-visible-gap-where-the-blurb-goes",
+                '<p class="sum none">—</p>' in out, None)
+        # Same bullet, so the kana line goes with it. Documented, not incidental.
+        rep.add("no-summary", "and-no-kana-line-either",
+                out.count('class="rt"') == len(ORDER_SLUGS) - 1, out.count('class="rt"'))
+        rep.add("no-summary", "every-other-blurb-survives",
+                out.count('<p class="sum">') == len(ORDER_SLUGS) - 1,
+                out.count('<p class="sum">'))
 
 
 def build_fixture(slug, inject=False):
@@ -1761,6 +1815,11 @@ def suite_index(br, rep, base):
         load({mid: rec(7, 1000, of=16)})
         rep.add("index", "a-story-in-hand-becomes-the-continue-row",
                 br.eval(label) == "続き" and br.eval(title) == "迷子の手紙", br.eval(title))
+        # The one thing the row exists to do. Everything else about it is a
+        # label, and a label can be right while the link points anywhere.
+        rep.add("index", "and-links-back-into-that-story",
+                br.eval(f"{res}.getAttribute('href')") == "maigo-no-tegami.html",
+                br.eval(f"{res}.getAttribute('href')"))
         # 16 is the built page count on the card, not the `of` the record
         # carries — that is only what some device believed when it last read.
         rep.add("index", "with-the-position-against-the-built-page-count",
@@ -1778,9 +1837,20 @@ def suite_index(br, rep, base):
         rep.add("index", "a-tombstoned-story-is-next-rather-than-continued",
                 br.eval(label) == "次へ", br.eval(label))
 
-        done = {s: rec(1, 1000, done=True, doneAt=1000) for s in SLUGS}
-        done["ikanakatta-hito-no-chizu"] = rec(1, 1000, done=True, doneAt=1000)
-        load(done)
+        load()
+        every = br.eval("[].map.call(document.querySelectorAll('.cell[data-slug]'),"
+                        " function (c) { return c.dataset.slug; })")
+        rep.add("index", "the-page-renders-every-story-in-the-corpus",
+                len(every) == len(json.loads((REPO / "scripts" / "corpus.json")
+                                             .read_text(encoding="utf-8"))["stories"]), every)
+        # The footer was a hand-kept list of titles and sat one story short for
+        # as long as there had been seven, under a header counting them.
+        foot = br.eval("document.querySelector('footer span').textContent")
+        titles = br.eval("[].map.call(document.querySelectorAll('.cell[data-slug]'),"
+                         " function (c) { return c.dataset.title; })")
+        rep.add("index", "and-the-footer-names-all-of-them",
+                all(t in foot for t in titles) and foot.count("·") == len(titles) - 1, foot)
+        load({slug: rec(1, 1000, done=True, doneAt=1000) for slug in every})
         rep.add("index", "a-finished-corpus-withdraws-the-row",
                 br.eval(f"{res}.hidden") is True, None)
 
@@ -1848,6 +1918,17 @@ def suite_index(br, rep, base):
                 [first]["done"] is True
                 and not br.eval("JSON.parse(localStorage.getItem('japanese-stories:reviews') || '{}')"),
                 None)
+        br.goto_plain(f"{base}/index.html")
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+        rep.add("index", "and-stays-closed-across-a-reload",
+                br.eval(f"{c}.classList.contains('open')") is False, None)
+        # Re-opening it by hand has to clear the flag, or the row can never be
+        # auto-opened again for any later story-finished event.
+        br.eval(f"{c}.querySelector('.disc').click()")
+        br.goto_plain(f"{base}/index.html")
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+        rep.add("index", "and-re-opening-by-hand-clears-the-flag",
+                br.eval(f"{c}.classList.contains('open')"), None)
     finally:
         br.drop_init_script(ident)
 
@@ -2322,6 +2403,9 @@ def serve():
 def main():
     args = set(sys.argv[1:])
     check_contracts()
+    rep = Report()
+    print("===== no-summary =====")
+    check_no_summary(rep)
     for slug in SLUGS:
         build_fixture(slug)
     build_fixture("shuden", inject=True)
@@ -2339,7 +2423,6 @@ def main():
 
     srv = serve()
     br = None
-    rep = Report()
     base = f"http://127.0.0.1:{PORT}"
     try:
         br = Chrome()

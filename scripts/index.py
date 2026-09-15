@@ -74,9 +74,9 @@ def card(story, summary, versions=()):
     sum_p = f'<p class="sum">{html.escape(text)}</p>' if text else '<p class="sum none">—</p>'
     # data-title rather than reading the <h2> back: the heading carries the
     # level chip too, so its textContent is not the title.
-    return f"""    <div class="cell" data-slug="{html.escape(slug)}" data-pages="{story["pages"]}" data-title="{title}"{f' data-level="{lv}"' if lv else ""}>
+    return f"""    <div class="cell" data-slug="{html.escape(slug)}" data-pages="{story["pages"]}" data-title="{title}"{f' data-level="{lv}"' if lv is not None else ""}>
       <a class="card" href="{href}">
-        {rt}<h2>{title}{f'<span class="lv">Lv{lv}</span>' if lv else ""}</h2>
+        {rt}<h2>{title}{f'<span class="lv">Lv{lv}</span>' if lv is not None else ""}</h2>
         {sum_p}
         <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
       </a>
@@ -146,7 +146,13 @@ def main():
     )
 
     out = out_dir / "index.html"
-    out.write_text(TEMPLATE.replace("__CARDS__", cards).replace("__TOTALS__", totals), encoding="utf-8")
+    out.write_text(
+        TEMPLATE.replace("__CARDS__", cards)
+        .replace("__TOTALS__", totals)
+        # Hand-kept until 2026-09-14, and one story short of the count printed
+        # in the header the whole time.
+        .replace("__TITLES__", html.escape(" · ".join(s["title"] for s in built))),
+        encoding="utf-8")
     print(f"{out}\n  {len(built)} stories · {totals}")
 
 
@@ -273,7 +279,10 @@ TEMPLATE = """<!doctype html>
         font-variant-numeric: tabular-nums;
         color: var(--muted);
       }
-      .cell:hover {
+      /* Keyed on the anchor, not on the box. The box is the whole row now, but
+         only a.card navigates — lighting the row up while the pointer sits on
+         the stars or the 感想 box promises a click that does nothing. */
+      .cell:has(a.card:hover) {
         border-color: var(--accent);
         background: color-mix(in srgb, var(--accent) 6%, transparent);
       }
@@ -350,13 +359,18 @@ TEMPLATE = """<!doctype html>
       .cell:not(.open) .vers { display: none; }
       .disc {
         display: block;
-        margin: 0.35rem 0 0;
-        padding: 0.1rem 0;
+        margin: 0.1rem 0 0;
+        /* Same trade the .btn pills make: 44px of hit area, nowhere near 44px
+           of ink. This one gates every detail on every row, so it is the last
+           control on the page that should be hard to hit with a thumb. */
+        padding: 0.6rem 0.7rem 0.6rem 0;
+        min-height: 44px;
         border: 0;
         background: none;
         font-family: -apple-system, system-ui, sans-serif;
         font-size: 0.72rem;
         color: var(--muted);
+        text-align: start;
         cursor: pointer;
       }
       .disc:hover { color: var(--accent); }
@@ -640,7 +654,7 @@ __CARDS__
     </main>
 
     <footer>
-      <span>時計の音 · 迷子の手紙 · 終電 · 煙突の煙 · 猫を探す探偵 · 城の鐘</span>
+      <span>__TITLES__</span>
       <span class="spacer"></span>
       <span>known-word-reader</span>
     </footer>
@@ -762,11 +776,13 @@ __CARDS__
           }
           $("readtot").textContent = done ? " · 読了 " + done + "/" + cells.length : "";
           resume(open, openPage, next);
-          autoOpen();
+          autoOpen(all, null);
         }
 
-        // 続き on the story already in hand, 次へ on the one after the last
-        // finished — and gone entirely once the corpus is read out.
+        // 続き on the story already in hand, 次へ on the first one not yet
+        // finished — first in reading order, not first after the last one
+        // finished, so skipping ahead leaves the skipped story offered.
+        // Gone entirely once the corpus is read out.
         function resume(open, page, next) {
           var el = $("resume");
           if (!el) return;
@@ -785,11 +801,16 @@ __CARDS__
         // stars are still in front of you on the way out — which is the whole
         // reason they do not sit behind 編集. A row the reader has opened or
         // closed by hand is left alone; a preference beats a default.
-        function autoOpen() {
-          var prog = read(), revs = readR();
+        // Both callers already hold the map they painted from, and a push or a
+        // pull paints from the merged result rather than from the store — so
+        // going back to localStorage here can disagree with what is on screen.
+        // A write that silently failed on quota is enough to produce it.
+        function autoOpen(prog, revs) {
+          prog = prog || read();
+          revs = revs || readR();
           for (var i = 0; i < cells.length; i++) {
             var cell = cells[i];
-            if (cell.dataset.user === "1" || cell.classList.contains("open")) continue;
+            if (shut[cell.dataset.slug] || cell.classList.contains("open")) continue;
             var p = prog[cell.dataset.slug], r = revs[cell.dataset.slug];
             var fin = p && typeof p === "object" && p.done === true;
             var rated = r && typeof r === "object" && Number(r.stars) >= 1;
@@ -801,6 +822,19 @@ __CARDS__
           cell.classList.toggle("open", on);
           var btn = cell.querySelector(".disc");
           if (btn) btn.setAttribute("aria-expanded", on ? "true" : "false");
+        }
+
+        // Which rows have been shut by hand, so the auto-open does not undo the
+        // correction on the next load. A Home Screen install relaunches on
+        // every visit, so an in-memory flag would mean it never held at all.
+        // Device-local and out of the gist deliberately: this is where this
+        // screen is scrolled to, not anything about the reading.
+        var shut = slot("shut");
+        function remember(slug, on) {
+          if (on) delete shut[slug]; else shut[slug] = 1;
+          try {
+            localStorage.setItem("japanese-stories:shut", JSON.stringify(shut));
+          } catch (e) {}
         }
 
         function paintR(all) {
@@ -826,7 +860,7 @@ __CARDS__
             var btn = cell.querySelector(".notebtn");
             if (btn) btn.classList.toggle("has", !!note);
           }
-          autoOpen();
+          autoOpen(null, all);
         }
 
         // A hand-set review carries `at` for the same reason a hand-set record
@@ -923,8 +957,9 @@ __CARDS__
           // Ahead of act(): an unrecognised action falls through to its
           // stepper branch, so a disclosure tap would turn a page.
           if (what === "more") {
-            cell.dataset.user = "1";
-            disclose(cell, !cell.classList.contains("open"));
+            var on = !cell.classList.contains("open");
+            disclose(cell, on);
+            remember(cell.dataset.slug, on);
             return;
           }
           if (what === "star") { star(cell, Number(btn.dataset.n)); return; }

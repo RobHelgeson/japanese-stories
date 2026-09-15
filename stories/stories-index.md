@@ -14,7 +14,7 @@ The set is graded by level and by how much work the prose asks of you, not by vo
 
 The list itself is the [contents page](https://robhelgeson.github.io/japanese-stories/), which `index.py` generates: reading order and level out of `corpus.json`, and pages, sentences, 漢字語 counts, 苦手 and 新出 words read back out of each built reader. A table here restated all of that by hand, so it was the one place in the repo that could be wrong about the corpus, and the New-words column had no generator behind it at all. It was deleted on 2026-09-14; the card now carries the level, which was the only column nothing else showed.
 
-All five were rewritten against the level ladder on 2026-09-10 and all five pass `python3 stats.py --strict`. The 2026-09-08 drafts are archived under `versions/` and linked from every card on the contents page, so a rewrite can be read against what it replaced. `python3 stats.py --diff <v1> <current>` prints the two side by side.
+The original five were rewritten against the level ladder on 2026-09-10 and all of them pass `python3 stats.py --strict`; ｜煙突の煙《えんとつのけむり》 and ｜行かなかった人の地図《いかなかったひとのちず》 were written against it from the start. The 2026-09-08 drafts are archived under `versions/` and linked from every card on the contents page, so a rewrite can be read against what it replaced. `python3 stats.py --diff <v1> <current>` prints the two side by side.
 
 Leech words are no longer a token presence: the set carried 11 across five stories before, and carries 63 now. The change was a bug fix rather than a writing decision — `weak_forms()` read only `Card_Morph_Map`, which AnkiMorphs populates for the `Morphs::*` decks alone, so of 876 unsuspended leech cards it could see 35. Reading the Core, Jlab and Duolingo note fields as well took the usable pool from 14 kanji words to 189.
 
@@ -81,7 +81,7 @@ python3 readings.py ../docs/*.html | grep MULTIPLE   # ambiguous readings, if an
 
 `rebuild.py` replaced the hand-run per-story loop this section used to document. It walks the reading order in `corpus.json` rather than globbing — a glob sorts alphabetically and the stories come out in the wrong order — rebuilds only what is stale, covers the archived `versions/` too, and always runs `index.py` last. Staleness counts every build input, not just the story text, so editing `reader.js`, `reader.css` or an afterword below correctly marks the stories that depend on it. `--all` forces a full rebuild, which is what to use after a card matures in Anki, since that changes the known set with no file to notice.
 
-`index.py` must run last because it reads the built readers, so a story rebuilt afterwards leaves the counts on the contents page stale. It also reads the Summaries section below, and exits with an error if a story has no summary there.
+`index.py` must run last because it reads the built readers, so a story rebuilt afterwards leaves the counts on the contents page stale. It also reads the Summaries section below. A story with no bullet there gets a card with no blurb and no kana reading — `index.py` warns on stderr and carries on, because stopping a rebuild that has already spent a minute per story in Ichiran is a worse answer to a missing sentence. Nothing else in the pipeline checks for one, so the warning is the only notice you get.
 
 Requires Anki running (AnkiConnect) and Ichiran reachable (see README.md). Budget about a minute per story — Ichiran is the slow part.
 
