@@ -156,7 +156,7 @@ def pages(path):
     return out
 
 
-def vocabulary(jp):
+def vocabulary(jp, basis="surface"):
     """Content-word tokens by dictionary form, for the recycling measure.
 
     Ichiran, not a kanji-run regex. The regex counts 立っていた as 立 and glues
@@ -165,15 +165,30 @@ def vocabulary(jp):
     is an artifact to rewrite prose against. Segmentation is cached, so the real
     tokeniser costs nothing after the first run; the regex stays as a fallback
     for when Ichiran is not up.
+
+    `basis` decides which tokens count as content. `surface` keeps a token whose
+    written form carries kanji, and is what every threshold in corpus.json was
+    calibrated against. `lemma` keeps one whose dictionary form does, so つれた
+    counts under 連れる. The two agree on this corpus, where verbs are written in
+    kanji by design, and diverge hard on authentic children's prose, which writes
+    them in kana: measured on 新美南吉's 飴だま, surface keeps 18% of tokens and
+    lemma 35%, against 48-52% and 54-56% here. reference.py reports both for that
+    reason — see its module docstring.
     """
     body = "\n".join(jp)
     try:
         import ichiran
 
+        def keep(t):
+            lemma = t["bases"][0] if t["bases"] else t["surface"]
+            # The literal predicate the surface basis has always used, not
+            # ichiran.has_kanji, whose wider ranges would move settled numbers.
+            return any("一" <= c <= "鿿" for c in (t["surface"] if basis == "surface" else lemma))
+
         toks = [
             (t["bases"][0] if t["bases"] else t["surface"])
             for t in ichiran.tokens(body)
-            if any("一" <= c <= "鿿" for c in t["surface"])
+            if keep(t)
         ]
         return toks, True
     except Exception:
@@ -244,14 +259,30 @@ def subordination(jp):
 
 
 def analyze(path):
-    jp = sentences(path)
-    pg = pages(path)
+    a = measure(sentences(path), pages(path))
+    a["slug"] = Path(path).stem
+    return a
+
+
+def measure(jp, pg=None):
+    """Every structural axis, from a sentence list alone.
+
+    Split out of analyze() so a reference text can be put through the same
+    implementation rather than a second one written to match it. A band from a
+    parallel implementation would drift from the numbers it sits beside, and the
+    drift would look like a finding. `pg` is optional because only this project's
+    sources carry pages; a reference text has none and reports them as 0.
+    """
     lens = [len(s) for s in jp]
     body = "\n".join(jp)
     toks, real = vocabulary(jp)
+    lem_toks, _ = vocabulary(jp, basis="lemma")
     types = {}
     for t in toks:
         types[t] = types.get(t, 0) + 1
+    lem_types = {}
+    for t in lem_toks:
+        lem_types[t] = lem_types.get(t, 0) + 1
 
     quotes = [s for s in jp if s.startswith("「")]
     untagged = [s for s in quotes if not TAGGED.search(s)]
@@ -266,21 +297,25 @@ def analyze(path):
     found = {k: len(re.findall(v, body)) for k, v in GRAMMAR_PATTERNS.items()}
     sub_share, sub_full = subordination(jp)
     return {
-        "slug": Path(path).stem,
+        "slug": None,
         "subordinate_share": sub_share,
         "subordinate_full": sub_full,
         "sentences": len(jp),
-        "pages": len(pg),
+        "pages": len(pg) if pg else 0,
         "mean_len": st.mean(lens),
         "stdev_len": st.pstdev(lens),
         "pct_over_30": 100 * sum(1 for n in lens if n > 30) / len(lens),
         "pct_under_10": 100 * sum(1 for n in lens if n < 10) / len(lens),
-        "sent_per_page": len(jp) / len(pg),
+        "sent_per_page": len(jp) / len(pg) if pg else 0.0,
+        "chars": sum(lens),
         "tokens": len(toks),
         "types": len(types),
+        "lemma_tokens": len(lem_toks),
         "real_tokens": real,
         "hapax_rate": 100 * sum(1 for v in types.values() if v == 1) / len(types),
         "repeated_share": 100 * sum(v for v in types.values() if v >= 3) / len(toks),
+        "lemma_hapax_rate": 100 * sum(1 for v in lem_types.values() if v == 1) / len(lem_types),
+        "lemma_repeated_share": 100 * sum(v for v in lem_types.values() if v >= 3) / len(lem_toks),
         "dialogue_pct": 100 * len(quotes) / len(jp),
         "untagged_pct": 100 * len(untagged) / len(quotes) if quotes else 0.0,
         "longest_untagged": best,
