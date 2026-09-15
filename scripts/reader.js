@@ -1331,11 +1331,17 @@
         // The full reset: nothing lit, nothing open, and the tap sequence
         // forgotten. Everything that interrupts the gesture stream calls this —
         // a drag going live, a page turn, Escape, a tap away, 設.
+        //
+        // Reports whether it actually took something down, because the bare-paper
+        // tap is now a chrome toggle and one tap may only mean one thing: a tap
+        // that closes a sheet has spent itself on the sheet.
         function dismiss() {
+          const had = lit !== null || subject !== null;
           lastNode = null;
           lastAt = 0;
           light(null);
           closeSheet();
+          return had;
         }
 
         function showWord(w) {
@@ -1441,17 +1447,18 @@
         // A .w always wins over the sentence around it: it is the smaller, more
         // specific subject, and it is what the finger was aiming at. Returns true
         // when the tap was consumed — Track.tap reads false as "that was bare
-        // paper" and toggles the chrome.
+        // paper" and toggles the chrome. Clearing a reading or a sheet counts as
+        // consumed: otherwise the tap that puts a gloss away would also take the
+        // page count away with it.
         function route(target, x, y) {
-          if (!target || !target.closest) { dismiss(); return false; }
+          if (!target || !target.closest) return dismiss();
           if (el.contains(target)) return true;
-          if (!track.contains(target)) { dismiss(); return false; }
+          if (!track.contains(target)) return dismiss();
           const w = target.closest(".w");
           if (w) return gesture(w);
           const s = sentenceAt(target, x, y);
           if (s) return gesture(s);
-          dismiss();
-          return false;
+          return dismiss();
         }
 
         function start() {
@@ -1736,6 +1743,19 @@
         }
 
         function bind() {
+          // The strip is the gesture's other half. #track is inset: 0, so while
+          // the bars are hidden a tap there falls through to it and shows them —
+          // but once shown they are opaque overlays above the track with handlers
+          // only on their own buttons, so the second tap landed on nothing and
+          // the bars could not be dismissed from the place that raised them.
+          // Anything that is not a control puts them away.
+          for (const strip of [els.top, els.bar]) {
+            strip.addEventListener("pointerdown", (e) => {
+              if (e.target.closest(FOCUSABLE)) return;
+              hide();
+            });
+          }
+
           els.prev.addEventListener("click", () => { show(); Track.step(-1); });
           els.next.addEventListener("click", () => { show(); Track.step(1); });
           els.set.addEventListener("click", openSettings);

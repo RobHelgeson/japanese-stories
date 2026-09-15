@@ -78,8 +78,12 @@
 > "No, it's fine."
 「重そうですが」
 > "They look heavy."
-「重いです。｜割《わ》れる｜物《もの》が入っているので。｜下《した》に置いておきます」
-> "They are. There are things in there that break. I'll keep them down here."
+「重いです」
+> "They are."
+「｜割《わ》れる｜物《もの》が入っているので」
+> "There are things in there that break."
+「｜下《した》に置いておきます」
+> "I'll keep them down here."
 「それなら、その｜方《ほう》がいいですね」
 > "In that case, better that way."
 「はい」
@@ -95,8 +99,10 @@
 > This time I was not nervous.
 「引っ越しですか」
 > "Moving?"
-「そうなんです。｜明日《あした》の朝、東京に着きます」
-> "That's right. I get into Tokyo tomorrow morning."
+「そうなんです」
+> "That's right."
+「｜明日《あした》の朝、東京に着きます」
+> "I get into Tokyo tomorrow morning."
 
 彼女の返事はいつも短い。
 > Her answers were always short.
@@ -104,12 +110,22 @@
 > My own questions always came out long, whatever I did about it.
 「東京は、初めてですか」
 > "Is this your first time in Tokyo?"
-「初めてです。ずっとこの町にいました。｜二十年《にじゅうねん》、一度も出ていません」
-> "First time. I've been in this town the whole time. Twenty years, and I never once left."
-「そうですか。お母さんは、もう向こうですか」
-> "I see. Is your mother over there already?"
-「母は去年亡くなりました。家も売りました。もう帰る家がないんです」
-> "My mother died last year. I sold the house too. I don't have a home to go back to anymore."
+「初めてです」
+> "First time."
+「ずっとこの町にいました」
+> "I've been in this town the whole time."
+「｜二十年《にじゅうねん》、一度も出ていません」
+> "Twenty years, and I never once left."
+「そうですか」
+> "I see."
+「お母さんは、もう向こうですか」
+> "Is your mother over there already?"
+「母は去年亡くなりました」
+> "My mother died last year."
+「家も売りました」
+> "I sold the house too."
+「もう帰る家がないんです」
+> "I don't have a home to go back to anymore."
 「それは」
 > "That's..."
 
@@ -172,8 +188,10 @@
 > "They were my mother's."
 「全部持って｜行《い》くんですか」
 > "Are you taking all of them?"
-「これだけです。｜他《ほか》は全部捨てました」
-> "Only these. I threw everything else away."
+「これだけです」
+> "Only these."
+「｜他《ほか》は全部捨てました」
+> "I threw everything else away."
 「東京に着いたら、どうするんですか」
 > "What will you do once you get to Tokyo?"
 「まず部屋を探します」
@@ -204,8 +222,10 @@
 > The rack had stayed empty to the end.
 「東京は広いところですよ」
 > "Tokyo is a big place."
-「広い｜方《ほう》がいいです。知らない｜人《ひと》が多いほど、楽なんです」
-> "Bigger is better. The more strangers there are, the easier it is."
+「広い｜方《ほう》がいいです」
+> "Bigger is better."
+「知らない｜人《ひと》が多いほど、楽なんです」
+> "The more strangers there are, the easier it is."
 「そういうものですか」
 > "Is that how it is?"
 「そういうものです」

@@ -24,7 +24,7 @@ Text is vertical by default, as Japanese literary prose is, and a page never scr
 | `f`                        | reveal every reading at once (also 設 → ふりがな)    |
 | Swipe                      | turn the page (touch; on a mouse use the arrows)     |
 | `←` `→`                    | turn pages, following the binding direction          |
-| Tap the top or bottom edge | the bars, and the same tap again puts them away      |
+| Tap the top or bottom edge | show the bars; tap it again to put them away         |
 | `設`                       | writing mode, 改行, 綴じ, type size, theme, ふりがな |
 | `目次`                     | back to the contents page                            |
 

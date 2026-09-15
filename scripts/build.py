@@ -360,7 +360,7 @@ def main():
         "stats": {
             "words": sum(1 for p in built for s in p for t in s["toks"] if t.get("r")),
             "translated": sum(1 for p in built for s in p if s["en"]),
-            "sentences": sum(len(p) for p in built),
+            "units": sum(len(p) for p in built),
             "weak": sorted({t["w"] for p in built for s in p for t in s["toks"] if t.get("w")}),
             "approved": sorted({t["n"] for p in built for s in p for t in s["toks"] if t.get("n")}),
             "unknown": unknown,
@@ -381,7 +381,7 @@ def main():
         f"{out}\n  {len(built)} pages · {data['stats']['words']} kanji words · "
         f"{len(data['stats']['weak'])} weak · "
         f"{len(data['stats']['approved'])} approved-new · {len(unknown)} unknown · "
-        f"{data['stats']['translated']}/{data['stats']['sentences']} translated"
+        f"{data['stats']['translated']}/{data['stats']['units']} translated"
     )
     for fix, n in sorted(applied.items()):
         print(f"  reading override: {fix} ({n}x)")

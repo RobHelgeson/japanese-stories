@@ -130,17 +130,22 @@ Leech words come from `vocab.weak_forms()` — kanji words tagged leech in Anki 
 - **One quoted turn per line, however many sentences it holds.** 「」 brackets a turn — everything one speaker says before anybody else speaks or the narration resumes — not a sentence. Sentences inside a turn are divided by 。 as usual, and the last one drops its 。 before the 」. This is the only place the one-sentence-per-line rule yields, and it has to: the alternative is a closing 」 in the middle of somebody still talking.
 - Blank line separates pages. Aim for four to five sentences a page.
 - **This format once became a style rule by accident.** The 1:1 coupling made long multi-clause sentences awkward to keep aligned, so the first five stories were written almost entirely in short declaratives: mean 17 characters, standard deviation 4.6, and three of the five contained no sentence over 30 characters at all. Vary length deliberately. The stdev floor exists to catch exactly this.
+- **The coupling is not a reason to write short.** Write the long sentence and translate it as one long sentence. What the coupling really discourages is **subordination** — 連用形 chaining, relative clauses, ので / のに / ながら — and those are the level ladder's own constructions, so writing around it works against the ladder. `stats.py` reports `subordinate_share` for this; it is measured and not yet gated.
+
 ### 「」 is the speaker attribution
 
-Most quoted lines carry no dialogue tag, so a reader has nothing but the brackets to go on: a new 「 means a new speaker, and turns alternate. Splitting one speaker's turn across several 「」 therefore does not merely look wrong, it *says* something false, and there is no other cue to contradict it.
+Most quoted lines carry no dialogue tag, so a reader has nothing but the brackets to go on: a new 「 means the speaker changed, or the same speaker stopped and started again. Splitting a continuous turn across several 「」 therefore *says* something false, and there is no other cue to contradict it.
 
 ```
-✗ 「初めてです」        ✓ 「初めてです。ずっとこの町にいました。｜二十年《にじゅうねん》、一度も出ていません」
-  「ずっとこの町にいました」
-  「｜二十年《にじゅうねん》、一度も出ていません」
+✗ 「あの鐘は、私が四十の時に作った」        ✓ 「あの鐘は、私が四十の時に作った。当時の王の命令だ。戦争のための鐘だった」
+  「当時の王の命令だ。戦争のための鐘だった」
 ```
 
-The ✗ column is three speakers answering one question. It is one woman, and it shipped that way in ｜終電《しゅうでん》 — the September 2026 audit found 28 turns split like this across all seven stories, produced by reading the one-sentence-per-line rule as though it outranked the brackets.
+The ✗ column is two people. It is one man telling one story, and it shipped that way — the September 2026 audit found 21 turns split like this across six of the seven stories, produced by reading the one-sentence-per-line rule as though it outranked the brackets.
+
+**But a beat is a real reason to open a second 「.** A speaker who stops, is not answered, and starts again is two turns, and the brackets are how that silence is written. ｜終電《しゅうでん》 is built on this: almost nothing is attributed, her replies come in separate four-to-eight character bursts against his long over-polite questions, and the narration hands the reader that key outright — 彼女の返事はいつも短い。私の質問は、どうしても長くなる。Merging those turns inverts the one cue the story gives. It was audited and deliberately left split.
+
+So the test is not "same speaker, therefore merge". It is **continuous or not**: one breath with nothing between the sentences is one 「」, and a pause the reader is meant to feel is two.
 
 **A narrative tag closes the turn.** 「｜海《うみ》は」と｜祖父《そふ》は｜言《い》った。「｜青《あお》かったか」 is right and stays two lines: the tag interrupts, so the same speaker's continuation opens a fresh 「. So does a page break, which is why a turn never spans one.
 
@@ -148,9 +153,8 @@ The ✗ column is three speakers answering one question. It is one woman, and it
 python3 stats.py ../stories/<slug>.txt --turns   # every run of adjacent quoted lines
 ```
 
-Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest must alternate. Two neighbours you would give to the same speaker are one turn wrongly split. Nothing gates this — speaker identity is not recoverable from the text, so the script prints and you judge.
+Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest alternate unless a beat says otherwise. Two neighbours you would give to the same speaker, with no silence between them, are one turn wrongly split. Nothing gates this — neither speaker identity nor a pause is recoverable from the text, so the script prints and you judge.
 
-- **The coupling is not a reason to write short.** Write the long sentence and translate it as one long sentence. What the coupling really discourages is **subordination** — 連用形 chaining, relative clauses, ので / のに / ながら — and those are the level ladder's own constructions, so writing around it works against the ladder. `stats.py` reports `subordinate_share` for this; it is measured and not yet gated.
 
 ## Furigana
 
@@ -172,7 +176,7 @@ An annotation on a verb stem covers its inflection, so `｜行《い》った` c
 
 ## The revision pass
 
-Four failure modes, each found the expensive way. Run this against every draft.
+Five failure modes, each found the expensive way. Run this against every draft.
 
 | Failure                          | Evidence                                                      | Check                                                      |
 | -------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -180,21 +184,23 @@ Four failure modes, each found the expensive way. Run this against every draft.
 | Flat short declaratives          | mean 17 chars, stdev 4.6; 3 of 5 had nothing over 30          | Is every sentence one clause?                              |
 | Variance bought long-only        | ｜猫《ねこ》 +24%, ｜城《しろ》の｜鐘《かね》 +14% over brief | Are the long sentences long from structure, or more nouns? |
 | Circumlocution to dodge unknowns | 一緒に暮らしている人 for ｜飼《か》い｜主《ぬし》             | Is a phrase working around a word rather than using one?   |
-| One turn split across several 「」 | 28 turns, all seven stories, Sept 2026                    | `stats.py --turns`; does a 」 close where nobody else speaks? |
+| One turn split across several 「」 | 21 turns, six of seven stories, Sept 2026                 | `stats.py --turns`; does a 」 close mid-breath, with no beat? |
 
 ## Metrics are floors, not targets
 
 **Every threshold catches a specific failure this corpus actually produced. None is a target to optimise.** A story can meet all of them and still be inert; a story can miss one and still be the right story, in which case say so and ship it.
 
-This clause is load-bearing rather than decorative: two of the four failures above were _caused_ by optimising a metric. Sentence variance was bought by writing long, and driving the unknown-word count to zero is what produced the circumlocutions.
+This clause is load-bearing rather than decorative: two of the five failures above were _caused_ by optimising a metric. Sentence variance was bought by writing long, and driving the unknown-word count to zero is what produced the circumlocutions.
 
 ## Validate, then build
 
 ```bash
-python3 stats.py ../stories/<slug>.txt --strict   # level, brief, rhythm, recycling
-python3 check.py ../stories/<slug>.txt            # vocabulary; slow, ~30-60s
-python3 rebuild.py                                # only stale stories; index.py last
+python3 stats.py ../stories/<slug>.txt --turns --strict   # turns, then level/brief/rhythm
+python3 check.py ../stories/<slug>.txt                    # vocabulary; slow, ~30-60s
+python3 rebuild.py                                        # only stale stories; index.py last
 ```
+
+`--turns` prints and never fails, so it is the one step here that cannot tell you it was skipped. Run it anyway: nothing else in the pipeline sees a split turn, which is how 28 of them shipped.
 
 `rebuild.py` handles ordering, and knows which build input touches which output — editing an afterword in `stories-index.md` re-segments the story it belongs to, while editing `reader.js` or `reader.css` only rewrites the shared engine. Do not run `build.py` and `index.py` by hand unless you know why: `index.py` reads the built readers, so rebuilding a story after it leaves the contents page stale with nothing to flag it.
 
