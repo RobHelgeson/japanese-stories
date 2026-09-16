@@ -18,12 +18,14 @@ frozen, and only --versions reaches them.
 """
 
 import argparse
+import ast
 import json
 import subprocess
 import sys
 from pathlib import Path
 
 import build
+import indexmd
 import stats
 
 HERE = Path(__file__).resolve().parent
@@ -34,6 +36,45 @@ CORPUS = json.loads((HERE / "corpus.json").read_text(encoding="utf-8"))
 # and the engine on the public site alongside the readers.
 SRC = HERE.parent / "stories"
 OUT = HERE.parent / "docs"
+
+
+def build_modules(root="build"):
+    """Every local module build.py actually reaches, transitively.
+
+    This used to be glob("*.py"), which swept in ten scripts the build never
+    imports — stats, reviews, reference, progress, brief, have, icons, index,
+    rebuild, readings — so editing any of them marked every data file stale and
+    charged a full Ichiran re-segmentation for a change build.py cannot see. That
+    is the same defect the reader/CSS split was made to fix, arriving by a
+    different route, and a hand-kept list would drift the first time build.py
+    grew an import. Walking the imports cannot drift.
+
+    This covers the Python half only. The JSON inputs below are still listed by
+    hand, so adding a new one to pitch.py or check.py invalidates nothing until
+    someone adds it there too — the same silent under-invalidation, one file type
+    over. Reading them off the AST would need every path literal to be reachable
+    statically, which is a bigger claim than this walker makes.
+
+    A module that will not parse is a hard error rather than a skip. Swallowing
+    it would drop that module and its whole import subtree from the dependency
+    set, so a story would report "up to date" against a stale data file — which
+    is the failure this function exists to prevent, arriving through its own
+    error handling.
+    """
+    local = {p.stem for p in HERE.glob("*.py")}
+    seen, stack = set(), [root]
+    while stack:
+        name = stack.pop()
+        if name in seen:
+            continue
+        seen.add(name)
+        tree = ast.parse((HERE / f"{name}.py").read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                stack += [a.name for a in node.names if a.name in local]
+            elif isinstance(node, ast.ImportFrom) and node.module in local:
+                stack.append(node.module)
+    return {HERE / f"{name}.py" for name in seen}
 
 
 def targets(src_dir, out_dir):
@@ -73,7 +114,7 @@ def targets(src_dir, out_dir):
 # Generated files are deliberately absent: .deck-words-cache.json, pos-table.json
 # and .segcache/ are all rewritten on a schedule of their own and would force
 # rebuilds that change nothing.
-DATA_DEPS = sorted(HERE.glob("*.py")) + [
+DATA_DEPS = sorted(build_modules()) + [
     HERE / "corpus.json",
     HERE / "approved-words.json",
     HERE / "readings-overrides.json",
@@ -105,6 +146,23 @@ def stale(dst, deps):
     return any(d.stat().st_mtime > out for d in deps if d.exists())
 
 
+def afterword_changed(data, index_md):
+    """True when this story's afterword differs from the one built into it.
+
+    stories-index.md holds two sections and a story consumes one of them, so
+    mtime cannot tell an afterword rewrite from a blurb typo — and it used to
+    charge the same full re-segmentation for both, about a minute a story with
+    Anki and Ichiran live. The 2026-09-16 pass that cut the file to its two
+    machine-read sections was itself a pure-prose edit and re-segmented all
+    eight. build.py stores the afterword it used, so the honest comparison was
+    already sitting in the output.
+    """
+    if not data.exists() or not index_md.exists():
+        return True
+    built = stats.data_file(data)
+    return indexmd.afterwords(index_md).get(built["title"], "") != built["afterword"]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true", help="rebuild even if up to date")
@@ -119,7 +177,9 @@ def main():
     args = ap.parse_args()
 
     # The afterword comes from here via indexmd.py, so editing one has to make
-    # the story it belongs to stale.
+    # the story it belongs to stale — by content, not by mtime. See
+    # afterword_changed; a version build still compares the file, because an
+    # archived draft carries its afterword inline and stats cannot read it back.
     index_md = args.src / "stories-index.md"
 
     # The shared engine, written before anything links to it. build.write_engine
@@ -145,7 +205,8 @@ def main():
                 continue
         else:
             data = args.out / "data" / f"{dst.stem}.js"
-            if not args.all and not stale(data, [src, *DATA_DEPS, index_md]):
+            if not args.all and not stale(data, [src, *DATA_DEPS]) \
+                    and not afterword_changed(data, index_md):
                 # The data is current, so the expensive half is skipped; the
                 # shell is 5KB of template and gets rewritten on its own terms.
                 if stale(dst, SHELL_DEPS):

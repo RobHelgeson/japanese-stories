@@ -117,9 +117,12 @@ docs/             what GitHub Pages serves
   <slug>.html     a ~5KB shell linking the three
   versions/       archived drafts, self-contained and frozen
 AUTHORING.md      the craft spec a new story is written against
+CALIBRATION.md    where every threshold came from, and what was measured wrong
 ```
 
-`scripts/reference.json` is the odd one out: a manifest of public-domain 青空文庫 children's stories used as an external yardstick for sentence rhythm and subordination, because every other threshold in the project is calibrated from the project's own output. It is read by `reference.py` and by nothing else, and it gates nothing. See AUTHORING.md § The reference band is not a floor either.
+The contents page has the same three-file shape the reader does — `scripts/contents.html`, `.css` and `.js` — except they are folded into one `docs/index.html` at build time rather than linked, because it is a single page and a second request would buy no cache sharing. They were a 1,050-line string literal inside `index.py` until 2026-09-16, which put 40KB of CSS and JS beyond the reach of every tool that reads either.
+
+`scripts/reference.json` is the odd one out: a manifest of public-domain 青空文庫 children's stories used as an external yardstick for sentence rhythm and subordination, because every other threshold in the project is calibrated from the project's own output. It is read by `reference.py` and by nothing else, and it gates nothing. See CALIBRATION.md § The reference band.
 
 A story source is plain text: a `# title` line, then alternating Japanese sentences and `>` English translations, with a blank line between pages. Furigana is authored inline as `｜漢字《かんじ》`. Everything else — level, brief, new-word budget, reading order — lives in `scripts/corpus.json`.
 
@@ -137,11 +140,13 @@ A live story is three outputs with three different inputs, and only the first is
 
 | Output                           | Stale against                                     | Needs Ichiran + Anki |
 | -------------------------------- | ------------------------------------------------- | -------------------- |
-| `data/<slug>.js`                 | the story `.txt`, the afterword, the `.py` engine | yes                  |
+| `data/<slug>.js`                 | the story `.txt`, its afterword, the build engine | yes                  |
 | `<slug>.html`                    | `reader.html`, `build.py`                         | no                   |
 | `reader.css` / `.js` / `sync.js` | `reader.css`, `reader.js`, `sync.js`, `build.py`  | no                   |
 
 So editing the reader's styling or behaviour now rewrites two files in about a second, and re-segments nothing.
+
+"The build engine" is precise rather than loose: `rebuild.py` walks `build.py`'s own imports and counts only the modules it transitively reaches, so `stats.py`, `reviews.py`, `reference.py` and the other scripts the build never loads no longer force a re-segmentation. The afterword is compared by content, not by the timestamp on `stories-index.md` — a story re-segments when its own bullet changes, and a blurb fix in the same file costs nothing.
 
 `docs/versions/` is left out of all of this. An archived draft is self-contained and **frozen** — it keeps the engine it published with, because an archive that re-renders with today's code preserves the story and not the reading it shipped with. `--versions` rebuilds them anyway.
 
@@ -154,6 +159,7 @@ So editing the reader's styling or behaviour now rewrites two files in about a s
 | `python3 reviews.py`                     | star ratings and notes, joined to level, register and length          |
 | `python3 progress.py`                    | snapshot the progress gist; `--restore` puts one back                 |
 | `python3 reference.py --compare`         | our structural numbers beside authentic 児童文学 — a band, not a gate |
+| `python3 readings.py ../docs/*.html`     | ambiguous readings across the built set; `grep MULTIPLE` for the ones to annotate |
 | `python3 pitch.py --build`               | rebuild the pitch table after adding or editing a story (needs fugashi) |
 | `python3 pitch.py --selftest`            | the accent rules against the gold set, without writing anything        |
 | `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki                 |
