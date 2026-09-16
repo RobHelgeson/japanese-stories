@@ -51,6 +51,8 @@ SRC = REPO / "scripts"
 # reader.html would ship in every reader and in none of these fixtures.
 sys.path.insert(0, str(SRC))
 import build  # noqa: E402
+import index  # noqa: E402
+import rebuild  # noqa: E402
 import stats  # noqa: E402
 
 # Built fixtures go to a scratch dir, never into the repo: this harness runs
@@ -118,6 +120,49 @@ def check_contracts():
         raise SystemExit("build contract broken: the engine loads before the story data")
     if "__READER_CSS__" in shell or "__READER_JS__" in shell:
         raise SystemExit("build contract broken: render_shell left a placeholder behind")
+
+    # The contents page has the same shape and the same exposure since the
+    # 2026-09-16 split, and none of the browser suites would catch a lost marker:
+    # they exercise behaviour, and a dropped __CONTENTS_CSS__ ships a page that
+    # works and is completely unstyled.
+    chtml = (index.HERE / "contents.html").read_text(encoding="utf-8")
+    ccss = (index.HERE / "contents.css").read_text(encoding="utf-8")
+    cjs = (index.HERE / "contents.js").read_text(encoding="utf-8")
+
+    for needle in ("    <style>\n__CONTENTS_CSS__\n    </style>\n",
+                   "    <script>\n__CONTENTS_JS__\n    </script>\n",
+                   "__CARDS__", "__TOTALS__", "__TITLES__"):
+        if chtml.count(needle) != 1:
+            raise SystemExit(
+                f"build contract broken: {needle!r} matched {chtml.count(needle)}x in contents.html")
+
+    # main() substitutes the cards after template() has already folded these two
+    # in, so a marker appearing in either file would be expanded into story
+    # markup. Nothing else looks, and the tokens are no longer visible in the
+    # file that consumes them.
+    for name, body in (("contents.css", ccss), ("contents.js", cjs)):
+        stray = [m for m in ("__CARDS__", "__TOTALS__", "__TITLES__",
+                             "__CONTENTS_CSS__", "__CONTENTS_JS__") if m in body]
+        if stray:
+            raise SystemExit(
+                f"build contract broken: {name} contains substitution marker(s) {stray}")
+
+    folded = index.template()
+    left = [m for m in ("__CONTENTS_CSS__", "__CONTENTS_JS__") if m in folded]
+    if left:
+        raise SystemExit(f"build contract broken: template() left {left} behind")
+
+    # DATA_DEPS is computed by walking build.py's imports rather than globbing,
+    # so the walker is now the thing that decides whether a story re-segments.
+    # A module it misses is a story that reports "up to date" against a stale
+    # data file, which is the failure the walk was added to prevent.
+    walked = {p.stem for p in rebuild.build_modules()}
+    expected = {"build", "cache", "check", "furigana", "ichiran",
+                "indexmd", "inflect", "pitch", "pos", "vocab"}
+    if walked != expected:
+        raise SystemExit(
+            f"build contract broken: build_modules() walked {sorted(walked)}, "
+            f"expected {sorted(expected)}")
 
 
 def check_no_summary(rep):

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#faf7f0" />
+    <!-- start_url points here, so this is the page an install opens on. -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>物語 — 目次</title>
+    <style>
+__CONTENTS_CSS__
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>物語</h1>
+      <span class="spacer"></span>
+      <span id="totals">__TOTALS__<span id="readtot"></span></span>
+      <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
+    </header>
+
+    <main>
+      <p class="lede">
+        Written entirely inside the known-word set, so nothing here needs a dictionary.
+        The order is graded by what the prose asks of you, not by vocabulary. Read down the list.
+      </p>
+
+      <a class="resume" id="resume" href="#" hidden>
+        <span class="rlabel"></span>
+        <span class="rtitle"></span>
+        <span class="rpct"></span>
+      </a>
+
+__CARDS__
+      <p class="keys">
+        In a story: tap a kanji word for its reading, in place. Tap it twice for its
+        English meaning, in a sheet at the foot of the page.
+        Tap between words — the kana and the punctuation — for the whole sentence's
+        readings, and twice for the sentence in English.
+        <kbd>f</kbd> reveals every reading at once.
+        Swipe to turn the page, or <kbd>←</kbd> <kbd>→</kbd>;
+        <kbd>設</kbd> holds writing mode, 改行, 綴じ, type size, theme and ふりがな;
+        <kbd>目次</kbd> comes back here.
+        <br />
+        Red 傍点 beside a word is a leech: known, but on a card that keeps failing.
+        Teal circles with a visible reading is approved but not yet learned.
+      </p>
+
+      <details class="sync" id="sync">
+        <summary>読書記録の同期</summary>
+        <div class="sbody">
+          <p>
+            Progress is kept in this browser, and browsers throw that away — WebKit deletes
+            all script-writable storage after seven days without a visit, and a Home Screen
+            web app starts with an empty store of its own. Connecting a GitHub token keeps a
+            copy in a secret gist instead, shared by every device that pastes the same token.
+            The gist is a plain JSON file you can open and correct by hand, and its revision
+            history is the undo.
+          </p>
+          <div class="srow">
+            <input type="password" id="tok" placeholder="GitHub token (Gists: write)"
+                   autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <button id="conn" type="button">接続</button>
+            <button id="disc" type="button">解除</button>
+          </div>
+          <p class="sstat" id="sstat">—</p>
+          <p><a id="glink" href="#" target="_blank" rel="noopener" hidden>gist を開く</a></p>
+          <div class="srow">
+            <button id="exp" type="button">書き出し</button>
+            <button id="imp" type="button">読み込み</button>
+            <span class="mspacer"></span>
+            <button id="wipe" type="button">全消去</button>
+          </div>
+          <textarea id="box" rows="10" spellcheck="false" hidden
+                    aria-label="読書記録の JSON"></textarea>
+        </div>
+      </details>
+    </main>
+
+    <footer>
+      <span>__TITLES__</span>
+      <span class="spacer"></span>
+      <span>known-word-reader</span>
+    </footer>
+    <script src="sync.js"></script>
+    <script>
+__CONTENTS_JS__
+    </script>
+  </body>
+</html>

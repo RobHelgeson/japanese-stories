@@ -2,7 +2,7 @@
 """Measure the axes the grading ladder actually claims.
 
 This used to report page and word counts, which is why two false claims survived
-in stories-index.md: that sentence length ramps across the set (it does not, the
+in the reading-order prose, since moved to CALIBRATION.md: that sentence length ramps across the set (it does not, the
 longest story has the shortest sentences) and that 終電's distinguishing feature
 is untagged dialogue (it has the lowest untagged proportion of the five). If the
 set is graded by construction, the tool has to measure construction.
