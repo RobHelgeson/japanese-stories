@@ -2449,7 +2449,12 @@ def walk(br, fs):
 # ------------------------------------------------------------------- suites --
 def suite_table(br, rep, base):
     """The measured per-story screen count at 28px 縦書き 改行-off on 390x844."""
-    expect = {"shuden": 28, "neko-o-sagasu-tantei": 32, "maigo-no-tegami": 18,
+    # These are MEASURED, not designed: a text edit that changes how a page fills
+    # moves them, and the only honest response is to re-measure. 猫を探す探偵 was
+    # 32 until the quote-turn merge (4654b56) put four split turns back onto one
+    # line each; the sentence blocks that went with them were enough for one
+    # authored page to stop needing a second screen.
+    expect = {"shuden": 28, "neko-o-sagasu-tantei": 31, "maigo-no-tegami": 18,
               "tokei-no-oto": 25, "shiro-no-kane": 41, "entotsu-no-kemuri": 27}
     br.emulate(*PHONE[1:])
     table = {}
