@@ -26,6 +26,7 @@ import check
 import furigana
 import ichiran
 import indexmd
+import pitch
 import vocab
 
 HERE = Path(__file__).resolve().parent
@@ -114,7 +115,7 @@ def authored_reading(authored, surface):
     return None
 
 
-def to_token(tok, known, weak, approved, authored=None):
+def to_token(tok, known, weak, approved, authored=None, accents=None):
     if "raw" in tok:
         return {"t": tok["raw"]}
     surface = tok["surface"]
@@ -146,7 +147,59 @@ def to_token(tok, known, weak, approved, authored=None):
         entry["n"] = new  # approved but not yet known — reader shows its reading
     if not check.is_known(tok, known):
         entry["u"] = 1
+    if accents is not None:
+        hit = accents.key(surface)
+        if hit is not None:
+            entry["p"] = hit
     return entry
+
+
+class Pitch:
+    """Accent entries for a story, deduped into one table the tokens index into.
+
+    Inlining the triple on every token measured 12% on docs/data/<slug>.js against
+    7-9% for a table plus an index, and the corpus repeats itself heavily enough
+    that the gap is real: the stories run 175-328 distinct entries against 700-odd
+    marked tokens.
+
+    A surface absent from the table is not an error. pitch.py declines to guess,
+    so a miss here is a word whose accent nobody has asserted, and the reader
+    simply shows no guide for it.
+    """
+
+    # Only what the reader cannot derive. The mora count and the pattern name
+    # both fall out of the accent and the kana, and the kana is already on the
+    # token — so a surface the engine vouched for ships as one integer, and the
+    # 辞書形 triple rides along only when there is no surface accent to show.
+    # Deduping then collapses nearly every surface entry onto the same handful of
+    # records, which is why the table costs almost nothing.
+
+    def __init__(self):
+        self.table = pitch.load()
+        self.entries = []
+        self.index = {}
+        self.hits = 0
+        self.lemma_only = 0
+
+    def key(self, surface):
+        raw = self.table.get(surface)
+        if not raw:
+            return None
+        if "a" in raw:
+            entry = {"a": raw["a"]}
+        elif "la" in raw:
+            entry = {"la": raw["la"], "lk": raw["lk"], "lp": raw["lp"], "lt": raw["lemma"]}
+        else:
+            return None
+        token = json.dumps(entry, ensure_ascii=False, sort_keys=True)
+        if token not in self.index:
+            self.index[token] = len(self.entries)
+            self.entries.append(entry)
+        if "a" in entry:
+            self.hits += 1
+        else:
+            self.lemma_only += 1
+        return self.index[token]
 
 
 def blob(data):
@@ -288,6 +341,7 @@ def main():
     # They have to be declared: the particle-splitting fallback in check.py reads
     # 部品 as 部 + 品, so the unknown detector never sees them.
     approved = vocab.approved_forms() | corpus_new_words(args.story.stem)
+    accents = Pitch()
 
     # One segmentation pass over the whole story, then sliced back apart by
     # offset — Ichiran costs seconds per request regardless of input size.
@@ -321,7 +375,9 @@ def main():
                 if text:
                     out.append({"t": text})
             elif start <= tok["start"] < end:
-                out.append(to_token(tok, known, weak, approved, doc_ruby.get(tok["start"])))
+                out.append(
+                    to_token(tok, known, weak, approved, doc_ruby.get(tok["start"]), accents)
+                )
         return out
 
     built = [
@@ -357,6 +413,7 @@ def main():
         "toc": args.toc,
         "afterword": afterword,
         "pages": built,
+        "pitch": accents.entries,
         "stats": {
             "words": sum(1 for p in built for s in p for t in s["toks"] if t.get("r")),
             "translated": sum(1 for p in built for s in p if s["en"]),
@@ -379,6 +436,7 @@ def main():
         out.write_text(render(title, data), encoding="utf-8")
     print(
         f"{out}\n  {len(built)} pages · {data['stats']['words']} kanji words · "
+        f"{accents.hits} accented ({len(accents.entries)} distinct) · "
         f"{len(data['stats']['weak'])} weak · "
         f"{len(data['stats']['approved'])} approved-new · {len(unknown)} unknown · "
         f"{data['stats']['translated']}/{data['stats']['units']} translated"
