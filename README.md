@@ -25,7 +25,7 @@ Text is vertical by default, as Japanese literary prose is, and a page never scr
 | Swipe                      | turn the page (touch; on a mouse use the arrows)     |
 | `←` `→`                    | turn pages, following the binding direction          |
 | Tap the top or bottom edge | show the bars; tap it again to put them away         |
-| `設`                       | writing mode, 改行, 綴じ, type size, theme, ふりがな |
+| `設`                       | writing mode, 改行, 綴じ, type size, theme, ふりがな, 高低, 墨 |
 | `目次`                     | back to the contents page                            |
 
 Kana, particles and punctuation are not wrapped as words, so "between words" is about half of every line and easy to hit with a thumb. Which is also why the bars have their own gesture: every tap on the text now means something, so the strip the bars occupy is what is left to summon them with. It is a toggle rather than a summons, because it is the only gesture that can be — there is nowhere else to tap that does not already belong to a word or a sentence.
@@ -34,7 +34,25 @@ On a mouse, hovering a word reveals its reading and a double click opens the she
 
 The reading and the meaning stay one gesture apart on purpose: a story built from words you already know should not put the English in reach of the same tap that asks how a kanji is pronounced. That separation used to be three buttons in the bar — ふ, 訳, 意 — which meant the page did nothing at all until one of them was armed. Moving it into the gesture is what let them go.
 
-Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose uses to draw attention to a word. **Red sesame** is a leech: a known word on a card that keeps being failed, with its reading hidden. **Teal circles with the reading shown** is a new word, approved for this story but not yet learned.
+Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose uses to draw attention to a word. **Pink sesame** is a leech: a known word on a card that keeps being failed, with its reading hidden. **Cyan circles with the reading shown** is a new word, approved for this story but not yet learned.
+
+Those two were orange and green until pitch accent arrived, and they moved rather than pitch moving. The five Migaku hues are a vocabulary you already hold from Anki, so they are worth more fixed than these two are — and a mark that means "you keep failing this" is legible in any hue, while a colour that means 頭高 is not.
+
+The two sets are one palette, because a sesame is drawn beside a character the pitch hue has already coloured. `harness.py` measures every pair in CIEDE2000 and fails below ΔE 18; the shipped worst is 19.4, and it is 平板 against 起伏 — both Migaku's.
+
+### Pitch accent
+
+The sheet carries the accent of the word you tapped: a coloured dot, a contour over its morae, and the type. The hollow last node is the following particle, which is the only thing that tells 平板 from 尾高 — both are high across the word itself.
+
+**高低 tints the text too, and is on by default.** Only what is lit, though: tap a word and that word takes its hue; tap between words and the whole sentence lights, every pitched word in it at once. That second gesture is the only place the reader shows more than one hue, and it is where accent stops being a fact about a word and becomes the shape of a line. Turn 高低 off and the sheet still draws the contour — the setting governs the page, not the panel.
+
+**墨 is the quiet session**, and it is a separate switch. It takes the colour off 苦手 and 新出 and leaves everything else alone: the 傍点 stay, because those two are told apart by shape rather than hue — filled sesame against an open circle — and a 新出 reading stays shown. It does not touch 高低, because a word you tapped is a question you asked, not a distraction.
+
+The accent shown is the one the printed word has, not its dictionary form's: 食べた is drawn as 食べた. Where that could not be established the dictionary form is drawn instead and **labelled 辞書形**, because a diagram reading タベル beside a page reading 食べた is worse than no diagram. Across the current corpus 88.8% of marked words carry a guide and 99.6% of those are the printed surface.
+
+The 11% that carry nothing are deliberate. A word is skipped when UniDic and Ichiran disagree about how it is read — 一本 is いっぽん here and イチホン to UniDic, and a contour drawn over the wrong morae points at the wrong syllable — or when Ichiran has grouped several words into one token, where there is no single accent phrase to draw. Guessing at those is what the second number costs.
+
+None of this is guesswork by the reader. `scripts/pitch.py` computes it at build time from UniDic's own accent-combination rules — every auxiliary carries the rule and offset that says what it does to the accent before it — and anything the rules cannot settle emits nothing at all. See [Building](#building).
 
 Preferences and your place in each story are remembered per device.
 
@@ -136,6 +154,8 @@ So editing the reader's styling or behaviour now rewrites two files in about a s
 | `python3 reviews.py`                     | star ratings and notes, joined to level, register and length          |
 | `python3 progress.py`                    | snapshot the progress gist; `--restore` puts one back                 |
 | `python3 reference.py --compare`         | our structural numbers beside authentic 児童文学 — a band, not a gate |
+| `python3 pitch.py --build`               | rebuild the pitch table after adding or editing a story (needs fugashi) |
+| `python3 pitch.py --selftest`            | the accent rules against the gold set, without writing anything        |
 | `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki                 |
 | `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                  |
 
@@ -148,6 +168,14 @@ This repo **cannot build in CI**, by design. Three of its inputs are local to th
 - **A JMdict cache** at `~/.cache/kanji-of-the-day/jmdict-eng.json`, which `pos.py` reduces to the conjugation classes it needs.
 
 `scripts/pos-table.json` and `scripts/.deck-words-cache.json` are derived from those and are gitignored — run `python3 pos.py` and `python3 vocab.py --refresh` to regenerate them after cloning.
+
+**Pitch accent is the one derived table that is committed.** `scripts/pitch-table.json` needs fugashi + unidic-lite, a 262MB install that is not otherwise a dependency of this repo and has no business in a routine rebuild, so the table ships and a normal build just reads it — `build.py` imports nothing from `pitch.py` but `load()`. Regenerate it only when the stories change:
+
+```bash
+PITCH_PYTHON=/path/to/a/venv/bin/python3 python3 pitch.py --build
+```
+
+It reads `docs/data/*.js` rather than re-segmenting, so run it **after** a rebuild and then rebuild once more to pick up the new entries. It refuses to write a table its gold set disagrees with.
 
 ## Publishing
 

@@ -12,9 +12,34 @@
         --muted: #6f695e;
         --rule: #e2dcd0;
         --accent: #7a5c2e;
-        --weak: #b4562a;
-        --new: #2f7d6a;
+        /* 苦手 and 新出 moved off orange and green when pitch arrived. Migaku's
+           five hues are a vocabulary the reader already holds from Anki, so they
+           are the fixed point and these two moved around them: pink and cyan are
+           the families pitch does not spend. 新出 stays inside the teal-cyan
+           family the README promises readers, pushed toward cyan and away from
+           尾高 green.
+
+           These are measured, not picked. A marker and a pitch hue can land on
+           the same glyph — sesame beside the character it marks — so the two
+           sets are one palette and what matters is its closest pair. 苦手 started
+           at #a82a70 and sat ΔE 13.8 from 起伏 purple in dark, the tightest pair
+           in the whole system and exactly the collision that is hardest to see,
+           because 起伏 only appears on a 辞書形 fallback. Moving it to hue 357°
+           puts the worst on-glyph pair at 19.4 — 平板 against 起伏, both Migaku's
+           and neither ours to move. */
+        --weak: #da117b;
+        --new: #0d7c86;
         --veil: rgba(34, 32, 28, 0.38);
+
+        /* Migaku's pitch hues, darkened for #faf7f0 rather than used raw: the
+           published set is tuned for a white page and reads as neon on cream.
+           Hue is preserved so a colour learned on a card is the same colour here;
+           only lightness and saturation move. */
+        --pitch-heiban: #0b52c4;
+        --pitch-atamadaka: #c62222;
+        --pitch-nakadaka: #b06400;
+        --pitch-odaka: #1a7336;
+        --pitch-kifuku: #6b2d91;
 
         --serif: "Hiragino Mincho ProN", "Yu Mincho", serif;
         --sans: -apple-system, system-ui, sans-serif;
@@ -62,9 +87,15 @@
           --muted: #9a9488;
           --rule: #2c2a31;
           --accent: #d3b075;
-          --weak: #e0895e;
-          --new: #6cc5ab;
+          --weak: #f74395;
+          --new: #4fc2ce;
           --veil: rgba(0, 0, 0, 0.5);
+
+          --pitch-heiban: #6ea8ff;
+          --pitch-atamadaka: #ff7d72;
+          --pitch-nakadaka: #e8a54d;
+          --pitch-odaka: #5fc77f;
+          --pitch-kifuku: #bb8dd8;
         }
       }
       :root[data-theme="dark"] {
@@ -74,9 +105,15 @@
         --muted: #9a9488;
         --rule: #2c2a31;
         --accent: #d3b075;
-        --weak: #e0895e;
-        --new: #6cc5ab;
+        --weak: #f74395;
+        --new: #4fc2ce;
         --veil: rgba(0, 0, 0, 0.5);
+
+        --pitch-heiban: #6ea8ff;
+        --pitch-atamadaka: #ff7d72;
+        --pitch-nakadaka: #e8a54d;
+        --pitch-odaka: #5fc77f;
+        --pitch-kifuku: #bb8dd8;
       }
 
       *, *::before, *::after { box-sizing: border-box; }
@@ -666,6 +703,75 @@
       /* A third of glosses are truncated mid-word at 120 chars and none of them is
          guaranteed to carry a break opportunity. */
       #sheet-body { margin: 0.4rem 0 0; overflow-wrap: anywhere; }
+
+      /* ---- pitch ---------------------------------------------------------- */
+
+      /* The five hues resolve through the reader's own theme variables rather
+         than a prefers-color-scheme block of their own. An explicit 設定 theme is
+         stamped as data-theme on <html> and beats the OS, so a diagram carrying
+         its own media query renders light colours on dark paper exactly when the
+         reader has overridden the system. */
+      .pitch-heiban { --pitch: var(--pitch-heiban); }
+      .pitch-atamadaka { --pitch: var(--pitch-atamadaka); }
+      .pitch-nakadaka { --pitch: var(--pitch-nakadaka); }
+      .pitch-odaka { --pitch: var(--pitch-odaka); }
+      .pitch-kifuku { --pitch: var(--pitch-kifuku); }
+
+      /* Colour is gated on .lit, never painted always. A page where every marked
+         word carried a hue reads as five colours at once and buries the 苦手 and
+         新出 marks, which are the two the reader is meant to act on. Lit means
+         tapped, so the colour is transient and asked for.
+
+         A lit SENTENCE colours every pitched word inside it, which is the one
+         place the reader shows more than one hue at a time. That is the point:
+         a sentence is where accent becomes a shape rather than a fact about one
+         word, and it is still bounded by a deliberate tap.
+
+         The rt rules matter on a 新出 word, where .w.new rt already owns the ruby
+         colour. Inheriting hands it to the pitch hue for as long as the word is
+         lit; the open-circle 傍点 keeps carrying 新出 throughout, which is what
+         the README actually promises. */
+      body.pitch-on .w.lit[class*="pitch-"],
+      body.pitch-on .s.lit .w[class*="pitch-"] { color: var(--pitch); }
+      body.pitch-on .w.lit[class*="pitch-"] rt,
+      body.pitch-on .s.lit .w[class*="pitch-"] rt { color: inherit; }
+
+      /* 墨 — the distraction-free session. The marks stay, and stay meaningful,
+         because 苦手 and 新出 are told apart by SHAPE and not by hue: filled
+         sesame against an open circle. Only the colour goes.
+
+         Scoped to #track rather than :root so the variables are overridden for
+         the page alone. The sheet keeps its coloured 苦手 / 新出 chips, and it
+         should: the page is what a reading session has to stay quiet, and the
+         sheet is only ever open because it was asked for. 高低 is untouched by
+         this on purpose — it is a separate setting, and a tapped word is a
+         question, not a distraction. */
+      body.ink-on #track { --weak: var(--ink); --new: var(--ink); }
+
+      #sheet-pitch {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.45rem;
+      }
+      #sheet-pitch .dot {
+        width: 0.62rem;
+        height: 0.62rem;
+        border-radius: 50%;
+        background: var(--pitch, var(--muted));
+        flex: none;
+      }
+      #sheet-pitch .type { color: var(--pitch, var(--muted)); font-size: 0.8rem; }
+      /* Says which word the contour above belongs to, and only appears when that
+         is not the word on the page — see Pitch.render in reader.js. */
+      #sheet-pitch .base { color: var(--muted); font-size: 0.72rem; margin-left: auto; }
+      #sheet-pitch svg { display: block; overflow: visible; }
+      #sheet-pitch svg .line { fill: none; stroke: var(--pitch, var(--muted)); stroke-width: 1.5; }
+      #sheet-pitch svg .node { fill: var(--pitch, var(--muted)); }
+      /* An unaccented final mora is drawn hollow: it is the following particle's
+         pitch, not the word's, so it must not read as another mora of the word. */
+      #sheet-pitch svg .node.ghost { fill: var(--paper); stroke: var(--pitch, var(--muted)); stroke-width: 1.5; }
+      #sheet-pitch svg .mora { fill: var(--muted); font-size: 9px; font-family: var(--sans); text-anchor: middle; }
 
       /* ---- settings ------------------------------------------------------- */
       /* A <dialog>, for the free focus trap, backdrop, Escape and inert-ing of the
