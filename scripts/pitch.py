@@ -39,10 +39,28 @@ SMALL_KANA = set("ャュョァィゥェォ")
 
 _KATA = {chr(c): chr(c + 0x60) for c in range(0x3041, 0x3097)}
 
+# Ichiran writes word-internal breaks into its readings — 時には arrives as
+# とき\u200bには. They are invisible, they are not morae, and a contour drawn over
+# them gains a blank node and misclassifies against the inflated count.
+ZERO_WIDTH = dict.fromkeys(map(ord, "\u200b\u200c\u200d\u2060\ufeff"))
+
 
 def katakana(s):
     """Ichiran reads in hiragana, UniDic answers in katakana."""
-    return "".join(_KATA.get(c, c) for c in s or "")
+    return "".join(_KATA.get(c, c) for c in (s or "").translate(ZERO_WIDTH))
+
+
+def key(surface, kana):
+    """Table key. A surface alone is not one word.
+
+    空 is ソラ and から, 他 is ホカ and タ, 年月 is としつき and ねんげつ — seven
+    surfaces in this corpus carry more than one reading. Keyed by surface alone
+    the last one written wins and build.py then hands it to every occurrence,
+    which is exactly the mistake analyse()'s reading guard exists to prevent:
+    the guard checks that UniDic and Ichiran agree, and then a lookup keyed on
+    less than it verified throws the agreement away.
+    """
+    return surface + "\t" + katakana(kana)
 
 # aType 0 is 平板; anything else is a downstep after that mora. The four shapes a
 # noun can take, plus the collapsed verb/adjective pair — see classify().
@@ -186,6 +204,22 @@ def _modify(code, base, count):
 # back to a bare code when the rule does not vary.
 HOST_CLASS = {"動詞": "動詞", "形容詞": "形容詞", "形状詞": "形容詞", "名詞": "名詞", "代名詞": "名詞"}
 
+# An auxiliary can change what the NEXT auxiliary is attaching to. 食べたかった is
+# 食べ + たかっ + た, and that final た attaches to たい, which inflects as an
+# i-adjective — so it wants the 形容詞 branch of its aConType, not the 動詞 branch
+# the phrase head would select. UniDic says so in cType; anything not listed here
+# leaves the class alone, which is the old behaviour and the safe direction.
+CTYPE_CLASS = {"助動詞-タイ": "形容詞", "助動詞-ナイ": "形容詞", "助動詞-ラシイ": "形容詞"}
+
+
+def _reclass(tok, current):
+    ct = tok.get("ctype") or ""
+    if ct in CTYPE_CLASS:
+        return CTYPE_CLASS[ct]
+    if ct.startswith("形容詞"):
+        return "形容詞"
+    return current
+
 
 # One documented correction to UniDic's own data.
 #
@@ -211,7 +245,7 @@ def _rule_for(contype, host_pos, lemma=None):
         return None
     if "%" not in contype:
         return contype.strip()
-    want = HOST_CLASS.get(host_pos)
+    want = HOST_CLASS.get(host_pos, host_pos)
     fallback = None
     # Split on the commas that separate 品詞%RULE branches, not on the one inside
     # F6's own @M,L offset pair. A branch always starts with a 品詞 name, so a
@@ -257,7 +291,21 @@ def phrase_accent(tokens):
         if accent is None:
             return None, total
 
-    host_pos = head["pos"]
+    # A 接頭辞 head is the one case where the FRONT element owns the rule: 表11 is
+    # keyed on the prefix, not on what follows it. Everywhere else the head has
+    # nothing before it and its own aConType is irrelevant.
+    if head["pos"] == "接頭辞":
+        code = (head.get("contype") or "").strip()
+        if len(tokens) < 2 or not code.startswith("P"):
+            return None, total
+        rear = tokens[1]
+        nxt = _combine(code, count, accent, rear["atype"], len(morae(rear["kana"])))
+        if nxt is None:
+            return None, total
+        accent, count = nxt, count + len(morae(rear["kana"]))
+        tokens = [head] + tokens[2:]
+
+    host_pos = HOST_CLASS.get(head["pos"], head["pos"])
     for tok in tokens[1:]:
         code = _rule_for(tok.get("contype"), host_pos, tok.get("lemma"))
         if not code:
@@ -266,6 +314,21 @@ def phrase_accent(tokens):
         if nxt is None:
             return None, total
         accent, count = nxt, count + len(morae(tok["kana"]))
+        # 表9 was collected for every token and applied only to the head, so a
+        # modification carried by an auxiliary was read and thrown away:
+        # 上げましょう shipped a downstep after マ where the form is アゲマショ↓ー.
+        #
+        # N0 is "この活用形のモーラ数", and the conjugated form here is the phrase
+        # so far — ましょう is 意志推量形 of ます, and what is in 意志推量形 is
+        # 上げましょう entire. So it applies to the running accent and the running
+        # count, which is exactly how the head's own modification is applied a
+        # few lines above; the head was simply the case where the phrase was one
+        # token long.
+        if tok.get("modtype") and tok["modtype"] != "*":
+            accent = _modify(tok["modtype"], accent, count)
+            if accent is None:
+                return None, total
+        host_pos = _reclass(tok, host_pos)
 
     if accent < 0 or accent > count:
         return None, total  # the rules produced something unpronounceable
@@ -314,11 +377,12 @@ def _tag(text):
         out.append(
             {
                 "surface": w.surface,
-                "kana": (f.kana or f.pron or "").replace("‌", ""),
+                "kana": (f.kana or f.pron or "").translate(ZERO_WIDTH),
                 "pos": f.pos1,
                 "lemma": f.lemma,
                 "lemma_kana": f.kanaBase or f.lForm or "",
                 "cform": f.cForm,
+                "ctype": f.cType,
                 "atype": _atype(f.aType),
                 "contype": f.aConType,
                 "modtype": f.aModeType,
@@ -341,27 +405,37 @@ def analyse(surface, expect_kana=None):
         return None
 
     out = {}
-    # The 辞書形 fallback has to name the word that was inflected, which is not
-    # always the head: こう言った heads on こう, and こう has no paradigm and no
-    # bearing on how 言った is read. Prefer the last 用言, fall back to a nominal
-    # head, and emit nothing for a surface that is neither.
     head = toks[0]
-    base = next((t for t in reversed(toks) if t["pos"] in ("動詞", "形容詞", "形状詞")), None)
-    if base is None and head["pos"] in ("名詞", "代名詞"):
-        base = head
-    if base and base["lemma_kana"] and base["atype"] is not None:
-        out["lemma"] = base["lemma"]
-        out["lk"] = base["lemma_kana"]
-        out["la"] = base["atype"]
-        out["lp"] = classify(base["atype"], len(morae(base["lemma_kana"])), base["pos"])
+    joined = "".join(t["kana"] for t in toks)
+    agrees = expect_kana is None or joined == expect_kana
+    if not agrees:
+        # UniDic is reading a different word than the page is printing, so
+        # nothing it says about this surface can be trusted — including which
+        # lemma it belongs to. 空いて is あいて to fugashi and すいて on the page.
+        return None
 
     accent, count = phrase_accent(toks)
-    joined = "".join(t["kana"] for t in toks)
-    if accent is not None and (expect_kana is None or joined == expect_kana):
+    if accent is not None:
         out["a"] = accent
         out["m"] = count
         out["p"] = classify(accent, count)
         out["k"] = joined
+
+    # The 辞書形 fallback may only ever name the whole printed word. It exists to
+    # say "this is 食べた's dictionary form", and the head of an inflecting phrase
+    # is the only token that can honestly claim that.
+    #
+    # The first cut took the last 用言 anywhere in the surface, or a nominal head.
+    # Both name fragments: 一本 came out as 辞書形 一, 七日 as 七, 口にした as
+    # 為る with a スル diagram, 会社を辞めた as 止める. 90 tokens shipped that way.
+    # A noun compound has no dictionary form distinct from itself, so there is
+    # nothing to fall back TO, and it now emits nothing rather than a piece of
+    # its own first character.
+    if head["pos"] in ("動詞", "形容詞", "形状詞") and head["lemma_kana"] and head["atype"] is not None:
+        out["lemma"] = head["lemma"]
+        out["lk"] = head["lemma_kana"]
+        out["la"] = head["atype"]
+        out["lp"] = classify(head["atype"], len(morae(head["lemma_kana"])), head["pos"])
     return out or None
 
 
@@ -424,7 +498,7 @@ def build(surfaces, path=TABLE):
         entry = analyse(surface, katakana(kana))
         if not entry:
             continue
-        table[surface] = entry
+        table[key(surface, kana)] = entry
         if "a" in entry:
             hit += 1
         elif "la" in entry:
@@ -487,4 +561,6 @@ if __name__ == "__main__":
         table = load()
         words = [a for a in sys.argv[1:] if not a.startswith("--")]
         for w in words or sorted(table)[:10]:
-            print(f"{w}: {table.get(w)}")
+            for k, v in table.items():
+                if k.split("\t")[0] == w.split("\t")[0]:
+                    print(f"{k.replace(chr(9), ' ')}: {v}")

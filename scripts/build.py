@@ -148,7 +148,7 @@ def to_token(tok, known, weak, approved, authored=None, accents=None):
     if not check.is_known(tok, known):
         entry["u"] = 1
     if accents is not None:
-        hit = accents.key(surface)
+        hit = accents.key(surface, kana)
         if hit is not None:
             entry["p"] = hit
     return entry
@@ -181,8 +181,8 @@ class Pitch:
         self.hits = 0
         self.lemma_only = 0
 
-    def key(self, surface):
-        raw = self.table.get(surface)
+    def key(self, surface, kana):
+        raw = self.table.get(pitch.key(surface, kana))
         if not raw:
             return None
         if "a" in raw:

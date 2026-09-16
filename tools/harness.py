@@ -1461,16 +1461,24 @@ window.H = (() => {
 
     // One node per mora plus the trailing particle slot, and the polyline has to
     // agree with them: the drop between two of those points IS the diagram.
-    const morae = [...(w.dataset.kana || "")].reduce((acc, ch) => {
-      if ("ャュョァィゥェォゃゅょぁぃぅぇぉ".includes(ch) && acc.length) acc[acc.length - 1] += ch;
-      else acc.push(ch);
-      return acc;
-    }, []);
+    const morae = [...(w.dataset.kana || "").replace(/[\u200b-\u200d\u2060\ufeff]/g, "")]
+      .reduce((acc, ch) => {
+        if ("ャュョァィゥェォゃゅょぁぃぅぇぉ".includes(ch) && acc.length) acc[acc.length - 1] += ch;
+        else acc.push(ch);
+        return acc;
+      }, []);
     const circles = box.querySelectorAll("circle");
     const points = (line.getAttribute("points") || "").trim().split(/\s+/).length;
     add("pitch/one-node-per-mora-plus-the-particle",
         circles.length === morae.length + 1 && points === circles.length,
         { morae: morae.length, nodes: circles.length, points });
+
+    // Read off the diagram rather than recomputed: the count above re-implements
+    // the engine's splitter, so the two can agree on a wrong answer. A blank
+    // label is what a zero-width character in the reading actually looks like.
+    const labels = [...box.querySelectorAll("text.mora")].map(t => t.textContent);
+    add("pitch/no-mora-is-blank", labels.length > 0 && labels.every(t => t.trim()),
+        { labels });
 
     // The trailing slot is hollow, because it is not a mora of this word.
     const last = circles[circles.length - 1];
@@ -2556,9 +2564,9 @@ def suite_behaviour(br, rep, base):
     rep.add("selection", "copy-does-not-inline-furigana", sel["ok"], sel["detail"])
 
 
-def _tok(kana, pos="動詞", atype=None, contype=None, modtype=None, lemma=None):
+def _tok(kana, pos="動詞", atype=None, contype=None, modtype=None, lemma=None, ctype=None):
     return {"kana": kana, "pos": pos, "atype": atype, "contype": contype,
-            "modtype": modtype, "lemma": lemma}
+            "modtype": modtype, "lemma": lemma, "ctype": ctype}
 
 
 def suite_pitch_rules(rep):
@@ -2612,6 +2620,41 @@ def suite_pitch_rules(rep):
     for name, toks, want in cases:
         got, _ = pitch.phrase_accent(toks)
         rep.add("pitch-rules", name, got == want, {"want": want, "got": got})
+
+    # 表11, reachable only through a 接頭辞 head — the one case where the FRONT
+    # element owns the rule. Unreachable and untested until the review found it.
+    prefix = [
+        ("P1/flat-rear-goes-flat",
+         [_tok("ゴ", "接頭辞", 0, contype="P1"), _tok("ハン", "名詞", 0)], 0),
+        ("P1/accented-rear-is-offset",
+         [_tok("ゴ", "接頭辞", 0, contype="P1"), _tok("シュジン", "名詞", 2)], 3),
+        ("P2/flat-rear-accents-the-first-rear-mora",
+         [_tok("ソウ", "接頭辞", 0, contype="P2"), _tok("カイ", "名詞", 0)], 3),
+        ("P13/keeps-the-prefix-accent",
+         [_tok("ゲン", "接頭辞", 1, contype="P13"), _tok("ジュウショ", "名詞", 1)], 1),
+    ]
+    for name, toks, want in prefix:
+        got, _ = pitch.phrase_accent(toks)
+        rep.add("pitch-rules", name, got == want, {"want": want, "got": got})
+    rep.add("pitch-rules", "接頭辞-head-without-a-P-rule-declines",
+            pitch.phrase_accent(
+                [_tok("ゴ", "接頭辞", 0, contype="C3"), _tok("ハン", "名詞", 0)])[0] is None, {})
+
+    # 表9 on an auxiliary, which was read and discarded before the review.
+    volitional = [_tok("アゲ", atype=0),
+                  _tok("マショウ", "助動詞", contype="動詞%F4@1", modtype="M1@1")]
+    got, _ = pitch.phrase_accent(volitional)
+    rep.add("pitch-rules", "表9-on-an-auxiliary-moves-the-combined-accent", got == 4,
+            {"want": 4, "got": got, "note": "F4@1 alone would give 3"})
+
+    # The host class follows the chain: たい inflects as an i-adjective, so the
+    # た after it wants the 形容詞 branch and not the phrase head's 動詞 one.
+    adj = [_tok("タベ", atype=2),
+           _tok("タカッ", "助動詞", 0, contype="動詞%F2@1", ctype="助動詞-タイ"),
+           _tok("タ", "助動詞", contype="動詞%F2@1,形容詞%F4@-2", lemma="た")]
+    got, _ = pitch.phrase_accent(adj)
+    rep.add("pitch-rules", "an-adjectival-auxiliary-reclasses-the-host", got == 3,
+            {"got": got, "note": "形容詞%F4@-2 over 5 morae; the 動詞 branch would keep 2"})
 
     # The one place this repo overrides UniDic's own data. F2@1 and F1 agree on an
     # accented host, so only the 平板 case can catch a regression here.
@@ -2770,15 +2813,46 @@ def suite_pitch_table(rep):
     import pitch
 
     table = pitch.load()
+    by_surface = {}
+    for k, v in table.items():
+        by_surface.setdefault(k.split("\t")[0], []).append(v)
+
     checked = 0
     for word, want in sorted(pitch.GOLD.items()):
-        entry = table.get(word)
-        if not entry or "a" not in entry:
-            continue  # not a surface these stories use
-        checked += 1
-        rep.add("pitch-table", f"gold/{word}", entry["a"] == want,
-                {"want": want, "got": entry["a"], "kana": entry.get("k")})
+        for entry in by_surface.get(word, []):
+            if "a" not in entry:
+                continue
+            checked += 1
+            rep.add("pitch-table", f"gold/{word}", entry["a"] == want,
+                    {"want": want, "got": entry["a"], "kana": entry.get("k")})
     rep.add("pitch-table", "gold-overlaps-the-corpus", checked >= 8, {"checked": checked})
+
+    # A surface is not a word. 空 is ソラ and から, 他 is ホカ and タ — keyed on the
+    # surface alone the last one written wins and build.py then hands it to every
+    # occurrence, which is the very agreement analyse()'s reading guard checked.
+    rep.add("pitch-table", "the-key-carries-the-reading", all("\t" in k for k in table),
+            {"sample": sorted(table)[:2]})
+
+    # The 辞書形 may only ever name the whole printed word. Asserted as the named
+    # regressions rather than structurally, because a dictionary form legitimately
+    # differs from its inflected surface — 作られて really does reduce to 作る — so
+    # there is no shape that separates 食べた → 食べる from 一本 → 一. These are the
+    # surfaces that shipped a fragment before the review found them.
+    FRAGMENTS = ["一本", "九時", "四日", "二日目", "十分", "三本",
+                 "口にした", "匂いがして", "年を取った", "会社を辞めた"]
+    named = []
+    for surface in FRAGMENTS:
+        for e in by_surface.get(surface, []):
+            if "lemma" in e:
+                named.append(f"{surface} -> {e['lemma']}")
+    rep.add("pitch-table", "no-辞書形-names-a-word-the-page-does-not-print",
+            not named, {"bad": named})
+
+    # Zero-width characters are not morae. 時には ships as とき\u200bには.
+    ZW = "\u200b\u200c\u200d\u2060\ufeff"
+    bad_zw = [k for k, e in table.items() if any(c in (e.get("k") or "") for c in ZW)]
+    rep.add("pitch-table", "no-reading-carries-a-zero-width-char", not bad_zw,
+            {"readings_with_zw": bad_zw[:3]})
 
     # Every entry has to be drawable: an accent past the end of the word puts the
     # downstep off the diagram, and the reader has no way to notice.
@@ -2787,6 +2861,7 @@ def suite_pitch_table(rep):
     rep.add("pitch-table", "every-accent-lands-inside-its-word", not bad, {"bad": bad[:5]})
 
     total = marked = surface = 0
+    mismatched = []
     for path in sorted((REPO / "docs" / "data").glob("*.js")):
         blob = json.loads(re.search(r"=\s*(\{.*\})\s*;?\s*$", path.read_text(encoding="utf-8"), re.S).group(1))
         entries = blob.get("pitch") or []
@@ -2805,6 +2880,11 @@ def suite_pitch_table(rep):
                             stray.append(node.get("t"))
                         elif "a" in entries[node["p"]]:
                             surface += 1
+                            # The keying bug's actual symptom: a token wearing
+                            # another reading's accent. 空/から wore ソラ's.
+                            want = table.get(pitch.key(node["t"], node.get("k") or ""))
+                            if want and want.get("k") and want["k"] != pitch.katakana(node.get("k") or ""):
+                                mismatched.append(f"{node['t']} {node.get('k')} got {want['k']}")
                 for v in node.values():
                     walk(v)
             elif isinstance(node, list):
@@ -2817,11 +2897,18 @@ def suite_pitch_table(rep):
 
     # Coverage is a fact about the corpus, not a rule, so it is pinned loosely —
     # low enough not to fail on a new story, high enough to catch a table that
-    # silently stopped being rebuilt.
+    # silently stopped being rebuilt. It fell from 99.4% when the reading guard
+    # started applying to the whole entry rather than only to the surface accent:
+    # what it gave up was 116 surfaces where UniDic and Ichiran disagree about the
+    # reading, or where Ichiran grouped several words into one token, and those
+    # were previously answered with a 辞書形 naming a fragment.
     rep.add("pitch-table", "most-marked-tokens-carry-a-guide",
-            total and marked / total > 0.9, {"marked": marked, "total": total})
-    rep.add("pitch-table", "most-guides-are-the-printed-surface",
-            marked and surface / marked > 0.8, {"surface": surface, "marked": marked})
+            total and marked / total > 0.85, {"marked": marked, "total": total})
+    # This is what the drop bought, and it is the number worth watching.
+    rep.add("pitch-table", "nearly-every-guide-is-the-printed-surface",
+            marked and surface / marked > 0.95, {"surface": surface, "marked": marked})
+    rep.add("pitch-table", "no-token-gets-another-reading's-accent",
+            not mismatched, {"bad": mismatched[:6]})
 
 
 def suite_pitch_reader(br, rep, base):

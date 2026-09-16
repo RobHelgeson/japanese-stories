@@ -1279,9 +1279,13 @@
           return null;
         }
 
+        // Zero-width characters are dropped first. Ichiran writes word-internal
+        // breaks into its readings — 時には ships as とき\u200bには — and they are
+        // invisible, are not morae, and would otherwise draw a blank node and
+        // classify the word against an inflated count.
         function morae(kana) {
           const out = [];
-          for (const ch of kana || "") {
+          for (const ch of (kana || "").replace(/[\u200b-\u200d\u2060\ufeff]/g, "")) {
             if (SMALL.includes(ch) && out.length) out[out.length - 1] += ch;
             else out.push(ch);
           }
