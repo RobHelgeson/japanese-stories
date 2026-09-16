@@ -234,6 +234,16 @@ Four places. Miss one and the corpus is inconsistent in a way only some of them 
 3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
 
+Then rebuild twice, because the pitch table is read from the built data rather than from the source:
+
+```bash
+python3 rebuild.py
+PITCH_PYTHON=/path/to/venv/bin/python3 python3 pitch.py --build
+python3 rebuild.py
+```
+
+Skipping it is not an error and nothing warns: the new story simply carries no accent guides while every older one does. `pitch.py --build` prints its coverage, and `harness.py` fails `pitch-table/most-marked-tokens-carry-a-guide` once enough of the corpus is missing.
+
 ## Modes
 
 - **new** — the default, all four steps above.
