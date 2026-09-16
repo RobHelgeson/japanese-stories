@@ -185,11 +185,8 @@ class Pitch:
         raw = self.table.get(pitch.key(surface, kana))
         if not raw:
             return None
-        if "a" in raw:
-            entry = {"a": raw["a"]}
-        elif "la" in raw:
-            entry = {"la": raw["la"], "lk": raw["lk"], "lp": raw["lp"], "lt": raw["lemma"]}
-        else:
+        entry = pitch.shipped(raw)
+        if entry is None:
             return None
         token = json.dumps(entry, ensure_ascii=False, sort_keys=True)
         if token not in self.index:

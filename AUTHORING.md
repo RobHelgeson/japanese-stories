@@ -242,7 +242,9 @@ PITCH_PYTHON=/path/to/venv/bin/python3 python3 pitch.py --build
 python3 rebuild.py
 ```
 
-Skipping it is not an error and nothing warns: the new story simply carries no accent guides while every older one does. `pitch.py --build` prints its coverage, and `harness.py` fails `pitch-table/most-marked-tokens-carry-a-guide` once enough of the corpus is missing.
+Two things now catch you if you skip or mis-order it, and neither existed at first. `rebuild.py` lists `pitch-table.json` as an input to every data file, so the second rebuild can no longer find nothing to do and report success. And `harness.py` compares the built payload against the current table directly — `pitch-table/every-word-the-table-can-answer-carries-its-guide` — rather than measuring the payload against itself, which is what a stale build passes.
+
+That second one is the assertion that matters, because the failure mode here is silent by construction: a story with no accent guides looks exactly like a story whose words the rules declined to answer.
 
 ## Modes
 

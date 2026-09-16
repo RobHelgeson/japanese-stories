@@ -439,6 +439,24 @@ def analyse(surface, expect_kana=None):
     return out or None
 
 
+def shipped(raw):
+    """The subset of an entry that reaches the browser, or None.
+
+    Lives here rather than in build.py because the harness has to reproduce it
+    exactly to check a built payload against the table, and two copies of a
+    projection is two things to keep in step. Only what the reader cannot derive:
+    the mora count and the pattern name both fall out of the accent and the kana,
+    and the kana is already on the token.
+    """
+    if not raw:
+        return None
+    if "a" in raw:
+        return {"a": raw["a"]}
+    if "la" in raw:
+        return {"la": raw["la"], "lk": raw["lk"], "lp": raw["lp"], "lt": raw["lemma"]}
+    return None
+
+
 def load(path=TABLE):
     if not os.path.exists(path):
         sys.exit(f"pitch table not found at {path}; run scripts/pitch.py --build")

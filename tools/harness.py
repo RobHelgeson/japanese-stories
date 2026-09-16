@@ -2911,6 +2911,44 @@ def suite_pitch_table(rep):
         rep.add("pitch-table", f"{path.stem}/no-index-points-past-the-table",
                 not stray, {"stray": stray[:5]})
 
+    # The built data has to agree with the table it was built from.
+    #
+    # Everything above this reads the payload and reports what it finds, so a
+    # build that never reran measures its own stale output and passes. That is
+    # not hypothetical: pitch-table.json was missing from rebuild.py's DATA_DEPS
+    # until da2d159, which made the last step of the documented rebuild ->
+    # pitch.py --build -> rebuild sequence a silent no-op. On 廊下の鏡 it cost 157
+    # of 463 marked words their accent, and nothing said so.
+    #
+    # This is the assertion that would have caught it directly, and it is the
+    # only one here that compares the payload against something outside itself.
+    stale, wrong = [], []
+    for path in sorted((REPO / "docs" / "data").glob("*.js")):
+        blob = json.loads(re.search(r"=\s*(\{.*\})\s*;?\s*$", path.read_text(encoding="utf-8"), re.S).group(1))
+        entries = blob.get("pitch") or []
+
+        def check(node):
+            if isinstance(node, dict):
+                if node.get("r"):
+                    want = pitch.shipped(table.get(pitch.key(node["t"], node.get("k") or "")))
+                    got = entries[node["p"]] if "p" in node and node["p"] < len(entries) else None
+                    if want and got is None:
+                        stale.append(f"{path.stem}: {node['t']}")
+                    elif want and got != want:
+                        wrong.append(f"{path.stem}: {node['t']} has {got}, table says {want}")
+                for v in node.values():
+                    check(v)
+            elif isinstance(node, list):
+                for v in node:
+                    check(v)
+
+        check(blob)
+    rep.add("pitch-table", "every-word-the-table-can-answer-carries-its-guide",
+            not stale, {"count": len(stale), "sample": stale[:6],
+                        "hint": "docs/ is older than pitch-table.json; rebuild"})
+    rep.add("pitch-table", "and-the-guide-it-carries-is-the-current-one",
+            not wrong, {"count": len(wrong), "sample": wrong[:4]})
+
     # Coverage is a fact about the corpus, not a rule, so it is pinned loosely —
     # low enough not to fail on a new story, high enough to catch a table that
     # silently stopped being rebuilt. It fell from 99.4% when the reading guard
