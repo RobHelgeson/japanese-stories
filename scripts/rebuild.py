@@ -77,6 +77,13 @@ DATA_DEPS = sorted(HERE.glob("*.py")) + [
     HERE / "corpus.json",
     HERE / "approved-words.json",
     HERE / "readings-overrides.json",
+    # build.py calls pitch.load(), so the table is a real input to every data
+    # file. Without it here the documented rebuild -> pitch.py --build -> rebuild
+    # sequence silently does nothing on its last step, and the story ships with
+    # whatever accents the table happened to hold before it was regenerated.
+    # It never showed because every run that regenerated the table had also
+    # edited a .py, which made all eight stale by another route.
+    HERE / "pitch-table.json",
 ]
 SHELL_DEPS = [HERE / "reader.html", HERE / "build.py"]
 ENGINE_DEPS = [HERE / "reader.css", HERE / "reader.js", HERE / "sync.js", HERE / "build.py"]
