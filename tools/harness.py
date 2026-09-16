@@ -60,8 +60,14 @@ HERE = Path(tempfile.mkdtemp(prefix="reader-harness-"))
 PORT = 8917
 DEVPORT = 9757
 
-SLUGS = ["shuden", "tokei-no-oto", "neko-o-sagasu-tantei", "maigo-no-tegami",
-         "shiro-no-kane", "entotsu-no-kemuri"]
+# Read from corpus.json rather than maintained beside it. A hand-written list is
+# how 行かなかった人の地図 joined the corpus on 2026-09-13 and was still unmeasured
+# by the table, matrix, atom and never-scroll suites two days later: adding a
+# story to the corpus did not add it here, and nothing anywhere reported the gap.
+# In reading order, so the printed table checks against the contents page.
+ORDER_SLUGS = [x["slug"] for x in json.loads(
+    (REPO / "scripts" / "corpus.json").read_text(encoding="utf-8"))["stories"]]
+SLUGS = ORDER_SLUGS
 
 PHONE = ("phone", 390, 844, True)
 LAND = ("landscape", 844, 390, True)
@@ -69,8 +75,6 @@ DESK = ("desktop", 1440, 900, False)
 
 
 # --------------------------------------------------------------------- build --
-ORDER_SLUGS = [x["slug"] for x in json.loads(
-    (REPO / "scripts" / "corpus.json").read_text(encoding="utf-8"))["stories"]]
 
 
 def check_contracts():
@@ -2463,7 +2467,8 @@ def suite_table(br, rep, base):
     # line each; the sentence blocks that went with them were enough for one
     # authored page to stop needing a second screen.
     expect = {"shuden": 28, "neko-o-sagasu-tantei": 31, "maigo-no-tegami": 18,
-              "tokei-no-oto": 25, "shiro-no-kane": 41, "entotsu-no-kemuri": 27}
+              "tokei-no-oto": 25, "shiro-no-kane": 41, "entotsu-no-kemuri": 27,
+              "ikanakatta-hito-no-chizu": 55}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
@@ -2473,16 +2478,27 @@ def suite_table(br, rep, base):
         apply_prefs(br, "vertical", False, 28)
         r = walk(br, 28)
         table[slug] = r
+        want = expect.get(slug)
         print(f"  {slug:22} pages={r['pages']:3}  screens={r['screens']:3} "
               f"(text {r['text']}, あとがき {r['after']})  tight={r['tight']} "
-              f"worst-overflow={r['worst']}px  expected={expect[slug]}")
+              f"worst-overflow={r['worst']}px  "
+              f"expected={want if want is not None else 'NOT RECORDED'}")
         rep.add("never-scroll", f"{slug}/no-raw-overflow", not r["fails"], r["fails"][:6])
         # The settled table counts TEXT screens: the あとがき is appended to the
         # last authored page and is not one of the story's screens.
-        rep.add("split", f"{slug}/screens-match-plan", r["text"] == expect[slug],
-                {"text": r["text"], "want": expect[slug], "total": r["screens"]})
+        #
+        # want is .get, not [slug]: a story added to corpus.json before anyone
+        # measured it must FAIL here, naming the number to record. Indexing
+        # would raise instead, aborting the run and reporting nothing at all
+        # about the other six — which is how this went unnoticed.
+        rep.add("split", f"{slug}/screens-match-plan", want is not None and r["text"] == want,
+                {"text": r["text"], "want": want, "total": r["screens"]})
         bad = br.eval("H.atoms()")
         rep.add("split", f"{slug}/authored-page-is-an-atom", not bad, bad[:6])
+    # The gap that let a story go unmeasured is now two gaps narrower: SLUGS
+    # follows the corpus, and this says so out loud if the table falls behind it.
+    missing = [x for x in SLUGS if x not in expect]
+    rep.add("split", "the-table-covers-the-whole-corpus", not missing, missing)
     return table
 
 
