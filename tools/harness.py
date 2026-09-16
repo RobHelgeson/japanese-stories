@@ -2468,7 +2468,7 @@ def suite_table(br, rep, base):
     # authored page to stop needing a second screen.
     expect = {"shuden": 28, "neko-o-sagasu-tantei": 31, "maigo-no-tegami": 18,
               "tokei-no-oto": 25, "shiro-no-kane": 41, "entotsu-no-kemuri": 27,
-              "ikanakatta-hito-no-chizu": 55}
+              "ikanakatta-hito-no-chizu": 55, "rouka-no-kagami": 25}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")

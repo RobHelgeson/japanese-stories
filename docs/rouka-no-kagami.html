@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" id="theme-color" content="#faf7f0" />
+    <!-- Installed to the Home Screen, this gets its own counter of days of use
+         and so never trips WebKit's seven-day purge of script-writable storage.
+         That is the durability half of keeping progress; the gist is the other. -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>廊下の鏡</title>
+    <link rel="stylesheet" href="reader.css" />
+  </head>
+  <body>
+    <header id="top">
+      <h1 id="title"></h1>
+      <span id="count"></span>
+    </header>
+
+    <main id="track">
+      <div class="cell"><div class="page"></div></div>
+      <div class="cell"><div class="page"></div></div>
+      <div class="cell"><div class="page"></div></div>
+    </main>
+
+    <nav id="bar" aria-label="ページ操作">
+      <button id="prev" type="button" aria-label="前のページ">前</button>
+      <span class="gates">
+        <a class="btn" id="toc" href="index.html">目次</a>
+        <button id="set" type="button" aria-label="設定" aria-expanded="false" aria-controls="settings">設</button>
+      </span>
+      <button id="next" type="button" aria-label="次のページ">次</button>
+    </nav>
+
+    <aside id="sheet" hidden aria-label="注釈">
+      <div id="sheet-head" hidden>
+        <span id="sheet-word"></span>
+        <span id="sheet-kana"></span>
+        <span id="sheet-tags"></span>
+      </div>
+      <div id="sheet-pitch" hidden></div>
+      <p id="sheet-body" hidden></p>
+    </aside>
+
+    <div id="veil" hidden></div>
+    <dialog id="settings" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="phead">
+        <h2 id="settings-title">設定</h2>
+        <button id="settings-close" type="button" aria-label="閉じる">✕</button>
+      </div>
+      <div class="pbody">
+        <h3>本文</h3>
+        <div class="row" role="radiogroup" aria-labelledby="l-wm">
+          <span class="rlabel" id="l-wm">書字方向</span>
+          <span class="seg">
+            <label><input type="radio" name="wm" value="vertical" /><span>縦書き</span></label>
+            <label><input type="radio" name="wm" value="horizontal" /><span>横書き</span></label>
+          </span>
+        </div>
+        <div class="row">
+          <label class="rlabel" for="sw-lb">改行<small>文ごとに行を変える</small></label>
+          <input class="sw" type="checkbox" role="switch" id="sw-lb" />
+        </div>
+        <div class="row" role="radiogroup" aria-labelledby="l-bind">
+          <span class="rlabel" id="l-bind">綴じ</span>
+          <span class="seg">
+            <label><input type="radio" name="bind" value="auto" /><span>自動</span></label>
+            <label><input type="radio" name="bind" value="right" /><span>右綴じ</span></label>
+            <label><input type="radio" name="bind" value="left" /><span>左綴じ</span></label>
+          </span>
+        </div>
+        <div class="row">
+          <span class="rlabel" id="l-fs">文字サイズ</span>
+          <span class="step">
+            <button id="fs-dec" type="button" aria-label="小さく" aria-describedby="l-fs">−</button>
+            <output id="fs-val" for="fs-dec fs-inc" aria-live="polite">28px</output>
+            <button id="fs-inc" type="button" aria-label="大きく" aria-describedby="l-fs">＋</button>
+          </span>
+        </div>
+        <div class="row" role="radiogroup" aria-labelledby="l-theme">
+          <span class="rlabel" id="l-theme">テーマ</span>
+          <span class="seg">
+            <label><input type="radio" name="theme" value="system" /><span>自動</span></label>
+            <label><input type="radio" name="theme" value="light" /><span>明るい</span></label>
+            <label><input type="radio" name="theme" value="dark" /><span>暗い</span></label>
+          </span>
+        </div>
+
+        <div class="row">
+          <label class="rlabel" for="sw-furi">ふりがな<small>すべての読みを出す</small></label>
+          <input class="sw" type="checkbox" role="switch" id="sw-furi" />
+        </div>
+        <div class="row">
+          <label class="rlabel" for="sw-pitch">高低<small>タップした語や文を型の色で示す</small></label>
+          <input class="sw" type="checkbox" role="switch" id="sw-pitch" />
+        </div>
+        <div class="row">
+          <label class="rlabel" for="sw-ink">墨<small>苦手と新出の色を消して読む</small></label>
+          <input class="sw" type="checkbox" role="switch" id="sw-ink" />
+        </div>
+
+        <h3>この物語</h3>
+        <div class="stats" id="stats"></div>
+
+        <p class="keys">
+          タップで読み · 二回で語義 · 語の外をタップすると文ぜんたい ·
+          <strong>上下のふちをタップすると操作バーが出る</strong>
+        </p>
+        <p class="keys">
+          <kbd>←</kbd> <kbd>→</kbd> ページ ·
+          <kbd>f</kbd> ふりがな · <kbd>Enter</kbd> 語義 ·
+          <kbd>Esc</kbd> 閉じる
+        </p>
+        <p class="keys">
+          読んだところは自動で記録されます。ほかの端末と同期したり、記録を直したりするのは
+          <kbd>目次</kbd> の「読書記録の同期」から。
+        </p>
+      </div>
+    </dialog>
+
+    <p id="live" class="sr" aria-live="polite" aria-atomic="true"></p>
+
+    <script src="sync.js"></script>
+    <script src="data/rouka-no-kagami.js"></script>
+    <script src="reader.js"></script>
+  </body>
+</html>

@@ -34,7 +34,8 @@
     "quiet-realism": "the default and the current five: one concrete object at the centre, close narration, ends on an image rather than a claim",
     "folktale": "城の鐘: nested time frames, a told-to-you voice, the turn stated once in dialogue",
     "procedural": "猫を探す探偵: a clue planted early and paid off late, the reader able to reach the answer from facts already on the page",
-    "comic": "none yet"
+    "comic": "none yet",
+    "述懐": "廊下の鏡: an older narrator looking back, long subordinated sentences as the shape of memory, ends on a claim rather than an image. The claim is about the WORLD — a person, the object, a fact the narrator now holds — never about what the story means; that second thing is the closing-thesis defect cut from four of five stories in September 2026, and this register sits closer to it than any other. The guard that makes it safe is that the narrator earns the claim by watching a physical event, so the last page reports a correction of fact rather than a conclusion."
   },
 
   "levels": {
@@ -171,6 +172,29 @@
         "岩": "rock, boulder — framed p13 as the first landmark that matches, 岩は真ん中から二つに割れていて、割れ目に草が生えていた. Recurs as the split rock, the rock slope of the climb, and the slide at the 崖",
         "岸": "riverbank — framed p13 by 岸には草が生えているだけで、何も立っていなかった, the absence of the bridge fixing what a bank is. The detour is three days of walking it",
         "足跡": "footprint — framed p18 by 甚平 reading animal tracks in the earth, then p33 by its own absence and then stated plainly, 人が歩けば足跡が残る. Marks the empty village, and the party's own are the last image before the climb"
+      }
+    },
+    {
+      "slug": "rouka-no-kagami",
+      "title": "廊下の鏡",
+      "level": 5,
+      "versions": [],
+      "_feature": "First story in the 述懐 register, and the first in the corpus to end on a claim rather than an image. The register was added for it. Also the first multi-construction grammar_focus: ものの, 一方で and にとって together, chosen because concession, contrast and perspective are the three things a looking-back voice actually does, so the focus and the register reinforce each other instead of the focus being sprinkled on afterwards.",
+      "_note": "THE RISK IS THE ENDING and it was named at Gate 2 before drafting. 'Ends on a claim' sits one step from the closing-thesis defect. The guard is that the claim corrects a fact about a PERSON — 祖母は、不思議なことを信じる人ではなかった — and contradicts a phrase the reader has already been given in dialogue on p10, 「おばあさんは、不思議なことを信じる人だから」. It is a correction, not a moral, and the narrator earns it by watching the hallway go dark rather than by concluding anything. THE MIRROR IS NEVER A FIGURE: it is cleaned, wrapped, carried, cracked, lifted and re-hung, and the prose never once uses it for memory or for looking back. That was a standing constraint from Rob, not a discovery. Every clue is physical and early: it hangs where nobody dresses, it faces a window rather than a room, it is polished on bright days and not dull ones, she is twice shown cleaning it and never once looking into it, and the child needs no lamp at the turn.",
+      "_premise": "A mirror hangs at the turn of a dark hallway in one house for sixty years, through a grandmother, a mother and a daughter, each of whom polishes it, wraps it and hangs it back on the same nail. Only when the last of them takes the house apart and lifts it off the wall does she find out what it was for: hung at an angle to the one window, it carried light around the corner into the windowless back of the house. Beats, each joined by だから or しかし: (1) the narrator, 71, is emptying the house and leaves the heavy mirror for last / (2) she notices she has worked all day at the turn without a lamp and thinks nothing of it, because she never has / (3) the grandmother carried the mirror in when she married, chose its place herself, and asked one thing, 動かさないでください / (4) she polished it constantly and only on clear days; PLANT: 一方で, never once seen looking at her own reflection / (5) the family settled on 不思議なことを信じる人, stated in dialogue / (6) she died and nobody moved it, the instruction outliving the reason / (7) the mother kept the rule without the reason, and at the roof repair wrapped it herself and made the workmen return the nail to the same hole / (8) asked why, she could only say her mother had asked her not to / (9) the narrator read all of it as a keepsake and stopped thinking / (10) TURN, physical and not a realization: she lifts it off the nail to wrap it and the back of the hallway goes dark around her while she is holding it / (11) she puts it back three times, and by the third is counting years rather than checking / (12) PAYOFF: the polishing, the weather and the averted eyes all resolve at once / (13) the claim, once: 祖母は、不思議なことを信じる人ではなかった.",
+      "brief": {
+        "pages": 25,
+        "register": "述懐",
+        "new_words": 5,
+        "leech_seeds": 8,
+        "grammar_focus": ["ものの", "一方で", "にとって"]
+      },
+      "new_words": {
+        "光": "light, as a noun — the thing the mirror actually carries, and deliberately withheld until the payoff. 光る is already known, so the noun is the new form. Framed at the turn by 光が、曲がり角を回って奥に届いた, where the sentence before it has just shown the hallway going dark. Recurs through the resolution",
+        "斜め": "at an angle — the mechanism of the whole story. Framed p7 by contrast with the flat alternative, まっすぐ壁に向けるのではなく、少し斜めにして掛けた. Recurs at the roof repair, where the mother restores the angle, and at the payoff",
+        "釘": "nail — what fixes the position across three generations. Framed p2 by the act itself, 壁に釘を一本打って、そこに掛けた. Recurs as the same hole at the repair, as 三代、同じ釘, and at the lifting off",
+        "向き": "the way a thing faces, orientation — distinct from 斜め, which is that the orientation is oblique. Framed p7 by 鏡の向きは、玄関の窓のほうを向いていた, beside the already-known 向く that fixes it. Recurs wherever the mirror is set or restored",
+        "埃": "dust — why the polishing was frequent rather than fussy, and it is held back as an explanation until the payoff. Framed p9 by its own absence, 埃がついていなくても、晴れた日には必ず磨いた, which makes the polishing strange before it makes it sensible"
       }
     }
   ]
