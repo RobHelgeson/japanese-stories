@@ -134,6 +134,13 @@
           fontSize: 28,
           theme: "system",
           furigana: false,
+          // On by default. The colour is transient — it exists only while
+          // something is lit — so the cost of being wrong about it is one tap,
+          // and the reader who has the Migaku hues already has them for free.
+          pitch: true,
+          // Off by default: 苦手 and 新出 are the reader's whole argument for
+          // marking a word at all, and 墨 is a session, not a preference.
+          ink: false,
         });
 
         const oneOf = (list) => (v) => (list.indexOf(v) >= 0 ? v : undefined);
@@ -168,6 +175,11 @@
           fontSize: { ok: size, fx: ["layout"] },
           theme: { ok: oneOf(THEME), fx: ["theme"] },
           furigana: { ok: bool, fx: [] },
+          // Neither declares an fx, for the same reason furigana does not: both
+          // change colour and nothing else, and a reflow here would move
+          // sub-screen boundaries under the reader's finger mid-tap.
+          pitch: { ok: bool, fx: [] },
+          ink: { ok: bool, fx: [] },
         };
 
         let state = defaults();
@@ -229,6 +241,8 @@
           c.toggle("bind-right", bindingEdge() === "right");
           c.toggle("bind-left", bindingEdge() === "left");
           c.toggle("furigana", state.furigana);
+          c.toggle("pitch-on", state.pitch);
+          c.toggle("ink-on", state.ink);
           const root = document.documentElement;
           // The dark palette is a media query, so an explicit choice has to
           // out-specify it rather than replace it. No attribute means follow the
@@ -824,12 +838,15 @@
               continue;
             }
             const w = document.createElement("span");
-            w.className = "w" + (tok.w ? " weak" : "") + (tok.n ? " new" : "");
+            w.className =
+              "w" + (tok.w ? " weak" : "") + (tok.n ? " new" : "") +
+              Pitch.className(tok.p, tok.k || "");
             // The sheet reads the headword from here. textContent would
             // concatenate the <rt> kana into it and print 私わたし【わたし】.
             w.dataset.t = tok.t;
             w.dataset.kana = tok.k || "";
             w.dataset.gloss = tok.g || "";
+            if (tok.p !== undefined) w.dataset.pitch = tok.p;
             w.tabIndex = 0;
             for (const pair of tok.r) {
               const text = pair[0], ruby = pair[1];
@@ -1218,6 +1235,150 @@
       // — and it used to be spelled ふ/訳/意 in the button bar. Moving it into
       // the gesture is what let those three buttons go.
       //
+      // Pitch draws the accent guide. The table is built by scripts/pitch.py from
+      // UniDic and indexed per token, so nothing here decides where a downstep
+      // falls — it only decides how to draw one it was handed.
+      //
+      // Two accents arrive per entry and they answer different questions. `a` is
+      // the accent of the surface actually printed, which is what the sentence
+      // sounds like; `la` is the accent of the dictionary form, which is what the
+      // Anki card drills. A surface pitch.py would not vouch for is simply
+      // absent, so an entry may carry only the second.
+      const Pitch = (() => {
+        const SMALL = "ャュョァィゥェォゃゅょぁぃぅぇぉ";
+        const NAMES = {
+          heiban: "平板", atamadaka: "頭高", nakadaka: "中高",
+          odaka: "尾高", kifuku: "起伏",
+        };
+
+        const table = Array.isArray(DATA.pitch) ? DATA.pitch : [];
+
+        const entry = (i) => (i === null || i === undefined ? null : table[i] || null);
+
+        // The pattern name for a downstep. Only ever applied to a surface, where
+        // the four-way split is real; a 用言's dictionary form collapses to
+        // 平板/起伏 instead and pitch.py ships that name rather than this.
+        function classify(accent, count) {
+          if (accent === 0) return "heiban";
+          if (accent === 1) return "atamadaka";
+          return accent >= count ? "odaka" : "nakadaka";
+        }
+
+        // The accent to draw, and the reading to draw it over. Prefer the
+        // surface: colouring 食べた by 食べる's class would name a word the page
+        // does not contain. `kana` is the token's own reading, so the contour is
+        // always drawn over the morae the reader is looking at.
+        function shape(e, kana) {
+          if (!e) return null;
+          if (e.a !== undefined) {
+            const count = morae(kana).length;
+            if (!count) return null;
+            return { pattern: classify(e.a, count), accent: e.a, kana, base: false };
+          }
+          if (e.lp) return { pattern: e.lp, accent: e.la, kana: e.lk, base: true, lemma: e.lt };
+          return null;
+        }
+
+        function morae(kana) {
+          const out = [];
+          for (const ch of kana || "") {
+            if (SMALL.includes(ch) && out.length) out[out.length - 1] += ch;
+            else out.push(ch);
+          }
+          return out;
+        }
+
+        // Levels for each mora plus one trailing slot: that slot is the particle
+        // position, and it is the only thing that separates 平板 from 尾高 — both
+        // are high across the word itself and differ only in what follows.
+        function levels(count, accent) {
+          const out = [];
+          for (let i = 1; i <= count + 1; i++) {
+            if (accent === 0) out.push(i === 1 ? 0 : 1);
+            else if (i === 1) out.push(accent === 1 ? 1 : 0);
+            else out.push(i <= accent ? 1 : 0);
+          }
+          return out;
+        }
+
+        const SVG = "http://www.w3.org/2000/svg";
+        const node = (name, attrs) => {
+          const el = document.createElementNS(SVG, name);
+          for (const k in attrs) el.setAttribute(k, attrs[k]);
+          return el;
+        };
+
+        function diagram(kana, accent) {
+          const chars = morae(kana);
+          const lv = levels(chars.length, accent);
+          const STEP = 14, TOP = 5, BOTTOM = 17, PAD = 7;
+          const width = PAD * 2 + STEP * (lv.length - 1);
+          const svg = node("svg", {
+            width, height: 30, viewBox: `0 0 ${width} 30`, "aria-hidden": "true",
+          });
+          const x = (i) => PAD + i * STEP;
+          const y = (i) => (lv[i] ? TOP : BOTTOM);
+
+          svg.append(node("polyline", {
+            class: "line",
+            points: lv.map((_, i) => `${x(i)},${y(i)}`).join(" "),
+          }));
+          lv.forEach((_, i) => {
+            // The trailing slot is a particle the word does not own, so it is
+            // drawn hollow — a filled dot there reads as one more mora.
+            const cls = i === chars.length ? "node ghost" : "node";
+            svg.append(node("circle", { class: cls, cx: x(i), cy: y(i), r: 2.6 }));
+            if (chars[i]) {
+              const t = node("text", { class: "mora", x: x(i), y: 28 });
+              t.textContent = chars[i];
+              svg.append(t);
+            }
+          });
+          return svg;
+        }
+
+        return {
+          // The class that carries the hue. Applied to the word span at render
+          // time; the CSS only paints it when the word is lit and 高低 is on.
+          className(i, kana) {
+            const sh = shape(entry(i), kana);
+            return sh ? " pitch-" + sh.pattern : "";
+          },
+
+          // Fills the sheet's pitch row. Returns the text a screen reader should
+          // hear, or "" when there is nothing to show.
+          render(box, i, kana) {
+            box.textContent = "";
+            const sh = shape(entry(i), kana);
+            if (!sh || sh.accent === undefined || sh.accent === null) {
+              box.hidden = true;
+              return "";
+            }
+            box.hidden = false;
+            box.className = "pitch-" + sh.pattern;
+            const dot = document.createElement("span");
+            dot.className = "dot";
+            box.append(dot);
+            box.append(diagram(sh.kana, sh.accent));
+            const type = document.createElement("span");
+            type.className = "type";
+            type.textContent = (NAMES[sh.pattern] || "") + " " + sh.accent;
+            box.append(type);
+            // Only shown when the contour is not the printed word's own. The note
+            // is the whole reason a 辞書形 fallback is honest rather than
+            // misleading: without it 食べた shows a diagram reading タベル.
+            if (sh.base) {
+              const base = document.createElement("span");
+              base.className = "base";
+              base.textContent = "辞書形 " + (sh.lemma || "");
+              box.append(base);
+            }
+            return (sh.base ? "辞書形 " + (sh.lemma || "") + "、" : "") +
+              (NAMES[sh.pattern] || "") + sh.accent + "型";
+          },
+        };
+      })();
+
       // Sheet reads no prefs. It answers what it was asked for, every time.
       //
       // The track is the sole input router for the text surface: it owns
@@ -1234,6 +1395,7 @@
         const kana = $("sheet-kana");
         const tags = $("sheet-tags");
         const body = $("sheet-body");
+        const pitchBox = $("sheet-pitch");
         let track = null;
 
         // INVARIANT: subject !== null implies subject.el === lit. The light can
@@ -1284,12 +1446,15 @@
             // opening blank; the headword and its reading are still an answer.
             body.hidden = !subject.gloss;
             body.textContent = subject.gloss;
+            const heard = Pitch.render(pitchBox, subject.pitch, subject.kana);
             spoken =
               subject.t + " " + subject.kana +
               (subject.weak ? "、苦手" : "") +
               (subject.fresh ? "、新出" : "") +
+              (heard ? "、" + heard : "") +
               (subject.gloss ? "。" + subject.gloss : "");
           } else {
+            pitchBox.hidden = true;
             body.hidden = false;
             body.textContent = subject.en;
             spoken = subject.en;
@@ -1350,6 +1515,7 @@
             t: surfaceOf(w),
             kana: w.dataset.kana || "",
             gloss: w.dataset.gloss || "",
+            pitch: w.dataset.pitch === undefined ? null : Number(w.dataset.pitch),
             weak: w.classList.contains("weak"),
             fresh: w.classList.contains("new"),
           };
@@ -1560,7 +1726,7 @@
             "top", "toc", "title", "count", "bar", "prev", "next",
             "set", "veil", "settings",
             "settings-close", "stats", "live",
-            "sw-lb", "sw-furi",
+            "sw-lb", "sw-furi", "sw-pitch", "sw-ink",
             "fs-dec", "fs-inc", "fs-val",
           ];
           for (const id of ids) els[id] = $(id);
@@ -1630,6 +1796,8 @@
         function syncControls() {
           const p = Prefs.get();
           els["sw-furi"].checked = !!p.furigana;
+          els["sw-pitch"].checked = !!p.pitch;
+          els["sw-ink"].checked = !!p.ink;
           for (const r of els.wm) r.checked = r.value === p.writingMode;
           for (const r of els.bind) r.checked = r.value === p.binding;
           for (const r of els.theme) r.checked = r.value === p.theme;
@@ -1769,6 +1937,8 @@
           // belonging to the mode currently on screen.
           els["sw-lb"].addEventListener("change", () => Prefs.setLinebreaks(els["sw-lb"].checked));
           els["sw-furi"].addEventListener("change", () => Prefs.set("furigana", els["sw-furi"].checked));
+          els["sw-pitch"].addEventListener("change", () => Prefs.set("pitch", els["sw-pitch"].checked));
+          els["sw-ink"].addEventListener("change", () => Prefs.set("ink", els["sw-ink"].checked));
 
           els["fs-dec"].addEventListener("click", () => Prefs.stepFont(-1));
           els["fs-inc"].addEventListener("click", () => Prefs.stepFont(1));
