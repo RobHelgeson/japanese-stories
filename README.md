@@ -48,7 +48,9 @@ The sheet carries the accent of the word you tapped: a coloured dot, a contour o
 
 **墨 is the quiet session**, and it is a separate switch. It takes the colour off 苦手 and 新出 and leaves everything else alone: the 傍点 stay, because those two are told apart by shape rather than hue — filled sesame against an open circle — and a 新出 reading stays shown. It does not touch 高低, because a word you tapped is a question you asked, not a distraction.
 
-The accent shown is the one the printed word has, not its dictionary form's: 食べた is drawn as 食べた. Where that could not be established the dictionary form is drawn instead and **labelled 辞書形**, because a diagram reading タベル beside a page reading 食べた is worse than no diagram. Across the current corpus 99.4% of marked words carry a guide and 90.6% of those are the printed surface.
+The accent shown is the one the printed word has, not its dictionary form's: 食べた is drawn as 食べた. Where that could not be established the dictionary form is drawn instead and **labelled 辞書形**, because a diagram reading タベル beside a page reading 食べた is worse than no diagram. Across the current corpus 88.8% of marked words carry a guide and 99.6% of those are the printed surface.
+
+The 11% that carry nothing are deliberate. A word is skipped when UniDic and Ichiran disagree about how it is read — 一本 is いっぽん here and イチホン to UniDic, and a contour drawn over the wrong morae points at the wrong syllable — or when Ichiran has grouped several words into one token, where there is no single accent phrase to draw. Guessing at those is what the second number costs.
 
 None of this is guesswork by the reader. `scripts/pitch.py` computes it at build time from UniDic's own accent-combination rules — every auxiliary carries the rule and offset that says what it does to the accent before it — and anything the rules cannot settle emits nothing at all. See [Building](#building).
 
