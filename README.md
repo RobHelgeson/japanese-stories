@@ -175,6 +175,15 @@ This repo **cannot build in CI**, by design. Three of its inputs are local to th
 PITCH_PYTHON=/path/to/a/venv/bin/python3 python3 pitch.py --build
 ```
 
+Any venv with the two packages will do, and making one takes a minute:
+
+```bash
+python3 -m venv /tmp/pitch && /tmp/pitch/bin/pip install fugashi unidic-lite
+PITCH_PYTHON=/tmp/pitch/bin/python3 python3 pitch.py --build
+```
+
+On this machine one already exists, inside the Obsidian vault rather than anywhere under the repo: it belongs to the vault's `pitch-accent` skill, at `.claude/skills/pitch-accent/venv/`. That is a hidden directory nine levels deep, so it does not turn up in a casual search of the home tree — look for the skill, not for the venv.
+
 It reads `docs/data/*.js` rather than re-segmenting, so run it **after** a rebuild and then rebuild once more to pick up the new entries. It refuses to write a table its gold set disagrees with.
 
 ## Publishing
