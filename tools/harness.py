@@ -25,6 +25,7 @@ import base64
 import functools
 import http.server
 import json
+import math
 import os
 import re
 import socket
@@ -1407,7 +1408,233 @@ window.H = (() => {
     return out;
   }
 
-  return { walk, atoms, paintcache, gestures, sheet, selection, marks, snap, binding, invariants, sleep,
+  // ---- pitch ------------------------------------------------------------
+  // Everything here is read off the rendered page rather than off DATA: the
+  // table and the rules are already asserted in Python, and what this cannot
+  // know from there is whether any of it reaches the glass.
+  function pitchWord(wantBase) {
+    for (const w of document.querySelectorAll("#track .cell.is-current .w")) {
+      if (w.dataset.pitch === undefined) continue;
+      const e = DATA.pitch[Number(w.dataset.pitch)];
+      if (!e) continue;
+      if (wantBase === undefined || wantBase === ("a" in e ? false : true)) return w;
+    }
+    return null;
+  }
+
+  async function pitch() {
+    const out = [];
+    const add = (name, ok, detail) => out.push({ name, ok: !!ok, detail });
+    const box = document.getElementById("sheet-pitch");
+
+    // Stop on the first screen that has a word with a surface accent, and stay
+    // there — walking on would recycle the node out of the track.
+    let a = Paginator.first(), w = null;
+    for (let i = 0; i < 80 && a; i++) {
+      Track.goTo(a, false);
+      await sleep(10);
+      w = pitchWord(false);
+      if (w) break;
+      a = Paginator.next(a);
+    }
+    if (!w) return [{ name: "pitch/fixture", ok: false, detail: { found: false } }];
+
+    const hue = [...w.classList].find((c) => c.startsWith("pitch-"));
+    add("pitch/a-marked-word-carries-its-pattern-class", !!hue, { cls: [...w.classList] });
+
+    // Colour is gated on BOTH the setting and the light. Painting it always
+    // would bury the 苦手 and 新出 marks under a second colour system.
+    Prefs.setAll({ pitch: true });
+    await sleep(10);
+    const unlit = getComputedStyle(w).color;
+
+    // The guide lives in the sheet, and the sheet is the second tap. The first
+    // is the reading, which is a different question with a different answer.
+    await doubleTapAt(centre(w));
+    const lit = getComputedStyle(w).color;
+    add("pitch/lit-word-takes-the-hue-only-when-lit", lit !== unlit, { unlit, lit });
+
+    const line = box.querySelector("svg polyline");
+    add("pitch/the-sheet-draws-a-contour", !box.hidden && !!line,
+        { hidden: box.hidden, html: box.innerHTML.slice(0, 160) });
+    if (!line) return out;
+
+    // One node per mora plus the trailing particle slot, and the polyline has to
+    // agree with them: the drop between two of those points IS the diagram.
+    const morae = [...(w.dataset.kana || "")].reduce((acc, ch) => {
+      if ("ャュョァィゥェォゃゅょぁぃぅぇぉ".includes(ch) && acc.length) acc[acc.length - 1] += ch;
+      else acc.push(ch);
+      return acc;
+    }, []);
+    const circles = box.querySelectorAll("circle");
+    const points = (line.getAttribute("points") || "").trim().split(/\s+/).length;
+    add("pitch/one-node-per-mora-plus-the-particle",
+        circles.length === morae.length + 1 && points === circles.length,
+        { morae: morae.length, nodes: circles.length, points });
+
+    // The trailing slot is hollow, because it is not a mora of this word.
+    const last = circles[circles.length - 1];
+    add("pitch/the-particle-slot-is-drawn-hollow", last && last.classList.contains("ghost"),
+        { cls: last ? [...last.classList] : null });
+
+    // The diagram has to answer the reader's theme, not the OS's. That is the
+    // defect a self-contained prefers-color-scheme block carries, so an explicit
+    // choice is asserted to move the stroke in both directions.
+    Prefs.setAll({ theme: "light" });
+    await sleep(10);
+    const light = getComputedStyle(line).stroke;
+    Prefs.setAll({ theme: "dark" });
+    await sleep(10);
+    const dark = getComputedStyle(line).stroke;
+    add("pitch/an-explicit-theme-repaints-the-contour", light !== dark && !!light && !!dark,
+        { light, dark });
+    Prefs.setAll({ theme: "system" });
+    await sleep(10);
+
+    // Turning the setting off leaves the guide in the sheet and takes it off the
+    // page: the sheet is where it was asked for, the page is where it intrudes.
+    //
+    // Compared against the LIT colour, not the pre-tap one. A build that painted
+    // the hue unconditionally would have coloured the word before the tap too,
+    // so "unchanged since before the tap" is a test that such a build passes.
+    Prefs.setAll({ pitch: false });
+    await sleep(10);
+    const off = getComputedStyle(w).color;
+    add("pitch/the-setting-off-keeps-the-sheet-and-clears-the-page",
+        !box.hidden && off !== lit && off === unlit,
+        { hidden: box.hidden, off, lit, unlit });
+    Prefs.setAll({ pitch: true });
+
+    // A word that only resolved through its dictionary form must say so. Without
+    // the label the diagram for 食べた silently reads タベル.
+    const fb = pitchWord(true);
+    if (fb) {
+      await doubleTapAt(centre(fb));
+      const note = box.querySelector(".base");
+      add("pitch/a-辞書形-fallback-names-the-word-it-drew",
+          !!note && note.textContent.indexOf("辞書形") === 0,
+          { text: note ? note.textContent : null, word: fb.dataset.t });
+    }
+    return out;
+  }
+
+  // ---- lit-sentence colour, and the 墨 session -----------------------------
+  async function highlight() {
+    const out = [];
+    const add = (name, ok, detail) => out.push({ name, ok: !!ok, detail });
+    const hue = (w) => getComputedStyle(w).color;
+    const pitched = (s) => [...s.querySelectorAll(".w")]
+      .filter(w => [...w.classList].some(c => c.startsWith("pitch-")));
+
+    // A sentence carrying several pitched words AND a bare spot to tap.
+    let a = Paginator.first(), sent = null, spot = null;
+    for (let i = 0; i < 80 && a; i++) {
+      Track.goTo(a, false); await sleep(10);
+      for (const cand of document.querySelectorAll("#track .cell.is-current .s[data-en]")) {
+        if (pitched(cand).length < 3) continue;
+        const pt = bareSpot(cand);
+        if (pt) { sent = cand; spot = pt; break; }
+      }
+      if (sent) break;
+      a = Paginator.next(a);
+    }
+    if (!sent) return [{ name: "highlight/fixture", ok: false, detail: { found: false } }];
+
+    Prefs.setAll({ pitch: true, ink: false });
+    await sleep(10);
+    const words = pitched(sent);
+    const before = words.map(hue);
+
+    // Tapping a bare spot lights the whole sentence. That is the one gesture
+    // that shows more than one hue at once.
+    await tapAt(spot);
+    const after = words.map(hue);
+    const moved = words.filter((w, i) => after[i] !== before[i]).length;
+    add("highlight/a-lit-sentence-colours-its-words", isLit(sent) && moved >= 3,
+        { lit: isLit(sent), words: words.length, moved });
+
+    // And it really is multicolour: a sentence of one hue would pass the above.
+    const distinct = new Set(after).size;
+    add("highlight/and-shows-more-than-one-hue", distinct >= 2,
+        { distinct, colours: [...new Set(after)] });
+
+    // Unlighting puts every one of them back, not just the last.
+    await tapAt(spot);
+    const reverted = words.filter((w, i) => hue(w) === before[i]).length;
+    add("highlight/unlighting-reverts-every-word", !isLit(sent) && reverted === words.length,
+        { lit: isLit(sent), reverted, of: words.length });
+
+    // 高低 off is the whole gate: the same tap must colour nothing.
+    Prefs.setAll({ pitch: false });
+    await sleep(10);
+    await tapAt(spot);
+    const off = words.filter((w, i) => hue(w) !== before[i]).length;
+    add("highlight/the-setting-off-leaves-a-lit-sentence-plain", isLit(sent) && off === 0,
+        { lit: isLit(sent), changed: off });
+    await tapAt(spot);
+    Prefs.setAll({ pitch: true });
+    await sleep(10);
+
+    // ---- 墨 ---------------------------------------------------------------
+    const mark = document.querySelector("#track .cell.is-current .w.weak")
+              || document.querySelector("#track .w.weak");
+    const fresh = document.querySelector("#track .cell.is-current .w.new")
+               || document.querySelector("#track .w.new");
+    const emColour = (el) => {
+      const cs = getComputedStyle(el);
+      return cs.webkitTextEmphasisColor || cs.textEmphasisColor;
+    };
+    const emStyle = (el) => {
+      const cs = getComputedStyle(el);
+      return (cs.webkitTextEmphasisStyle || cs.textEmphasisStyle || "").replace(/"/g, "");
+    };
+    const inkColour = getComputedStyle(document.querySelector("#track .cell.is-current .s")).color;
+
+    if (mark) {
+      const colourOn = emColour(mark), styleOn = emStyle(mark);
+      Prefs.setAll({ ink: true });
+      await sleep(10);
+      add("highlight/墨-takes-the-colour-off-苦手",
+          emColour(mark) !== colourOn && emColour(mark) === inkColour,
+          { before: colourOn, after: emColour(mark), ink: inkColour });
+      // The mark itself has to survive: 苦手 and 新出 are told apart by shape.
+      add("highlight/墨-keeps-the-sesame", emStyle(mark) === styleOn && /sesame/.test(emStyle(mark)),
+          { before: styleOn, after: emStyle(mark) });
+      Prefs.setAll({ ink: false });
+      await sleep(10);
+      add("highlight/墨-off-puts-the-colour-back", emColour(mark) === colourOn,
+          { restored: emColour(mark), want: colourOn });
+    }
+    if (fresh) {
+      const rt = fresh.querySelector("rt");
+      const rubyOn = rt && getComputedStyle(rt).color;
+      Prefs.setAll({ ink: true });
+      await sleep(10);
+      add("highlight/墨-takes-the-colour-off-新出-ruby",
+          !!rt && getComputedStyle(rt).color !== rubyOn,
+          { before: rubyOn, after: rt && getComputedStyle(rt).color });
+      // The reading stays SHOWN, which is the promise 新出 carries.
+      add("highlight/墨-leaves-the-新出-reading-showing",
+          !!rt && parseFloat(getComputedStyle(rt).opacity) === 1,
+          { opacity: rt && getComputedStyle(rt).opacity });
+      Prefs.setAll({ ink: false });
+      await sleep(10);
+    }
+
+    // The two settings are independent: 墨 quiets the page, 高低 answers a tap.
+    const w = pitched(sent)[0];
+    const plain = hue(w);
+    Prefs.setAll({ ink: true, pitch: true });
+    await sleep(10);
+    await tapAt(centre(w));
+    add("highlight/墨-does-not-suppress-高低-on-a-tap", hue(w) !== plain,
+        { plain, lit: hue(w) });
+    await tapAt(centre(w));
+    Prefs.setAll({ ink: false });
+    return out;
+  }
+
+  return { walk, atoms, paintcache, gestures, sheet, pitch, highlight, selection, marks, snap, binding, invariants, sleep,
            setPrefs: (p) => { Prefs.setAll(p); }, flush: () => Store.flush() };
 })();
 1
@@ -2206,7 +2433,8 @@ def apply_prefs(br, wm, lb, fs, extra=None):
     """
     patch = {"writingMode": wm, "fontSize": fs,
              "linebreaks": {"vertical": bool(lb), "horizontal": bool(lb)},
-             "binding": "auto", "theme": "system", "furigana": False}
+             "binding": "auto", "theme": "system", "furigana": False,
+             "pitch": True, "ink": False}
     if extra:
         patch.update(extra)
     br.eval("H.setPrefs(" + json.dumps(patch) + ")")
@@ -2321,6 +2549,292 @@ def suite_behaviour(br, rep, base):
     rep.add("selection", "desktop-media-is-fine-pointer", snap["media"], {"media": snap["media"]})
     sel = br.eval("H.selection()")
     rep.add("selection", "copy-does-not-inline-furigana", sel["ok"], sel["detail"])
+
+
+def _tok(kana, pos="動詞", atype=None, contype=None, modtype=None, lemma=None):
+    return {"kana": kana, "pos": pos, "atype": atype, "contype": contype,
+            "modtype": modtype, "lemma": lemma}
+
+
+def suite_pitch_rules(rep):
+    """The accent rules, exercised directly. No fugashi, no browser, no corpus.
+
+    Every case here is a rule from tables 9-12 of the UniDic manual, chosen so
+    that it fails if the rule's two branches are swapped: a rule is only ever
+    wrong in one column, and a case that uses the other column passes either way.
+    """
+    import pitch
+
+    cases = [
+        # F1 — keep the host accent, whichever column it is in
+        ("F1/keeps-an-accented-host", [_tok("タベ", atype=2), _tok("テ", contype="動詞%F1")], 2),
+        ("F1/keeps-a-heiban-host", [_tok("カッ", atype=0), _tok("テ", contype="動詞%F1")], 0),
+        # F2 — N1+M for a 平板 host, the host's own accent otherwise
+        ("F2/heiban-host-takes-the-offset",
+         [_tok("ガクセイ", "名詞", 0), _tok("デス", "助動詞", contype="名詞%F2@1")], 5),
+        ("F2/accented-host-keeps-its-own",
+         [_tok("ホン", "名詞", 1), _tok("デス", "助動詞", contype="名詞%F2@1")], 1),
+        # F3 — the mirror of F2, and the reason both are tested in both columns
+        ("F3/heiban-host-stays-flat",
+         [_tok("イカ", atype=0), _tok("ナイ", "助動詞", contype="動詞%F3@0")], 0),
+        ("F3/accented-host-takes-the-offset",
+         [_tok("タベ", atype=2), _tok("ナイ", "助動詞", contype="動詞%F3@0")], 2),
+        # F4 — N1+M regardless, which is why ます accents ま either way
+        ("F4/heiban-host", [_tok("イキ", atype=0), _tok("マス", "助動詞", contype="動詞%F4@1")], 3),
+        ("F4/accented-host", [_tok("タベ", atype=2), _tok("マス", "助動詞", contype="動詞%F4@1")], 3),
+        ("F5/always-flat", [_tok("タベ", atype=2), _tok("ダケ", "助詞", contype="動詞%F5")], 0),
+        # Both offsets land inside the 4-mora phrase on purpose: an accent past
+        # the end is refused by the invariant, which would mask the branch.
+        ("F6/heiban-host-takes-M", [_tok("ヨミ", atype=0), _tok("タリ", "助詞", contype="動詞%F6@2,1")], 4),
+        ("F6/accented-host-takes-L", [_tok("ヨミ", atype=1), _tok("タリ", "助詞", contype="動詞%F6@2,1")], 3),
+        # C — 表10, where the rear element's own accent can matter
+        ("C1/adds-the-rear-accent",
+         [_tok("テ", "名詞", 0), _tok("ツヅキ", "名詞", 2, contype="C1")], 3),
+        ("C2/accents-the-first-rear-mora",
+         [_tok("セイ", "名詞", 0), _tok("カツ", "名詞", 0, contype="C2")], 3),
+        ("C3/accents-the-last-front-mora",
+         [_tok("トウ", "名詞", 0), _tok("ワン", "名詞", 0, contype="C3")], 2),
+        ("C4/flattens", [_tok("ナカ", "名詞", 1), _tok("シマ", "名詞", 2, contype="C4")], 0),
+        ("C5/keeps-the-front-accent",
+         [_tok("トノ", "名詞", 1), _tok("ドノ", "接尾辞", 0, contype="C5")], 1),
+        # M — 表9, a conjugated form shifting its own base accent
+        ("M1/always-counts-back-from-the-end", [_tok("タベヨウ", atype=2, modtype="M1@1")], 3),
+        ("M2/heiban-base-counts-back", [_tok("タベロ", atype=0, modtype="M2@1")], 2),
+        ("M2/accented-base-is-left-alone", [_tok("タベロ", atype=2, modtype="M2@1")], 2),
+        ("M4/atamadaka-base-is-left-alone", [_tok("タベ", atype=1, modtype="M4@1")], 1),
+        ("M4/deeper-base-shifts-back", [_tok("タベサセ", atype=3, modtype="M4@1")], 2),
+    ]
+    for name, toks, want in cases:
+        got, _ = pitch.phrase_accent(toks)
+        rep.add("pitch-rules", name, got == want, {"want": want, "got": got})
+
+    # The one place this repo overrides UniDic's own data. F2@1 and F1 agree on an
+    # accented host, so only the 平板 case can catch a regression here.
+    fix = [_tok("イッ", atype=0), _tok("タ", "助動詞", contype="動詞%F2@1", lemma="た")]
+    got, _ = pitch.phrase_accent(fix)
+    rep.add("pitch-rules", "た-correction/heiban-verb-stays-flat", got == 0,
+            {"got": got, "note": "F2@1 unpatched would give 3"})
+    keep = [_tok("タベ", atype=2), _tok("タ", "助動詞", contype="動詞%F2@1", lemma="た")]
+    got, _ = pitch.phrase_accent(keep)
+    rep.add("pitch-rules", "た-correction/accented-verb-unaffected", got == 2, {"got": got})
+
+    # Refusing to answer is the whole safety mechanism, so it is asserted rather
+    # than assumed: an unknown rule and an impossible result both come back None,
+    # and the reader falls back to the 辞書形 on either.
+    unknown = [_tok("タベ", atype=2), _tok("ホゲ", "助詞", contype="動詞%F9@1")]
+    rep.add("pitch-rules", "unknown-rule-declines",
+            pitch.phrase_accent(unknown)[0] is None, {})
+    rep.add("pitch-rules", "no-accent-on-the-host-declines",
+            pitch.phrase_accent([_tok("タベ", atype=None)])[0] is None, {})
+    overrun = [_tok("ア", "名詞", 0), _tok("イ", "助詞", contype="名詞%F2@9")]
+    rep.add("pitch-rules", "unpronounceable-result-declines",
+            pitch.phrase_accent(overrun)[0] is None, {})
+
+
+# CIEDE2000, so that "these two colours are too close" is a number rather than an
+# opinion. Small enough to inline; the alternative is a dependency for one check.
+def _lab(hex6):
+    r, g, b = [int(hex6[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    f = lambda c: c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+    r, g, b = f(r), f(g), f(b)
+    X = r * 0.4124564 + g * 0.3575761 + b * 0.1804375
+    Y = r * 0.2126729 + g * 0.7151522 + b * 0.0721750
+    Z = r * 0.0193339 + g * 0.1191920 + b * 0.9503041
+    k = lambda t: t ** (1 / 3) if t > 216 / 24389 else (841 / 108) * t + 4 / 29
+    fx, fy, fz = k(X / 0.95047), k(Y), k(Z / 1.08883)
+    return (116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz))
+
+
+def _de2000(p, q):
+    L1, a1, b1 = p
+    L2, a2, b2 = q
+    C1, C2 = math.hypot(a1, b1), math.hypot(a2, b2)
+    Cb = (C1 + C2) / 2
+    G = 0.5 * (1 - math.sqrt(Cb ** 7 / (Cb ** 7 + 25 ** 7))) if Cb else 0
+    a1p, a2p = (1 + G) * a1, (1 + G) * a2
+    C1p, C2p = math.hypot(a1p, b1), math.hypot(a2p, b2)
+    h1 = math.degrees(math.atan2(b1, a1p)) % 360 if (a1p or b1) else 0
+    h2 = math.degrees(math.atan2(b2, a2p)) % 360 if (a2p or b2) else 0
+    dLp, dCp = L2 - L1, C2p - C1p
+    if C1p * C2p == 0:
+        dh = 0
+    elif h2 - h1 > 180:
+        dh = h2 - h1 - 360
+    elif h2 - h1 < -180:
+        dh = h2 - h1 + 360
+    else:
+        dh = h2 - h1
+    dHp = 2 * math.sqrt(C1p * C2p) * math.sin(math.radians(dh) / 2)
+    Lbp, Cbp = (L1 + L2) / 2, (C1p + C2p) / 2
+    if C1p * C2p == 0:
+        hbp = h1 + h2
+    elif abs(h1 - h2) <= 180:
+        hbp = (h1 + h2) / 2
+    elif h1 + h2 < 360:
+        hbp = (h1 + h2 + 360) / 2
+    else:
+        hbp = (h1 + h2 - 360) / 2
+    T = (1 - 0.17 * math.cos(math.radians(hbp - 30)) + 0.24 * math.cos(math.radians(2 * hbp))
+         + 0.32 * math.cos(math.radians(3 * hbp + 6)) - 0.20 * math.cos(math.radians(4 * hbp - 63)))
+    Rc = 2 * math.sqrt(Cbp ** 7 / (Cbp ** 7 + 25 ** 7)) if Cbp else 0
+    Sl = 1 + (0.015 * (Lbp - 50) ** 2) / math.sqrt(20 + (Lbp - 50) ** 2)
+    Sc, Sh = 1 + 0.045 * Cbp, 1 + 0.015 * Cbp * T
+    Rt = -math.sin(math.radians(2 * (30 * math.exp(-(((hbp - 275) / 25) ** 2))))) * Rc
+    return math.sqrt((dLp / Sl) ** 2 + (dCp / Sc) ** 2 + (dHp / Sh) ** 2
+                     + Rt * (dCp / Sc) * (dHp / Sh))
+
+
+# Below this two colours on the same glyph stop being reliably separable at the
+# size a 傍点 is drawn. 19.4 is what the shipped palette achieves, and the pair
+# that sets it is 平板 against 起伏 — both Migaku's, and so not ours to move.
+MIN_ON_GLYPH_DE = 18.0
+
+
+def suite_defaults(rep):
+    """The shipped defaults, read out of reader.js.
+
+    高低 defaults on and 墨 defaults off, which is a product decision rather than
+    an implementation detail — a reader who never opens 設定 gets the accent
+    colours and the marks. Asserted here because nothing else would notice it
+    changing.
+    """
+    js = (REPO / "scripts" / "reader.js").read_text(encoding="utf-8")
+    block = re.search(r"const defaults = \(\) => \(\{(.*?)\}\)", js, re.S)
+    if not block:
+        block = re.search(r"defaults\s*=\s*\(\)\s*=>\s*\(\{(.*?)\}\)", js, re.S)
+    body = block.group(1) if block else js
+    for field, want in (("pitch", "true"), ("ink", "false")):
+        m = re.search(rf"\b{field}:\s*(true|false)", body)
+        rep.add("defaults", f"{field}-defaults-{want}", bool(m) and m.group(1) == want,
+                {"found": m.group(1) if m else None, "want": want})
+
+
+def suite_palette(rep):
+    """The marker hues and the pitch hues are one palette, and it has to stay legible.
+
+    They are separate concerns everywhere except on a word, where 苦手's sesame is
+    drawn beside the character its pitch hue has just coloured. That is the only
+    place they compete, and it is invisible in review: 起伏 appears only on a 辞書形
+    fallback, so the closest pair in the whole system is also the one least likely
+    to turn up on any page someone happens to look at.
+
+    Read out of reader.css rather than restated here — a copy would go stale
+    against the file it is meant to be protecting.
+    """
+    css = (REPO / "scripts" / "reader.css").read_text(encoding="utf-8")
+    names = ["--pitch-heiban", "--pitch-atamadaka", "--pitch-nakadaka",
+             "--pitch-odaka", "--pitch-kifuku", "--weak", "--new", "--ink"]
+    # Declarations appear light-first, then twice for dark (media query and
+    # data-theme), and the two dark copies must agree — which is itself worth
+    # asserting, since they are maintained by hand.
+    found = {n: re.findall(rf"{n}:\s*(#[0-9a-fA-F]{{6}})\s*;", css) for n in names}
+    missing = [n for n, v in found.items() if len(v) < 2]
+    rep.add("palette", "every-colour-is-declared-light-and-dark", not missing,
+            {"missing": missing, "counts": {n: len(v) for n, v in found.items()}})
+    if missing:
+        return
+    disagree = [n for n, v in found.items() if len(v) > 2 and len(set(v[1:])) != 1]
+    rep.add("palette", "the-two-dark-declarations-agree", not disagree,
+            {"disagree": {n: found[n] for n in disagree}})
+
+    for theme, pick in (("light", lambda v: v[0]), ("dark", lambda v: v[-1])):
+        pal = {n.replace("--pitch-", "").replace("--", ""): pick(v) for n, v in found.items()}
+        labs = {k: _lab(v) for k, v in pal.items()}
+        keys = sorted(pal)
+        pairs = sorted(
+            (_de2000(labs[a], labs[b]), a, b)
+            for i, a in enumerate(keys) for b in keys[i + 1:]
+        )
+        worst, x, y = pairs[0]
+        rep.add("palette", f"{theme}/no-two-on-glyph-colours-collide", worst >= MIN_ON_GLYPH_DE,
+                {"worst": round(worst, 1), "pair": f"{x} vs {y}", "floor": MIN_ON_GLYPH_DE,
+                 "next": [f"{a}/{b} {d:.1f}" for d, a, b in pairs[1:3]]})
+        # The one that actually bit: 苦手's sesame sits on a 起伏 word whenever a
+        # leech verb falls back to its dictionary form.
+        d = _de2000(labs["weak"], labs["kifuku"])
+        rep.add("palette", f"{theme}/苦手-sesame-reads-on-a-起伏-word", d >= MIN_ON_GLYPH_DE,
+                {"de": round(d, 1), "weak": pal["weak"], "kifuku": pal["kifuku"]})
+
+
+def suite_pitch_table(rep):
+    """The shipped table and the built data, against the gold set.
+
+    suite_pitch_rules can pass with a table nobody rebuilt. This is the half that
+    notices, and it needs neither fugashi nor a browser to do it.
+    """
+    import pitch
+
+    table = pitch.load()
+    checked = 0
+    for word, want in sorted(pitch.GOLD.items()):
+        entry = table.get(word)
+        if not entry or "a" not in entry:
+            continue  # not a surface these stories use
+        checked += 1
+        rep.add("pitch-table", f"gold/{word}", entry["a"] == want,
+                {"want": want, "got": entry["a"], "kana": entry.get("k")})
+    rep.add("pitch-table", "gold-overlaps-the-corpus", checked >= 8, {"checked": checked})
+
+    # Every entry has to be drawable: an accent past the end of the word puts the
+    # downstep off the diagram, and the reader has no way to notice.
+    bad = [w for w, e in table.items()
+           if "a" in e and not (0 <= e["a"] <= len(pitch.morae(e.get("k") or "")))]
+    rep.add("pitch-table", "every-accent-lands-inside-its-word", not bad, {"bad": bad[:5]})
+
+    total = marked = surface = 0
+    for path in sorted((REPO / "docs" / "data").glob("*.js")):
+        blob = json.loads(re.search(r"=\s*(\{.*\})\s*;?\s*$", path.read_text(encoding="utf-8"), re.S).group(1))
+        entries = blob.get("pitch") or []
+        rep.add("pitch-table", f"{path.stem}/ships-a-table", bool(entries), {"entries": len(entries)})
+        # An index the table cannot answer renders nothing and says nothing.
+        stray = []
+
+        def walk(node):
+            nonlocal total, marked, surface
+            if isinstance(node, dict):
+                if node.get("r"):
+                    total += 1
+                    if "p" in node:
+                        marked += 1
+                        if not (0 <= node["p"] < len(entries)):
+                            stray.append(node.get("t"))
+                        elif "a" in entries[node["p"]]:
+                            surface += 1
+                for v in node.values():
+                    walk(v)
+            elif isinstance(node, list):
+                for v in node:
+                    walk(v)
+
+        walk(blob)
+        rep.add("pitch-table", f"{path.stem}/no-index-points-past-the-table",
+                not stray, {"stray": stray[:5]})
+
+    # Coverage is a fact about the corpus, not a rule, so it is pinned loosely —
+    # low enough not to fail on a new story, high enough to catch a table that
+    # silently stopped being rebuilt.
+    rep.add("pitch-table", "most-marked-tokens-carry-a-guide",
+            total and marked / total > 0.9, {"marked": marked, "total": total})
+    rep.add("pitch-table", "most-guides-are-the-printed-surface",
+            marked and surface / marked > 0.8, {"surface": surface, "marked": marked})
+
+
+def suite_pitch_reader(br, rep, base):
+    """The guide as rendered. Python proves the numbers; this proves they land."""
+    br.emulate(*PHONE[1:])
+    br.goto(f"{base}/shiro-no-kane.html")
+    br.eval(LIB)
+    apply_prefs(br, "vertical", False, 28)
+    for row in br.eval("H.pitch()", await_promise=True):
+        suite, _, name = row["name"].partition("/")
+        rep.add("pitch", name, row["ok"], row["detail"])
+    # A fresh load, because H.pitch() leaves a word lit and prefs moved around.
+    br.goto(f"{base}/shiro-no-kane.html")
+    br.eval(LIB)
+    apply_prefs(br, "vertical", False, 28)
+    for row in br.eval("H.highlight()", await_promise=True):
+        suite, _, name = row["name"].partition("/")
+        rep.add("highlight", name, row["ok"], row["detail"])
 
 
 def suite_marks(br, rep, base):
@@ -2442,6 +2956,16 @@ def main():
     rep = Report()
     print("===== no-summary =====")
     check_no_summary(rep)
+    # Both run before Chrome starts: neither needs a browser, and a bad rule or a
+    # stale table should fail in a second rather than after the fixture build.
+    print("\n===== pitch rules =====")
+    suite_pitch_rules(rep)
+    print("\n===== pitch table =====")
+    suite_pitch_table(rep)
+    print("\n===== palette =====")
+    suite_palette(rep)
+    print("\n===== defaults =====")
+    suite_defaults(rep)
     for slug in SLUGS:
         build_fixture(slug)
     build_fixture("shuden", inject=True)
@@ -2466,6 +2990,8 @@ def main():
         if "--table" not in args:
             print("\n===== behaviour =====")
             suite_behaviour(br, rep, base)
+            print("\n===== pitch in the reader =====")
+            suite_pitch_reader(br, rep, base)
             print("\n===== 傍点 vs ruby =====")
             suite_marks(br, rep, base)
             print("\n===== persistence =====")
