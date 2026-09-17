@@ -30,7 +30,7 @@ A floor set just under the lowest stdev any story had recorded. Measured today t
 
 The share of sentences carrying a subordinate clause (連用形 chain, relative clause, or one of the ladder's own subordinators). `stats.py` reports it and nothing gates it, and the 2026-09-14 calibration settled why it should stay that way.
 
-Across 25 authentic texts, `subordinate_share` varies more **within** one author than between this corpus and authentic prose: per-author medians 新美南吉 47.9, 宮沢賢治 48.4, 小川未明 61.7, against our 43.9–58.8, with two of the three inside our range. Bin-matched we sit at or above authentic in every bin. There is no band here to gate against.
+Across 25 authentic texts, `subordinate_share` varies more **within** one author than between this corpus and authentic prose: per-author medians 新美南吉 47.9, 宮沢賢治 48.4, 小川未明 61.7, against our 43.9–58.8, with two of the three inside our range. Bin-matched we sit at or above authentic in the short and long bins and straddle it in the mid. There is no band here to gate against.
 
 The measure's own limit: it is binary per sentence, so five clauses chained with て score what one ので clause scores. That looked like a hiding place for a real gap. It is not — see correction (b).
 
@@ -43,7 +43,7 @@ Re-measured 2026-09-15 after the quote-turn merge, which redefined a source line
 **Read beside, never gate on.** See `AUTHORING.md` § Metrics are floors, not targets.
 
 1. **The corpus is compressed on sentence length, and this is the finding.** `mean_len` 16.3–21.0 against a bin-matched 28.5–32.6; `stdev_len` 6.4–11.6 against 18.9–21.2; `pct_over_30` 3.8–18.6 against 35.2–43.0, every story below its own bin. Measured in Ichiran **tokens**, which orthography does not move, the gap is 8.9 per sentence against 12.0 — **1.34x**. In characters it reads 1.60x, and the difference between the two is kana: children's books spend more characters on the same content. Quote the token figure.
-2. **Not on subordination.** Bin-matched we are at or above authentic in every bin: short 43.9–53.0 against 50.0, mid 51.1–53.5 against 48.7, long 58.8 against 52.4. The expectation that opened this work was that the corpus would be flatter here. It is not.
+2. **Not on subordination.** Bin-matched we are at or above authentic in the short and long bins — 43.9–53.0 against 50.0, and 58.8 against 52.4 — and straddle it in the mid, 51.1–53.5 against 51.7. The expectation that opened this work was that the corpus would be flatter here. It is not.
 3. **`min_sentence_stdev` 6.0 is very low against authentic prose** (bin-matched 18.9–21.2). Not raised, and it must not be: "variance bought long-only" is already a documented failure mode, and a persuasive external number is precisely how it would recur. A craft observation for the revision pass, nothing more.
 4. **`min_repeated_share` 0.4 is vindicated and conservative.** Bin-matched we recycle harder than authentic prose in every bin: short 48.7–64.4 against 36.7, mid 60.7–63.5 against 49.5, long 72.7 against 51.6.
 5. **`distinct_constructions` runs above authentic rates in every bin** (19–26 vs 16 short, 28–32 vs 20 mid, 26 vs 22 long): the ladder pushes construction variety past what children's literature does. See § The asymmetry.
@@ -85,7 +85,7 @@ Kept because each one was wrong in a way worth not repeating.
 
 **(c) `corpus_bins()` counted characters over source lines while `measure()` reports `chars` over `prose_sentences`.** Once a line became a speech turn the two drifted enough that a story fell outside its own corpus's range and binned as `None`, crashing `--compare`. Both now count the same way, and reference bins are computed live rather than read from the manifest, which records whatever `--sample` measured at the time.
 
-**(d) `ichiran.align()` drops any token it cannot locate by string search without advancing its cursor**, and on some reference texts that discards most of the alignment. Only `_relative_clause` consumes it, so reference `subordinate_share` is a floor rather than an estimate — conservative in the direction that would weaken finding (2). **Still unfixed**; it predates this work.
+**(d) `ichiran.align()` let its cursor run to wherever a token's surface next turned up.** Ichiran returns a canonical surface for some inflections — 熱すぎて segments as 熱い + すぎて while the text holds 熱 — so the lemma is not there to be found at the cursor, and an unbounded `str.find` matched a later occurrence and took the cursor with it, orphaning every token in between. インドラの網 aligned 22 of its 1683 tokens; the reference set as a whole aligned 78.3%. **Fixed 2026-09-16**: a gap is crossed only when the tokens already dropped can account for its word characters, punctuation being free. The reference set now aligns 99.9%, and this corpus's own alignment is byte-identical either way — which is why exactly one figure moved. Reference `subordinate_share` in the mid bin was reading 48.7 and reads 51.7, and the pooled IQR floor moves 41.6 to 43.9. Finding (2) survives and is weaker for it: the mid bin is parity, not above.
 
 **(e) `min_sentence_stdev` 6.0 was documented as the best value any story had hit.** It is a floor just under the lowest. See § `min_sentence_stdev` 6.0.
 
