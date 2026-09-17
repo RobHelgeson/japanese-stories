@@ -26,8 +26,20 @@
            in the whole system and exactly the collision that is hardest to see,
            because 起伏 only appears on a 辞書形 fallback. Moving it to hue 357°
            puts the worst on-glyph pair at 19.4 — 平板 against 起伏, both Migaku's
-           and neither ours to move. */
-        --weak: #da117b;
+           and neither ours to move.
+
+           Desaturated 2026-09-17, because hue 357 at C*73 was the loudest thing
+           in the dark set — above both of Migaku's most saturated hues — and read
+           as neon beside the text it was only meant to annotate. C*73 → C*34 is
+           the change; L*58 → L*52 is what pays for it. The lightness drop is not
+           cosmetic: ΔE against 起伏 is U-shaped in chroma, because at C*73 the
+           chroma difference carries the separation and at C*16 it carries it
+           again, while the middle has neither that nor enough hue difference to
+           stand in — desaturating in place bottoms out at 17.2 around C*30-40 and
+           fails the floor. Moving off 起伏's L*65 is what reopens the band. Now
+           20.1 in dark; light was never tight (起伏 sits at L*32 there) and
+           follows the same hue at C*41. The shipped worst is still 19.4. */
+        --weak: #af5477;
         --new: #0d7c86;
         --veil: rgba(34, 32, 28, 0.38);
 
@@ -87,7 +99,7 @@
           --muted: #9a9488;
           --rule: #2c2a31;
           --accent: #d3b075;
-          --weak: #f74395;
+          --weak: #b16580;
           --new: #4fc2ce;
           --veil: rgba(0, 0, 0, 0.5);
 
@@ -105,7 +117,7 @@
         --muted: #9a9488;
         --rule: #2c2a31;
         --accent: #d3b075;
-        --weak: #f74395;
+        --weak: #b16580;
         --new: #4fc2ce;
         --veil: rgba(0, 0, 0, 0.5);
 
@@ -961,7 +973,13 @@
       }
       .srow b { font-weight: 600; color: var(--ink); text-align: end; font-variant-numeric: tabular-nums; }
 
-      /* Only meaningful where there is a keyboard. */
+      /* Desktop only, and deliberately so for all three blocks rather than just
+         the key legend — decided 2026-09-17 rather than inherited. The legend
+         needs a keyboard; the gesture help and the sync pointer do not, and on a
+         phone they would be the panel's longest content. 案内 on the contents
+         page carries both unconditionally and is one 目次 tap from any story,
+         so the phone is not missing them, it is reading them somewhere that is
+         not competing with the settings. */
       .keys { display: none; }
       @media (hover: hover) and (pointer: fine) {
         .keys { display: block; margin-block: 0.5rem 0; color: var(--muted); font-size: 0.8rem; line-height: 1.75; }

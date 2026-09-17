@@ -1905,7 +1905,7 @@
           row("既知語彙", String(s.knownVocab || 0));
           if (s.weak && s.weak.length) row("苦手", String(s.weak.length));
           if (approved.length) row("新出", approved.join("、"));
-          if (s.translated) row("訳", s.translated + " / " + s.sentences);
+          if (s.translated) row("訳", s.translated + " / " + s.units);
         }
 
         function onRadio(nodes, key) {

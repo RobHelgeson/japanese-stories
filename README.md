@@ -34,7 +34,7 @@ On a mouse, hovering a word reveals its reading and a double click opens the she
 
 The reading and the meaning stay one gesture apart on purpose: a story built from words you already know should not put the English in reach of the same tap that asks how a kanji is pronounced. That separation used to be three buttons in the bar — ふ, 訳, 意 — which meant the page did nothing at all until one of them was armed. Moving it into the gesture is what let them go.
 
-Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose uses to draw attention to a word. **Pink sesame** is a leech: a known word on a card that keeps being failed, with its reading hidden. **Cyan circles with the reading shown** is a new word, approved for this story but not yet learned.
+Two kinds of word are marked, with 傍点 — the sesame dots Japanese prose uses to draw attention to a word. **Rose sesame** is a leech: a known word on a card that keeps being failed, with its reading hidden. **Cyan circles with the reading shown** is a new word, approved for this story but not yet learned.
 
 Those two were orange and green until pitch accent arrived, and they moved rather than pitch moving. The five Migaku hues are a vocabulary you already hold from Anki, so they are worth more fixed than these two are — and a mark that means "you keep failing this" is legible in any hue, while a colour that means 頭高 is not.
 
