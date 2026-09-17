@@ -122,6 +122,10 @@ def to_token(tok, known, weak, approved, authored=None, accents=None):
     if not ichiran.has_kanji(surface):
         return {"t": surface}
     kana = tok["kana"]
+    # Set when Ichiran named this token something the document does not contain -
+    # 熱すぎて is 熱い + すぎて, so `surface` is 熱 and the reading on hand is あつい.
+    # See ichiran._gap.
+    lemma = tok.get("lemma")
     # An author annotation wins over both Ichiran and the global override table:
     # it is per-occurrence, so it is the only one of the three that can be right
     # about a token whose reading genuinely varies by context.
@@ -129,13 +133,23 @@ def to_token(tok, known, weak, approved, authored=None, accents=None):
     if reading:
         if reading != kana:
             applied[f"{surface} {kana}→{reading} (authored)"] += 1
-        kana = reading
+        kana, lemma = reading, None
     elif surface in OVERRIDES and OVERRIDES[surface] != kana:
         applied[f"{surface} {kana}→{OVERRIDES[surface]}"] += 1
-        kana = OVERRIDES[surface]
+        kana, lemma = OVERRIDES[surface], None
+    # Both of those state a reading for the text that is actually here, so they
+    # settle the question and the cut below is not wanted. Only Ichiran's own
+    # reading needs one, because only it describes a longer word.
+    if lemma:
+        cut = furigana.truncate(furigana.align(lemma, kana), surface)
+        if cut is None:
+            return {"t": surface}  # no honest reading for this span; say nothing
+        pairs, kana = cut
+    else:
+        pairs = furigana.align(surface, kana)
     entry = {
         "t": surface,
-        "r": furigana.align(surface, kana),
+        "r": pairs,
         "k": kana,
         "g": tok["gloss"],
     }

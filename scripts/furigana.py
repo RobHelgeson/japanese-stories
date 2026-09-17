@@ -95,7 +95,66 @@ def align(surface, reading):
     return solve(0, 0) or [(surface, reading)]
 
 
-if __name__ == "__main__":
+def truncate(pairs, text):
+    """`pairs` cut down to `text`, a shorter run starting at the same place.
+
+    Ichiran hands back a canonical surface for some inflections — 熱すぎて comes
+    back as 熱い + すぎて — so the reading was aligned to a word the document does
+    not contain, and the pairs cover more than the text sitting here. What the
+    text holds is the stem, which is the canonical minus its okurigana; okurigana
+    is kana, so the cut lands in a kana run and every kanji reading either
+    survives whole or the cut is refused. 熱い/あつい cut to 熱 is 熱《あつ》, and
+    大きい/おおきい cut to 大き is 大《おお》き.
+
+    Returns (pairs, kana), or None when the cut cannot be made honestly: through
+    a kanji run, whose reading covers the run and cannot be apportioned across
+    it, or against text that is not what these pairs start with.
+    """
+    out, kana, i = [], [], 0
+    for surface, reading in pairs:
+        if i >= len(text):
+            break
+        take = text[i : i + len(surface)]
+        if take == surface:
+            out.append((surface, reading))
+            kana.append(surface if reading is None else reading)
+            i += len(surface)
+            continue
+        if reading is not None or not surface.startswith(take):
+            return None
+        out.append((take, None))
+        kana.append(take)
+        i += len(take)
+        break
+    if i != len(text) or not out:
+        return None
+    return out, _to_hira("".join(kana))
+
+
+# (canonical surface, its reading, the text actually written, expected cut). The
+# first five are the corpus's own carried tokens; the rest are the refusals.
+TRUNCATE_SELFTEST = [
+    ("熱い", "あつい", "熱", ([("熱", "あつ")], "あつ")),
+    ("薄い", "うすい", "薄", ([("薄", "うす")], "うす")),
+    ("大きい", "おおきい", "大き", ([("大", "おお"), ("き", None)], "おおき")),
+    # A contraction is not a prefix: くれない and くれん agree for two characters
+    # and then do not. Nothing here can say what ん reads as, so nothing is said.
+    ("くれない", "くれない", "くれん", None),
+    ("おらない", "おらない", "おらん", None),
+    # The cut may land in a kana run or on a run boundary, never inside a kanji
+    # run - おとな covers 大人 as a unit and does not divide across it.
+    ("大きい", "おおきい", "大", ([("大", "おお")], "おお")),
+    ("大人しい", "おとなしい", "大", None),
+    ("大人しい", "おとなしい", "大人", ([("大人", "おとな")], "おとな")),
+    # Text the pairs do not start with, and text longer than they cover.
+    ("熱い", "あつい", "寒", None),
+    ("熱い", "あつい", "熱いもの", None),
+    ("熱い", "あつい", "", None),
+]
+
+
+def selftest():
+    """align() on the demo set, then truncate()'s cuts and its refusals."""
     for s, r in [
         ("引き出し", "ひきだし"),
         ("暮らして", "くらして"),
@@ -106,4 +165,19 @@ if __name__ == "__main__":
         ("おじいさん", "おじいさん"),
         ("見つめる", "みつめる"),
     ]:
-        print(s, "->", align(s, r))
+        print(f"  align   {s} -> {align(s, r)}")
+    ok = True
+    for surface, reading, text, want in TRUNCATE_SELFTEST:
+        got = truncate(align(surface, reading), text)
+        good = got == want
+        ok &= good
+        print(f"  {'ok  ' if good else 'FAIL'} truncate {surface}/{reading} to {text!r} -> {got}")
+        if not good:
+            print(f"       want {want}")
+    return ok
+
+
+if __name__ == "__main__":
+    import sys
+
+    sys.exit(0 if selftest() else 1)  # --selftest accepted; there is no other mode

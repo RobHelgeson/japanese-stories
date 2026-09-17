@@ -163,6 +163,7 @@ So editing the reader's styling or behaviour now rewrites two files in about a s
 | `python3 pitch.py --build`               | rebuild the pitch table after adding or editing a story (needs fugashi) |
 | `python3 pitch.py --selftest`            | the accent rules against the gold set, without writing anything        |
 | `python3 ichiran.py --selftest`          | the token-to-offset matching rule, on hand-built token lists           |
+| `python3 furigana.py --selftest`         | reading alignment, and the cuts and refusals behind a carried token    |
 | `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki                 |
 | `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                  |
 

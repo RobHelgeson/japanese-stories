@@ -138,20 +138,49 @@ def _interleave(text, toks):
     """
     out = []
     pos = 0
-    slack = 0
+    dropped = []
     for tok in toks:
         surface = tok["surface"]
         idx = text.find(surface, pos)
-        if idx < 0 or len(WORD.findall(text[pos:idx])) > slack:
-            slack += len(surface)
+        if idx < 0 or len(WORD.findall(text[pos:idx])) > sum(len(t["surface"]) for t in dropped):
+            dropped.append(tok)
             continue
         if idx > pos:
-            out.append({"raw": text[pos:idx], "start": pos, "end": idx})
+            out.extend(_gap(text, pos, idx, dropped))
         out.append({**tok, "start": idx, "end": idx + len(surface)})
         pos = idx + len(surface)
-        slack = 0
+        dropped = []
     if pos < len(text):
         out.append({"raw": text[pos:], "start": pos, "end": len(text)})
+    return out
+
+
+def _gap(text, start, end, dropped):
+    """The pieces of the text a matched token skipped over.
+
+    Punctuation, usually, and then it is one raw chunk as it has always been.
+    But a gap also opens where Ichiran returned a canonical surface for what is
+    written here — 熱すぎて is 熱い + すぎて, and 熱い is nowhere to be placed — and
+    then the word characters in the gap are the text that token stands for. Where
+    exactly one token was dropped they are given to it, with its reading, gloss
+    and bases intact and `lemma` recording what Ichiran actually called it, so
+    the caller can cut the reading down to what is here. Two dropped tokens share
+    one gap with nothing to say where the boundary between them falls, so both
+    stay lost rather than one of them being guessed.
+    """
+    span = text[start:end]
+    hits = [m.start() for m in WORD.finditer(span)]
+    if len(dropped) != 1 or not hits:
+        return [{"raw": span, "start": start, "end": end}]
+    lo, hi = hits[0], hits[-1] + 1
+    tok = dropped[0]
+    out = []
+    if lo:
+        out.append({"raw": span[:lo], "start": start, "end": start + lo})
+    out.append({**tok, "surface": span[lo:hi], "lemma": tok["surface"],
+                "start": start + lo, "end": start + hi})
+    if hi < len(span):
+        out.append({"raw": span[hi:], "start": start + hi, "end": end})
     return out
 
 
@@ -169,42 +198,52 @@ def has_kanji(s):
 
 
 # (text, Ichiran's surfaces, the pieces _interleave should lay down). A piece is
-# a token's surface or a raw run, in document order, so one list states both what
-# survived and where the punctuation went.
+# ("raw", text) for punctuation, ("tok", surface) for a token found where it was
+# expected, and (lemma, text) for one Ichiran could not place that was carried
+# into the gap — so one list states what survived, what it holds, and where the
+# punctuation went.
 SELFTEST = [
     (
         "空が青い。",
         ["空", "が", "青い"],
-        ["空", "が", "青い", "。"],
+        [("tok", "空"), ("tok", "が"), ("tok", "青い"), ("raw", "。")],
     ),
     (
         "「はい」と言った",
         ["はい", "と", "言った"],
-        ["「", "はい", "」", "と", "言った"],
+        [("raw", "「"), ("tok", "はい"), ("raw", "」"), ("tok", "と"), ("tok", "言った")],
     ),
     # 熱すぎて segments as 熱い + すぎて and the text holds 熱, so the lemma is
-    # unplaceable. It is dropped, 熱 falls through as raw, and すぎて still lands
-    # on its own offset - the cost is one token, not the tail of the document.
+    # unplaceable. The gap it opens is its own text, so it is given it and keeps
+    # its reading, gloss and bases; `lemma` is what the caller cuts them down by.
     (
         "湯が熱すぎて",
         ["湯", "が", "熱い", "すぎて"],
-        ["湯", "が", "熱", "すぎて"],
+        [("tok", "湯"), ("tok", "が"), ("熱い", "熱"), ("tok", "すぎて")],
     ),
-    # The same lemma occurring later is the defect this guard exists for: an
+    # The same lemma occurring later is the defect the budget exists for: an
     # unbounded find matches that 熱い and takes the cursor with it, orphaning
     # すぎて, 湯 and は. The gap is 5 word characters against a 2-character
     # surface, so it is refused.
     (
         "熱すぎて湯は熱い",
         ["熱い", "すぎて", "湯", "は", "熱い"],
-        ["熱", "すぎて", "湯", "は", "熱い"],
+        [("熱い", "熱"), ("tok", "すぎて"), ("tok", "湯"), ("tok", "は"), ("tok", "熱い")],
     ),
     # Dialect negatives arrive canonical too, and the text is shorter than the
-    # lemma either way: くれん against くれない, with 」 and a newline free.
+    # lemma either way: くれん against くれない. Punctuation on either side of the
+    # carried text stays raw, so the token is the word and nothing else.
     (
         "「通してくれん」\n嘘だ",
         ["通して", "くれない", "嘘", "だ"],
-        ["「", "通して", "くれん」\n", "嘘", "だ"],
+        [("raw", "「"), ("tok", "通して"), ("くれない", "くれん"), ("raw", "」\n"),
+         ("tok", "嘘"), ("tok", "だ")],
+    ),
+    # Punctuation before the carried text splits off the same way.
+    (
+        "木は、大きすぎる",
+        ["木", "は", "大きい", "すぎる"],
+        [("tok", "木"), ("tok", "は"), ("raw", "、"), ("大きい", "大き"), ("tok", "すぎる")],
     ),
     # Kana is word text, not punctuation. いてた segments as いて + いた and the
     # text holds た, so the lemma's next real occurrence is the trap - and here
@@ -213,7 +252,8 @@ SELFTEST = [
     (
         "そこにいてたからいた",
         ["そこ", "に", "いて", "いた", "から", "いた"],
-        ["そこ", "に", "いて", "た", "から", "いた"],
+        [("tok", "そこ"), ("tok", "に"), ("tok", "いて"), ("いた", "た"),
+         ("tok", "から"), ("tok", "いた")],
     ),
     # A drop funds the gap directly after it and nothing later. Without the reset
     # the budget accumulates down the document until the guard is inert again -
@@ -222,35 +262,48 @@ SELFTEST = [
     (
         "熱すぎて湯は水と湯だ",
         ["熱い", "すぎて", "湯", "は", "湯", "だ"],
-        ["熱", "すぎて", "湯", "は", "水と湯だ"],
+        [("熱い", "熱"), ("tok", "すぎて"), ("tok", "湯"), ("tok", "は"),
+         ("raw", "水と湯だ")],
     ),
-    # Two drops in a row fund one gap between them: 大きい and 高い are both
-    # unplaceable, and 3 word characters is within their 5 of slack.
+    # Two tokens dropped in a row share one gap, and nothing in it says where the
+    # boundary between them falls. Both stay lost rather than one being guessed.
     (
         "大き高すぎる",
         ["大きい", "高い", "すぎる"],
-        ["大き高", "すぎる"],
+        [("raw", "大き高"), ("tok", "すぎる")],
     ),
 ]
 
 
 def selftest():
     """_interleave's matching rule, over hand-built token lists. No Ichiran needed."""
+
+    def kind(piece):
+        if "raw" in piece:
+            return ("raw", piece["raw"])
+        if "lemma" in piece:
+            return (piece["lemma"], piece["surface"])
+        return ("tok", piece["surface"])
+
     ok = True
     for text, surfaces, want in SELFTEST:
-        pieces = _interleave(text, [{"surface": s} for s in surfaces])
-        got = [p.get("raw", p.get("surface")) for p in pieces]
+        pieces = _interleave(text, [{"surface": x} for x in surfaces])
+        got = [kind(x) for x in pieces]
         # Offsets are the whole point of the function, so check them rather than
-        # trusting the surfaces: every piece must abut the last and cover the text.
-        spans = [(p["start"], p["end"]) for p in pieces]
+        # trusting the surfaces: every piece must abut the last and cover the
+        # text, and a carried token must hold the text its own offsets name.
+        spans = [(x["start"], x["end"]) for x in pieces]
         contiguous = all(a[1] == b[0] for a, b in zip(spans, spans[1:]))
         covered = not spans or (spans[0][0] == 0 and spans[-1][1] == len(text))
-        good = got == want and contiguous and covered
+        honest = all(text[x["start"]:x["end"]] == x.get("raw", x.get("surface"))
+                     for x in pieces)
+        good = got == want and contiguous and covered and honest
         ok &= good
         print(f"  {'ok  ' if good else 'FAIL'} {text}")
         if not good:
             print(f"       want {want}")
-            print(f"       got  {got}  contiguous={contiguous} covered={covered}")
+            print(f"       got  {got}")
+            print(f"       contiguous={contiguous} covered={covered} honest={honest}")
     return ok
 
 
