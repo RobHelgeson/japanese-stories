@@ -20,6 +20,7 @@
   --accent: #7a5c2e;
   --weak: #da117b;
   --new: #0d7c86;
+  --veil: rgba(34, 32, 28, 0.38);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -30,6 +31,7 @@
     --accent: #d3b075;
     --weak: #f74395;
     --new: #4fc2ce;
+    --veil: rgba(0, 0, 0, 0.5);
   }
 }
 * { box-sizing: border-box; }
@@ -42,7 +44,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
 }
-header, footer {
+header {
   display: flex;
   align-items: baseline;
   gap: 1rem;
@@ -53,9 +55,13 @@ header, footer {
 }
 /* Sticky rather than the reader's fixed frame. This page is one long
    scrolling list, so pinning <main> as its own scroll container would
-   inset the scrollbar to the 46rem column, and a pinned footer would
-   hold nothing worth keeping on screen. An opaque background is required
-   or the cards show through as they pass under it. */
+   inset the scrollbar to the 46rem column. An opaque background is
+   required or the cards show through as they pass under it.
+
+   There is no footer. It held the eight story titles — the same eight the
+   list above it is made of, in the same order — beside the repo's name,
+   so scrolling past the last card produced the whole list again in grey.
+   A generated duplicate is still a duplicate. */
 header {
   border-bottom: 1px solid var(--rule);
   position: sticky;
@@ -63,7 +69,6 @@ header {
   z-index: 2;
   background: var(--paper);
 }
-footer { border-top: 1px solid var(--rule); margin-top: auto; }
 h1 { font-size: 1.1rem; margin: 0; color: var(--ink); font-weight: 600; white-space: nowrap; }
 .spacer { flex: 1; }
 header { gap: 0.6rem; }
@@ -427,18 +432,24 @@ main { counter-reset: story; }
 .rate .notebtn.has { color: var(--accent); border-color: var(--accent); }
 .cell.done .manage [data-act="done"] { color: var(--new); border-color: var(--new); }
 
+/* A section of the 案内 panel now, not a <details> at the foot of the list,
+   so the rule, the top margin and the summary that opened it are all gone.
+   What is left is the setup itself: paste a token, or move the record by
+   hand. The paragraph that used to explain WHY — seven-day storage purges,
+   Home Screen containers, gist revisions as undo — is in README, which is
+   where a thing you read once belongs. */
 .sync {
   font-family: -apple-system, system-ui, sans-serif;
   font-size: 0.78rem;
   color: var(--muted);
-  margin-top: 2.2rem;
-  padding-top: 1.3rem;
-  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 0.7rem;
 }
-.sync summary { cursor: pointer; color: var(--accent); }
 .sync a { color: var(--accent); }
+/* The markup has always carried this spacer and no rule ever claimed it, so
+   全消去 sat against 読み込み — a wipe one thumb-width from an import. */
+.sync .mspacer { flex: 1; }
 .sync a[hidden] { display: none; }
-.sync .sbody { margin-top: 0.9rem; display: grid; gap: 0.7rem; }
 .sync .srow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .sync input[type="password"] {
   font: inherit;
@@ -472,9 +483,7 @@ main { counter-reset: story; }
   font-size: 0.78rem;
   line-height: 1.7;
   color: var(--muted);
-  margin: 2.2rem 0 0;
-  padding-top: 1.3rem;
-  border-top: 1px solid var(--rule);
+  margin: 0 0 0.7rem;
 }
 .keys kbd {
   font: inherit;
@@ -483,13 +492,118 @@ main { counter-reset: story; }
   padding: 0.05rem 0.35rem;
   color: var(--ink);
 }
+/* The legend does not name the two colours, it draws them — the reader's own
+   傍点, off the reader's own two variables. Prose drifts from a stylesheet with
+   nothing to catch it: this paragraph claimed red and teal for a page that has
+   painted pink and cyan since the marks landed. A rendered sample cannot say
+   the wrong colour. --ink rather than --muted because the sample is the thing
+   being pointed at, and a sesame on muted grey text is what it looks like when
+   the page has gone quiet. */
+.keys .mk {
+  color: var(--ink);
+  -webkit-text-emphasis-position: under left;
+  text-emphasis-position: under left;
+}
+.keys .mk.weak {
+  -webkit-text-emphasis: filled sesame var(--weak);
+  text-emphasis: filled sesame var(--weak);
+}
+.keys .mk.new {
+  -webkit-text-emphasis: open circle var(--new);
+  text-emphasis: open circle var(--new);
+}
+
+/* ---- the 案内 panel ---------------------------------------------------
+   The reader's 設定 panel, in miniature and with its class names: a bottom
+   sheet in a <dialog>, for the free focus trap, Escape, backdrop and
+   inert-ing of the list behind it. Where showModal is missing it opens
+   non-modally over #veil, which is the one thing a plain [open] cannot do
+   for itself. Sharing .phead / .pbody with the reader is deliberate — two
+   panels that behave alike should not be two implementations. */
+#guide {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 27rem;
+  max-height: min(86vh, 44rem);
+  max-height: min(86dvh, 44rem);
+  padding: 0;
+  border: 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.22);
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 0.92rem;
+}
+/* display:flex above beats the UA's dialog:not([open]) rule, so the panel
+   ships open without this. */
+#guide:not([open]) { display: none; }
+/* Opened with focus on the panel itself, so no control wears a keyboard
+   ring the moment a thumb opens it. */
+#guide:focus { outline: none; }
+/* The var() fallback covers engines where ::backdrop does not inherit
+   custom properties from the element it belongs to. */
+#guide::backdrop { background: var(--veil, rgba(20, 18, 16, 0.4)); }
+#veil {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--veil);
+}
+#veil[hidden] { display: none; }
+
+.phead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.phead h2 { margin: 0; font: inherit; font-size: 1rem; font-weight: 600; color: var(--ink); }
+#guide-close {
+  font: inherit;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#guide-close:hover { border-color: var(--accent); color: var(--accent); }
+.pbody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: 0 1rem calc(1rem + env(safe-area-inset-bottom));
+}
+.pbody h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     </style>
   </head>
   <body>
     <header>
       <h1>物語</h1>
       <span class="spacer"></span>
-      <span id="totals">8 編 · 235 ページ · 1084 文 · 既知語彙 6537<span id="readtot"></span></span>
+      <span id="totals">8 編 · 235 ページ · 1084 文 · 既知語彙 6545<span id="readtot"></span></span>
+      <button class="btn" id="guide-open" type="button" aria-haspopup="dialog">案内</button>
       <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
     </header>
 
@@ -815,31 +929,39 @@ main { counter-reset: story; }
       </div>
     </div>
 
-      <p class="keys">
-        In a story: tap a kanji word for its reading, in place. Tap it twice for its
-        English meaning, in a sheet at the foot of the page.
-        Tap between words — the kana and the punctuation — for the whole sentence's
-        readings, and twice for the sentence in English.
-        <kbd>f</kbd> reveals every reading at once.
-        Swipe to turn the page, or <kbd>←</kbd> <kbd>→</kbd>;
-        <kbd>設</kbd> holds writing mode, 改行, 綴じ, type size, theme and ふりがな;
-        <kbd>目次</kbd> comes back here.
-        <br />
-        Red 傍点 beside a word is a leech: known, but on a card that keeps failing.
-        Teal circles with a visible reading is approved but not yet learned.
-      </p>
+    </main>
 
-      <details class="sync" id="sync">
-        <summary>読書記録の同期</summary>
-        <div class="sbody">
-          <p>
-            Progress is kept in this browser, and browsers throw that away — WebKit deletes
-            all script-writable storage after seven days without a visit, and a Home Screen
-            web app starts with an empty store of its own. Connecting a GitHub token keeps a
-            copy in a secret gist instead, shared by every device that pastes the same token.
-            The gist is a plain JSON file you can open and correct by hand, and its revision
-            history is the undo.
-          </p>
+    <!-- Both halves of this used to sit at the foot of the list, in the reading
+         column, under the eighth story. Neither is read twice: the gestures are
+         learned in one sitting and the token is pasted once per device. Behind
+         案内 they cost a tap when they are wanted and nothing when they are not. -->
+    <dialog id="guide" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <div class="phead">
+        <h2 id="guide-title">案内</h2>
+        <button id="guide-close" type="button" aria-label="閉じる">✕</button>
+      </div>
+      <div class="pbody">
+        <h3>使い方</h3>
+        <p class="keys">
+          In a story: tap a kanji word for its reading, in place. Tap it twice for its
+          English meaning, in a sheet at the foot of the page.
+          Tap between words — the kana and the punctuation — for the whole sentence's
+          readings, and twice for the sentence in English.
+          <kbd>f</kbd> reveals every reading at once.
+          Swipe to turn the page, or <kbd>←</kbd> <kbd>→</kbd>;
+          <kbd>設</kbd> holds writing mode, 改行, 綴じ, type size, theme and ふりがな;
+          <kbd>目次</kbd> comes back here.
+        </p>
+        <p class="keys">
+          Two kinds of word carry 傍点, the sesame dots Japanese prose uses to draw
+          attention to a word. Pink filled sesame — <span class="mk weak">苦手</span> —
+          is a leech: known, but on a card that keeps failing, and its reading stays
+          hidden like any other. Cyan open circles — <span class="mk new">新出</span> —
+          is a new word, approved for this story but not yet learned, and its reading
+          is shown from the start.
+        </p>
+        <h3>読書記録の同期</h3>
+        <div class="sync" id="sync">
           <div class="srow">
             <input type="password" id="tok" placeholder="GitHub token (Gists: write)"
                    autocomplete="off" autocapitalize="off" spellcheck="false" />
@@ -857,14 +979,10 @@ main { counter-reset: story; }
           <textarea id="box" rows="10" spellcheck="false" hidden
                     aria-label="読書記録の JSON"></textarea>
         </div>
-      </details>
-    </main>
-
-    <footer>
-      <span>時計の音 · 迷子の手紙 · 終電 · 煙突の煙 · 猫を探す探偵 · 城の鐘 · 行かなかった人の地図 · 廊下の鏡</span>
-      <span class="spacer"></span>
-      <span>known-word-reader</span>
-    </footer>
+      </div>
+    </dialog>
+    <!-- The no-showModal fallback, same as the reader's. -->
+    <div id="veil" hidden></div>
     <script src="sync.js"></script>
     <script>
 // Progress is written by the readers into this device's localStorage, so
@@ -1216,6 +1334,41 @@ main { counter-reset: story; }
     }
   });
 
+  // The reader's 設定 panel logic, minus the settings: showModal where it
+  // exists, for the focus trap, the backdrop, Escape and the inert-ing of
+  // the list behind it; a plain [open] over #veil where it does not. The
+  // reader carries a hand-rolled Tab trap for that second path because a
+  // reader is the file that gets mailed around; this page is only ever
+  // served, so the degraded path degrades and is not re-implemented.
+  //
+  // Wired above the `if (!S)` below on purpose. 案内 must open on a page
+  // that never loaded sync.js — half of what is in it is the gestures.
+  var panel = $("guide"), veil = $("veil"), opener = $("guide-open");
+  var MODAL = typeof panel.showModal === "function";
+  var closeGuide = function () {
+    if (MODAL) { panel.close(); return; } // fires 'close', which restores focus
+    panel.removeAttribute("open");
+    veil.hidden = true;
+    opener.focus();
+  };
+  opener.addEventListener("click", function () {
+    if (MODAL) panel.showModal();
+    else { veil.hidden = false; panel.setAttribute("open", ""); }
+    panel.focus();
+  });
+  $("guide-close").addEventListener("click", closeGuide);
+  veil.addEventListener("click", closeGuide);
+  // showModal draws the backdrop as part of the dialog's own box, so a tap
+  // outside the sheet lands on the <dialog> element and not on a child.
+  panel.addEventListener("click", function (e) {
+    if (e.target === panel) closeGuide();
+  });
+  // Covers the UA's own Escape as well as closeGuide's call.
+  panel.addEventListener("close", function () { opener.focus(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !MODAL && panel.hasAttribute("open")) closeGuide();
+  });
+
   paint(read());
   paintR(readR());
 
@@ -1310,7 +1463,7 @@ main { counter-reset: story; }
   $("wipe").addEventListener("click", function () {
     // No confirm(): a modal dialog blocks the extension driving this page
     // in the harness, and the gist's revision history is the real undo.
-    // Two deliberate taps behind a closed <details> is the guard.
+    // Two deliberate taps behind a closed 案内 panel is the guard.
     if ($("wipe").dataset.armed !== "1") {
       $("wipe").dataset.armed = "1";
       $("wipe").textContent = "本当に全消去";

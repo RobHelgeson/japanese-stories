@@ -347,6 +347,41 @@
     }
   });
 
+  // The reader's 設定 panel logic, minus the settings: showModal where it
+  // exists, for the focus trap, the backdrop, Escape and the inert-ing of
+  // the list behind it; a plain [open] over #veil where it does not. The
+  // reader carries a hand-rolled Tab trap for that second path because a
+  // reader is the file that gets mailed around; this page is only ever
+  // served, so the degraded path degrades and is not re-implemented.
+  //
+  // Wired above the `if (!S)` below on purpose. 案内 must open on a page
+  // that never loaded sync.js — half of what is in it is the gestures.
+  var panel = $("guide"), veil = $("veil"), opener = $("guide-open");
+  var MODAL = typeof panel.showModal === "function";
+  var closeGuide = function () {
+    if (MODAL) { panel.close(); return; } // fires 'close', which restores focus
+    panel.removeAttribute("open");
+    veil.hidden = true;
+    opener.focus();
+  };
+  opener.addEventListener("click", function () {
+    if (MODAL) panel.showModal();
+    else { veil.hidden = false; panel.setAttribute("open", ""); }
+    panel.focus();
+  });
+  $("guide-close").addEventListener("click", closeGuide);
+  veil.addEventListener("click", closeGuide);
+  // showModal draws the backdrop as part of the dialog's own box, so a tap
+  // outside the sheet lands on the <dialog> element and not on a child.
+  panel.addEventListener("click", function (e) {
+    if (e.target === panel) closeGuide();
+  });
+  // Covers the UA's own Escape as well as closeGuide's call.
+  panel.addEventListener("close", function () { opener.focus(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !MODAL && panel.hasAttribute("open")) closeGuide();
+  });
+
   paint(read());
   paintR(readR());
 
@@ -441,7 +476,7 @@
   $("wipe").addEventListener("click", function () {
     // No confirm(): a modal dialog blocks the extension driving this page
     // in the harness, and the gist's revision history is the real undo.
-    // Two deliberate taps behind a closed <details> is the guard.
+    // Two deliberate taps behind a closed 案内 panel is the guard.
     if ($("wipe").dataset.armed !== "1") {
       $("wipe").dataset.armed = "1";
       $("wipe").textContent = "本当に全消去";

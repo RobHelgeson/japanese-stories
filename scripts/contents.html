@@ -20,6 +20,7 @@ __CONTENTS_CSS__
       <h1>物語</h1>
       <span class="spacer"></span>
       <span id="totals">__TOTALS__<span id="readtot"></span></span>
+      <button class="btn" id="guide-open" type="button" aria-haspopup="dialog">案内</button>
       <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
     </header>
 
@@ -36,31 +37,39 @@ __CONTENTS_CSS__
       </a>
 
 __CARDS__
-      <p class="keys">
-        In a story: tap a kanji word for its reading, in place. Tap it twice for its
-        English meaning, in a sheet at the foot of the page.
-        Tap between words — the kana and the punctuation — for the whole sentence's
-        readings, and twice for the sentence in English.
-        <kbd>f</kbd> reveals every reading at once.
-        Swipe to turn the page, or <kbd>←</kbd> <kbd>→</kbd>;
-        <kbd>設</kbd> holds writing mode, 改行, 綴じ, type size, theme and ふりがな;
-        <kbd>目次</kbd> comes back here.
-        <br />
-        Red 傍点 beside a word is a leech: known, but on a card that keeps failing.
-        Teal circles with a visible reading is approved but not yet learned.
-      </p>
+    </main>
 
-      <details class="sync" id="sync">
-        <summary>読書記録の同期</summary>
-        <div class="sbody">
-          <p>
-            Progress is kept in this browser, and browsers throw that away — WebKit deletes
-            all script-writable storage after seven days without a visit, and a Home Screen
-            web app starts with an empty store of its own. Connecting a GitHub token keeps a
-            copy in a secret gist instead, shared by every device that pastes the same token.
-            The gist is a plain JSON file you can open and correct by hand, and its revision
-            history is the undo.
-          </p>
+    <!-- Both halves of this used to sit at the foot of the list, in the reading
+         column, under the eighth story. Neither is read twice: the gestures are
+         learned in one sitting and the token is pasted once per device. Behind
+         案内 they cost a tap when they are wanted and nothing when they are not. -->
+    <dialog id="guide" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <div class="phead">
+        <h2 id="guide-title">案内</h2>
+        <button id="guide-close" type="button" aria-label="閉じる">✕</button>
+      </div>
+      <div class="pbody">
+        <h3>使い方</h3>
+        <p class="keys">
+          In a story: tap a kanji word for its reading, in place. Tap it twice for its
+          English meaning, in a sheet at the foot of the page.
+          Tap between words — the kana and the punctuation — for the whole sentence's
+          readings, and twice for the sentence in English.
+          <kbd>f</kbd> reveals every reading at once.
+          Swipe to turn the page, or <kbd>←</kbd> <kbd>→</kbd>;
+          <kbd>設</kbd> holds writing mode, 改行, 綴じ, type size, theme and ふりがな;
+          <kbd>目次</kbd> comes back here.
+        </p>
+        <p class="keys">
+          Two kinds of word carry 傍点, the sesame dots Japanese prose uses to draw
+          attention to a word. Pink filled sesame — <span class="mk weak">苦手</span> —
+          is a leech: known, but on a card that keeps failing, and its reading stays
+          hidden like any other. Cyan open circles — <span class="mk new">新出</span> —
+          is a new word, approved for this story but not yet learned, and its reading
+          is shown from the start.
+        </p>
+        <h3>読書記録の同期</h3>
+        <div class="sync" id="sync">
           <div class="srow">
             <input type="password" id="tok" placeholder="GitHub token (Gists: write)"
                    autocomplete="off" autocapitalize="off" spellcheck="false" />
@@ -78,14 +87,10 @@ __CARDS__
           <textarea id="box" rows="10" spellcheck="false" hidden
                     aria-label="読書記録の JSON"></textarea>
         </div>
-      </details>
-    </main>
-
-    <footer>
-      <span>__TITLES__</span>
-      <span class="spacer"></span>
-      <span>known-word-reader</span>
-    </footer>
+      </div>
+    </dialog>
+    <!-- The no-showModal fallback, same as the reader's. -->
+    <div id="veil" hidden></div>
     <script src="sync.js"></script>
     <script>
 __CONTENTS_JS__

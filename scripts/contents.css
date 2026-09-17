@@ -6,6 +6,7 @@
   --accent: #7a5c2e;
   --weak: #da117b;
   --new: #0d7c86;
+  --veil: rgba(34, 32, 28, 0.38);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -16,6 +17,7 @@
     --accent: #d3b075;
     --weak: #f74395;
     --new: #4fc2ce;
+    --veil: rgba(0, 0, 0, 0.5);
   }
 }
 * { box-sizing: border-box; }
@@ -28,7 +30,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
 }
-header, footer {
+header {
   display: flex;
   align-items: baseline;
   gap: 1rem;
@@ -39,9 +41,13 @@ header, footer {
 }
 /* Sticky rather than the reader's fixed frame. This page is one long
    scrolling list, so pinning <main> as its own scroll container would
-   inset the scrollbar to the 46rem column, and a pinned footer would
-   hold nothing worth keeping on screen. An opaque background is required
-   or the cards show through as they pass under it. */
+   inset the scrollbar to the 46rem column. An opaque background is
+   required or the cards show through as they pass under it.
+
+   There is no footer. It held the eight story titles — the same eight the
+   list above it is made of, in the same order — beside the repo's name,
+   so scrolling past the last card produced the whole list again in grey.
+   A generated duplicate is still a duplicate. */
 header {
   border-bottom: 1px solid var(--rule);
   position: sticky;
@@ -49,7 +55,6 @@ header {
   z-index: 2;
   background: var(--paper);
 }
-footer { border-top: 1px solid var(--rule); margin-top: auto; }
 h1 { font-size: 1.1rem; margin: 0; color: var(--ink); font-weight: 600; white-space: nowrap; }
 .spacer { flex: 1; }
 header { gap: 0.6rem; }
@@ -413,18 +418,24 @@ main { counter-reset: story; }
 .rate .notebtn.has { color: var(--accent); border-color: var(--accent); }
 .cell.done .manage [data-act="done"] { color: var(--new); border-color: var(--new); }
 
+/* A section of the 案内 panel now, not a <details> at the foot of the list,
+   so the rule, the top margin and the summary that opened it are all gone.
+   What is left is the setup itself: paste a token, or move the record by
+   hand. The paragraph that used to explain WHY — seven-day storage purges,
+   Home Screen containers, gist revisions as undo — is in README, which is
+   where a thing you read once belongs. */
 .sync {
   font-family: -apple-system, system-ui, sans-serif;
   font-size: 0.78rem;
   color: var(--muted);
-  margin-top: 2.2rem;
-  padding-top: 1.3rem;
-  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 0.7rem;
 }
-.sync summary { cursor: pointer; color: var(--accent); }
 .sync a { color: var(--accent); }
+/* The markup has always carried this spacer and no rule ever claimed it, so
+   全消去 sat against 読み込み — a wipe one thumb-width from an import. */
+.sync .mspacer { flex: 1; }
 .sync a[hidden] { display: none; }
-.sync .sbody { margin-top: 0.9rem; display: grid; gap: 0.7rem; }
 .sync .srow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .sync input[type="password"] {
   font: inherit;
@@ -458,9 +469,7 @@ main { counter-reset: story; }
   font-size: 0.78rem;
   line-height: 1.7;
   color: var(--muted);
-  margin: 2.2rem 0 0;
-  padding-top: 1.3rem;
-  border-top: 1px solid var(--rule);
+  margin: 0 0 0.7rem;
 }
 .keys kbd {
   font: inherit;
@@ -469,3 +478,107 @@ main { counter-reset: story; }
   padding: 0.05rem 0.35rem;
   color: var(--ink);
 }
+/* The legend does not name the two colours, it draws them — the reader's own
+   傍点, off the reader's own two variables. Prose drifts from a stylesheet with
+   nothing to catch it: this paragraph claimed red and teal for a page that has
+   painted pink and cyan since the marks landed. A rendered sample cannot say
+   the wrong colour. --ink rather than --muted because the sample is the thing
+   being pointed at, and a sesame on muted grey text is what it looks like when
+   the page has gone quiet. */
+.keys .mk {
+  color: var(--ink);
+  -webkit-text-emphasis-position: under left;
+  text-emphasis-position: under left;
+}
+.keys .mk.weak {
+  -webkit-text-emphasis: filled sesame var(--weak);
+  text-emphasis: filled sesame var(--weak);
+}
+.keys .mk.new {
+  -webkit-text-emphasis: open circle var(--new);
+  text-emphasis: open circle var(--new);
+}
+
+/* ---- the 案内 panel ---------------------------------------------------
+   The reader's 設定 panel, in miniature and with its class names: a bottom
+   sheet in a <dialog>, for the free focus trap, Escape, backdrop and
+   inert-ing of the list behind it. Where showModal is missing it opens
+   non-modally over #veil, which is the one thing a plain [open] cannot do
+   for itself. Sharing .phead / .pbody with the reader is deliberate — two
+   panels that behave alike should not be two implementations. */
+#guide {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 27rem;
+  max-height: min(86vh, 44rem);
+  max-height: min(86dvh, 44rem);
+  padding: 0;
+  border: 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.22);
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 0.92rem;
+}
+/* display:flex above beats the UA's dialog:not([open]) rule, so the panel
+   ships open without this. */
+#guide:not([open]) { display: none; }
+/* Opened with focus on the panel itself, so no control wears a keyboard
+   ring the moment a thumb opens it. */
+#guide:focus { outline: none; }
+/* The var() fallback covers engines where ::backdrop does not inherit
+   custom properties from the element it belongs to. */
+#guide::backdrop { background: var(--veil, rgba(20, 18, 16, 0.4)); }
+#veil {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--veil);
+}
+#veil[hidden] { display: none; }
+
+.phead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.phead h2 { margin: 0; font: inherit; font-size: 1rem; font-weight: 600; color: var(--ink); }
+#guide-close {
+  font: inherit;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#guide-close:hover { border-color: var(--accent); color: var(--accent); }
+.pbody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: 0 1rem calc(1rem + env(safe-area-inset-bottom));
+}
+.pbody h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

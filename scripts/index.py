@@ -173,11 +173,7 @@ def main():
 
     out = out_dir / "index.html"
     out.write_text(
-        template().replace("__CARDS__", cards)
-        .replace("__TOTALS__", totals)
-        # Hand-kept until 2026-09-14, and one story short of the count printed
-        # in the header the whole time.
-        .replace("__TITLES__", html.escape(" · ".join(s["title"] for s in built))),
+        template().replace("__CARDS__", cards).replace("__TOTALS__", totals),
         encoding="utf-8")
     print(f"{out}\n  {len(built)} stories · {totals}")
 

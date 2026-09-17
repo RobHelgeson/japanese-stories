@@ -64,17 +64,19 @@ The row shows what you need to **pick** a story: the title, its reading, its lev
 
 続き at the top is the story already in hand, whichever was read most recently, or 次へ on the first one not yet finished. It is built from the progress record at paint time, so it is simply absent on a device that has never read anything, and gone once the set is read out.
 
+案内 in the header holds the two things that are read once and then never again: what the gestures do inside a story, and the token field that connects the gist. Both used to sit in the reading column under the last story, which put a wall of instructions between the list and the end of the page every time you scrolled to the bottom. There is no footer — it printed the eight story titles, generated, beneath a list made of them.
+
 ## Keeping your place
 
 Progress is written to `localStorage` as you read, and that is the working copy. Browsers throw it away, though: WebKit deletes all script-writable storage after seven days of browser use without a visit, and a Home Screen web app starts with a storage container of its own rather than the Safari tab's. Two things address that, and they are meant to be done in this order.
 
-**Connect a gist.** 読書記録の同期 on the contents page takes a GitHub token — fine-grained, **Gists: write**, nothing else — and keeps a copy of your progress in a secret gist. Every device that pastes the same token finds the same gist by filename and shares it; you never carry a gist id around. Per slug the later timestamp wins, so two devices converge without a lock, and a push that would write what is already there is skipped, which keeps the gist's revision list usable as an undo history rather than a log of page turns.
+**Connect a gist.** 読書記録の同期, inside 案内 on the contents page, takes a GitHub token — fine-grained, **Gists: write**, nothing else — and keeps a copy of your progress in a secret gist. Every device that pastes the same token finds the same gist by filename and shares it; you never carry a gist id around. Per slug the later timestamp wins, so two devices converge without a lock, and a push that would write what is already there is skipped, which keeps the gist's revision list usable as an undo history rather than a log of page turns.
 
 The store is a plain JSON file on github.com, so correcting a bad record is something you can do by hand in the gist editor, with its revision history behind you. `?nosync` disables the whole thing for a load, the way `?nostore` does for `localStorage`.
 
 **Then add it to the Home Screen.** That is what stops the seven-day eviction, because a standalone web app gets its own counter of days of use. Do it after connecting, not before: the install begins with an empty store, so it will read as zero progress until you paste the token into it and let it pull.
 
-編集 on the contents page opens per-story controls — mark 読了 or 未読, move the resume page, clear one story — alongside 書き出し / 読み込み for the whole record as JSON. Import merges by the same rule the gist does, so pasting an older export cannot pull a story backwards. Clearing writes a dated empty record rather than deleting the key, because a deletion merges back to whatever the gist still holds and would undo itself on the next pull. 消去 clears the place, not the rating.
+編集 on the contents page opens per-story controls — mark 読了 or 未読, move the resume page, clear one story — and 案内 holds 書き出し / 読み込み for the whole record as JSON. Import merges by the same rule the gist does, so pasting an older export cannot pull a story backwards. Clearing writes a dated empty record rather than deleting the key, because a deletion merges back to whatever the gist still holds and would undo itself on the next pull. 消去 clears the place, not the rating.
 
 ## Rating a story
 

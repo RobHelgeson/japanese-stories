@@ -131,7 +131,7 @@ def check_contracts():
 
     for needle in ("    <style>\n__CONTENTS_CSS__\n    </style>\n",
                    "    <script>\n__CONTENTS_JS__\n    </script>\n",
-                   "__CARDS__", "__TOTALS__", "__TITLES__"):
+                   "__CARDS__", "__TOTALS__"):
         if chtml.count(needle) != 1:
             raise SystemExit(
                 f"build contract broken: {needle!r} matched {chtml.count(needle)}x in contents.html")
@@ -141,7 +141,7 @@ def check_contracts():
     # markup. Nothing else looks, and the tokens are no longer visible in the
     # file that consumes them.
     for name, body in (("contents.css", ccss), ("contents.js", cjs)):
-        stray = [m for m in ("__CARDS__", "__TOTALS__", "__TITLES__",
+        stray = [m for m in ("__CARDS__", "__TOTALS__",
                              "__CONTENTS_CSS__", "__CONTENTS_JS__") if m in body]
         if stray:
             raise SystemExit(
@@ -1138,6 +1138,19 @@ window.H = (() => {
         Sheet.isOpen() && isLit(s) && body.textContent === s.dataset.en,
         { open: Sheet.isOpen(), lit: isLit(s), body: body.textContent.slice(0, 60) });
 
+    // With the headword and the pitch row both away, the translation is the only
+    // thing in the panel, and #sheet-body's top margin — which exists to hold a
+    // gloss off the headword — has nothing above it to clear. Left in, it stacks
+    // on the panel's own top padding and the line sits low in its box. Measured
+    // rather than asserted in the cascade, because a margin that collapses is
+    // indistinguishable from one that is overridden until it is on screen.
+    {
+      const pr = panel.getBoundingClientRect(), br = body.getBoundingClientRect();
+      const top = br.top - pr.top, bottom = pr.bottom - br.bottom;
+      add("sheet/a-translation-sits-centred", Math.abs(top - bottom) <= 1,
+          { top: Math.round(top * 100) / 100, bottom: Math.round(bottom * 100) / 100 });
+    }
+
     // A word inside a lit sentence takes the light off it. Single-slot lighting
     // is what keeps the page from drifting into full-page ふりがな a tap at a
     // time.
@@ -2127,13 +2140,30 @@ def suite_index(br, rep, base):
         rep.add("index", "the-page-renders-every-story-in-the-corpus",
                 len(every) == len(json.loads((REPO / "scripts" / "corpus.json")
                                              .read_text(encoding="utf-8"))["stories"]), every)
-        # The footer was a hand-kept list of titles and sat one story short for
-        # as long as there had been seven, under a header counting them.
-        foot = br.eval("document.querySelector('footer span').textContent")
-        titles = br.eval("[].map.call(document.querySelectorAll('.cell[data-slug]'),"
-                         " function (c) { return c.dataset.title; })")
-        rep.add("index", "and-the-footer-names-all-of-them",
-                all(t in foot for t in titles) and foot.count("·") == len(titles) - 1, foot)
+        # The footer that used to be asserted here repeated those same titles,
+        # generated, under a list made of them. It is gone rather than fixed.
+
+        # ---- 案内 --------------------------------------------------------------
+        # The help and the sync setup are a panel now, not two blocks at the foot
+        # of the reading column. Containment rather than visibility: markup that
+        # merely sits in the list with display:none would pass a hidden check and
+        # still be in the list.
+        disp = "getComputedStyle(document.getElementById('guide')).display"
+        keys = "getComputedStyle(document.querySelector('#guide .keys')).display"
+        rep.add("index", "the-help-and-the-sync-setup-live-in-the-panel",
+                br.eval("!!document.querySelector('#guide .keys')")
+                and br.eval("!!document.querySelector('#guide #sync')"), None)
+        rep.add("index", "which-is-shut-on-arrival",
+                br.eval("document.getElementById('guide').hasAttribute('open')") is False
+                and br.eval(disp) == "none", br.eval(disp))
+        br.eval("document.getElementById('guide-open').click()")
+        rep.add("index", "the-guide-button-opens-it",
+                br.eval("document.getElementById('guide').hasAttribute('open')")
+                and br.eval(keys) != "none", br.eval(keys))
+        br.eval("document.getElementById('guide-close').click()")
+        rep.add("index", "and-the-close-button-shuts-it",
+                br.eval("document.getElementById('guide').hasAttribute('open')") is False
+                and br.eval(disp) == "none", br.eval(disp))
         load({slug: rec(1, 1000, done=True, doneAt=1000) for slug in every})
         rep.add("index", "a-finished-corpus-withdraws-the-row",
                 br.eval(f"{res}.hidden") is True, None)

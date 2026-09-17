@@ -380,7 +380,7 @@
       .s.lit rt { opacity: 1; }
       /* Approved stretch vocabulary: not yet learned, so the reading is shown
          unconditionally rather than waiting for the ふ gate. README's "The
-         reader" section publishes that promise to readers — "teal circles with
+         reader" section publishes that promise to readers — "cyan circles with
          the reading shown" — so it is not an implementation detail to change
          quietly. The 傍点 below replace the underline, not this. */
       .w.new rt { opacity: 1; color: var(--new); }
@@ -703,6 +703,14 @@
       /* A third of glosses are truncated mid-word at 120 chars and none of them is
          guaranteed to carry a break opportunity. */
       #sheet-body { margin: 0.4rem 0 0; overflow-wrap: anywhere; }
+      /* That margin separates the gloss from the headword above it. A sentence
+         translation has neither a headword nor a pitch row, so the margin has
+         nothing left to separate and simply adds itself to the panel's 0.7rem of
+         top padding — 1.1rem above the only line in the box against 0.7rem below
+         it, which reads as the text sitting low. Asserted by the harness as
+         sheet/a-translation-sits-centred; the gap is a few pixels and shows up
+         only against the word panel, which this must NOT match. */
+      #sheet-head[hidden] + #sheet-pitch[hidden] + #sheet-body { margin-top: 0; }
 
       /* ---- pitch ---------------------------------------------------------- */
 
