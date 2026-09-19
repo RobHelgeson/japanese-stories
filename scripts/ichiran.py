@@ -16,6 +16,13 @@ KANJI = re.compile(r"[㐀-䶿一-鿿豈-﫿々]")
 # tokens, because Ichiran drops punctuation and never a word. See _interleave().
 WORD = re.compile(r"[ぁ-ゖァ-ヺーｰ㐀-䶿一-鿿豈-﫿々]")
 READING_BASE = re.compile(r"^(.+?)\s*【(.+?)】$")
+# Ichiran joins some readings with a zero-width character: で‌はある is five
+# codepoints, not four, and 時には's reading carries a zero-width space. They
+# are invisible in every context this project has — a base form that holds one
+# silently fails to match a known word, and a kana reading that holds one
+# renders it inside the furigana. Strip at the boundary so nothing downstream
+# has to know they exist.
+ZERO_WIDTH = re.compile(r"[​‌‍﻿]")
 
 
 def _urls():
@@ -52,16 +59,71 @@ def segment(text):
     return cache.through(text, _fetch)
 
 
-def _base_forms(entry):
-    """Dictionary forms this entry could reduce to, from its conjugation chain."""
-    out = set()
-    for c in entry.get("conj") or []:
-        m = READING_BASE.match(c.get("reading", ""))
-        if m:
-            out.add(m.group(1).strip())
-        elif c.get("reading"):
-            out.add(c["reading"].strip())
-        out |= _base_forms(c.get("via", {}) if isinstance(c.get("via"), dict) else {})
+def _children(node, key):
+    """`conj` or `via` as a list of nodes, whatever container Ichiran sent.
+
+    Every cached response holds a list, but the guard the first version of
+    _base_forms carried says a bare dict was seen at least once. Iterating a
+    dict yields its keys, so an unguarded walk calls .get on a string and takes
+    the whole segmentation pass down instead of degrading to one lost word.
+    """
+    child = node.get(key)
+    if isinstance(child, dict):
+        return [child]
+    return [c for c in (child or []) if isinstance(c, dict)]
+
+
+def _resolved(step):
+    """Whether a conjugation step carries its own entry rather than delegating."""
+    return bool(step.get("reading") or step.get("gloss"))
+
+
+def _chain(entry):
+    """The conjugation steps that describe this entry, Ichiran's order kept.
+
+    One step hangs its reading and gloss on the `conj` node itself, so 過ぎて
+    carries 過ぎる 【すぎる】 right there. A second step pushes the dictionary
+    entry down into that step's `via`: 描かれて is the te-form of the passive of
+    描く, and only `conj[0].via[0]` knows the word is 描く or that it means "to
+    draw". Reaching in at a fixed depth is what used to lose every passive,
+    causative and potential in the corpus.
+
+    But `via` is also where Ichiran parks a competing parse of a *different*
+    word, and that is the trap. 折れ is 折れる, and it is equally the potential of
+    折る — Ichiran gives the first its own reading and leaves the second to a
+    via-only sibling. Merging the two makes 折る a base form of 折れる, and since
+    callers read bases[0] as the dictionary form, the wrong verb wins on nothing
+    but sort order. So a sibling that resolved directly is Ichiran's answer and
+    the via-only siblings beside it are dropped; `via` is read only when no
+    sibling resolved, which is exactly the genuine multi-step case.
+
+    Order is Ichiran's own ranking and is load-bearing — see _base_forms.
+    """
+    steps = _children(entry, "conj")
+    direct = [c for c in steps if _resolved(c)]
+    for step in direct or steps:
+        yield step
+        if not _resolved(step):
+            for node in _children(step, "via"):
+                yield node
+                yield from _chain(node)
+
+
+def _base_forms(chain):
+    """Dictionary forms from an already-walked chain, best parse first.
+
+    Ranked, not sorted. Where a surface is genuinely ambiguous — 片付け is both
+    片付ける and 片付く — Ichiran orders the parses by score and bases[0] is read
+    downstream as *the* dictionary form. Sorting that by codepoint picked the
+    lemma by which kana happens to come first in Unicode.
+    """
+    out = []
+    for node in chain:
+        m = READING_BASE.match(node.get("reading", "") or "")
+        form = m.group(1).strip() if m else (node.get("reading") or "").strip()
+        form = ZERO_WIDTH.sub("", form)
+        if form and form not in out:
+            out.append(form)
     return out
 
 
@@ -101,17 +163,18 @@ def tokens(text):
         surface = e.get("text", "")
         if not surface:
             continue
+        chain = list(_chain(e))
         glosses = []
         for g in e.get("gloss") or []:
             glosses.append(g.get("gloss", ""))
-        for c in e.get("conj") or []:
-            for g in c.get("gloss") or []:
+        for node in chain:
+            for g in node.get("gloss") or []:
                 glosses.append(g.get("gloss", ""))
         out.append(
             {
                 "surface": surface,
-                "kana": (e.get("kana") or "").replace("\u200c", ""),
-                "bases": sorted(_base_forms(e)) or [surface],
+                "kana": ZERO_WIDTH.sub("", e.get("kana") or ""),
+                "bases": _base_forms(chain) or [surface],
                 "gloss": "; ".join(dict.fromkeys(g for g in glosses if g))[:120],
             }
         )
@@ -274,6 +337,94 @@ SELFTEST = [
     ),
 ]
 
+# Conjugation shapes, trimmed from recorded Ichiran responses. The glosses are
+# cut to one sense each; nothing else is edited, because the point is that the
+# walk reads the real nesting rather than a shape convenient to it.
+def _g(text):
+    return [{"gloss": text}]
+
+
+CHAIN_SELFTEST = [
+    # One step: reading and gloss sit on the conj node itself.
+    (
+        "過ぎて",
+        {"conj": [{"reading": "過ぎる 【すぎる】", "gloss": _g("to pass through")}]},
+        ["過ぎる"],
+        "to pass through",
+    ),
+    # Two steps: te-form of the passive, so only conj[0].via[0] knows the word.
+    # Reaching in at a fixed depth is what left every passive glossless.
+    (
+        "描かれて",
+        {"conj": [{"via": [{"reading": "描く 【えがく】", "gloss": _g("to draw")}]}]},
+        ["描く"],
+        "to draw",
+    ),
+    # A resolved sibling beside a via-only one: 折れ is 折れる, and equally the
+    # potential of 折る. Ichiran ranked 折れる first by giving it its own reading,
+    # so 折る is a competing parse and must not become a base form of it.
+    (
+        "折れ",
+        {"conj": [
+            {"reading": "折れる 【おれる】", "gloss": _g("to break")},
+            {"via": [{"reading": "折る 【おる】", "gloss": _g("to fold")}]},
+        ]},
+        ["折れる"],
+        "to break",
+    ),
+    # Two resolved siblings are genuine ambiguity, and both survive — in
+    # Ichiran's order, which is why bases is ranked rather than sorted. Sorting
+    # puts 片付く first on nothing but く sorting before け.
+    (
+        "片付け",
+        {"conj": [
+            {"reading": "片付ける 【かたづける】", "gloss": _g("to tidy up")},
+            {"reading": "片付く 【かたづく】", "gloss": _g("to be put in order")},
+        ]},
+        ["片付ける", "片付く"],
+        "to tidy up; to be put in order",
+    ),
+    # A dict where a list is expected must not take the segmentation pass down.
+    ("dict via", {"conj": [{"via": {"reading": "見る 【みる】", "gloss": _g("to see")}}]},
+     ["見る"], "to see"),
+    ("dict conj", {"conj": {"reading": "見る 【みる】", "gloss": _g("to see")}},
+     ["見る"], "to see"),
+    # Zero-width joins are invisible and load-bearing: で‌はある holds a U+200C
+    # and 時には's reading a U+200B. One makes a base form unmatchable against
+    # the known-word set, the other renders inside the furigana.
+    (
+        "zero-width",
+        {"conj": [{"reading": "で‌は​ある", "gloss": _g("to be")}]},
+        ["ではある"],
+        "to be",
+    ),
+    # Nothing to reduce to: the caller falls back to the surface.
+    ("no conj", {}, [], ""),
+]
+
+
+def chain_selftest():
+    """_chain / _base_forms over recorded conj shapes. No Ichiran needed."""
+    ok = True
+    for name, entry, want_bases, want_gloss in CHAIN_SELFTEST:
+        try:
+            chain = list(_chain(entry))
+            bases = _base_forms(chain)
+            gloss = "; ".join(dict.fromkeys(
+                g.get("gloss", "") for n in chain for g in n.get("gloss") or []
+            ))
+        except Exception as exc:  # a crash here is the finding, not an error
+            ok = False
+            print(f"  FAIL {name} raised {exc!r}")
+            continue
+        good = bases == want_bases and gloss == want_gloss
+        ok &= good
+        print(f"  {'ok  ' if good else 'FAIL'} {name}")
+        if not good:
+            print(f"       want {want_bases} / {want_gloss!r}")
+            print(f"       got  {bases} / {gloss!r}")
+    return ok
+
 
 def selftest():
     """_interleave's matching rule, over hand-built token lists. No Ichiran needed."""
@@ -311,6 +462,6 @@ if __name__ == "__main__":
     import sys
 
     if "--selftest" in sys.argv:
-        sys.exit(0 if selftest() else 1)
+        sys.exit(0 if all([chain_selftest(), selftest()]) else 1)
     for t in tokens(sys.argv[1]):
         print(f"{t['surface']}\t{t['kana']}\t{'/'.join(t['bases'])}")
