@@ -309,8 +309,39 @@ class Parse:
         return (*self.senses, *(s for step in self.chain for s in step.senses))
 
     def gloss(self, limit=120):
-        """Senses joined for display, deduplicated, Ichiran's order kept."""
-        joined = "; ".join(dict.fromkeys(s.text for s in self.all_senses if s.text))
+        """The leading sense of each entry this parse resolved to.
+
+        The first sense, not every sense, and that is a content decision rather
+        than a formatting one. Joining all of them and cutting at 120 characters
+        shipped JMdict's vulgar senses into the published reader: 割れ目 came
+        back as "chasm; interstice; crevice; crack; cleft; split; rift; fissure;
+        vulva; slit; cunt; vagina; twat", and 何 carried one past the cut in four
+        stories. Ichiran strips JMdict's [vulg] tags, so there is no tag left to
+        filter on — but a vulgar sense is never sense 1, and sense 1 is what a
+        graded reader wanted anyway. 猫 is "cat", not "cat; shamisen; geisha;
+        wheelbarrow".
+
+        One sense per entry rather than one sense overall, because a genuinely
+        ambiguous surface can resolve to several entries and they are all real:
+        つけず is 付ける, 付く and 着く, and dropping the rest would answer a
+        question the reader is entitled to see every half of.
+
+        The limit stays as a backstop on a single very long sense. It is no
+        longer what stands between the reader and the rest of the entry.
+
+        Where the word carries senses of its own, those are the word and the
+        conjugation chain is a rival analysis rather than a continuation of it —
+        the same overloading that makes `via` dangerous, one level up. Joining
+        the two produced strings that define two different words at once: より
+        came back as "than; to have the nerve to; to be bastard enough to",
+        which is the particle followed by an unrelated auxiliary, in 44 places
+        across the live stories. で was "at; in; be; is"; 煙 was "smoke; fumes;
+        smoky". A conjugated verb has no senses of its own, so the chain is all
+        there is, and it answers there.
+        """
+        entries = [self.senses] if self.senses else [s.senses for s in self.chain]
+        leading = [senses[0].text for senses in entries if senses]
+        joined = "; ".join(dict.fromkeys(t for t in leading if t))
         return joined[:limit] if limit else joined
 
 
