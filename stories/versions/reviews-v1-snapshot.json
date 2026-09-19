@@ -1,0 +1,82 @@
+[
+  {
+    "n": 1,
+    "slug": "tokei-no-oto",
+    "title": "時計の音",
+    "level": 1,
+    "register": "quiet-realism",
+    "pages": 25,
+    "stars": 2,
+    "note": "A little slow and the moral or hook never really hit."
+  },
+  {
+    "n": 2,
+    "slug": "maigo-no-tegami",
+    "title": "迷子の手紙",
+    "level": 2,
+    "register": "quiet-realism",
+    "pages": 16,
+    "stars": 3,
+    "note": "Peaceful and thoughtful, I liked the emotional connection."
+  },
+  {
+    "n": 3,
+    "slug": "shuden",
+    "title": "終電",
+    "level": 3,
+    "register": "quiet-realism",
+    "pages": 23,
+    "stars": 4,
+    "note": "I enjoyed this story for their brief and aloof interaction. There was a quiet connection that sat well with me."
+  },
+  {
+    "n": 4,
+    "slug": "entotsu-no-kemuri",
+    "title": "煙突の煙",
+    "level": 3,
+    "register": "quiet-realism",
+    "pages": 27,
+    "stars": 2,
+    "note": "Not bad, another story about a dead person, derivative of the watch story. This one was fairly predictable, and there was no twist, no evolution."
+  },
+  {
+    "n": 5,
+    "slug": "neko-o-sagasu-tantei",
+    "title": "猫を探す探偵",
+    "level": 4,
+    "register": "quiet-realism",
+    "pages": 30,
+    "stars": null,
+    "note": ""
+  },
+  {
+    "n": 6,
+    "slug": "shiro-no-kane",
+    "title": "城の鐘",
+    "level": 5,
+    "register": "quiet-realism",
+    "pages": 41,
+    "stars": null,
+    "note": ""
+  },
+  {
+    "n": 7,
+    "slug": "ikanakatta-hito-no-chizu",
+    "title": "行かなかった人の地図",
+    "level": 5,
+    "register": "folktale",
+    "pages": 48,
+    "stars": null,
+    "note": ""
+  },
+  {
+    "n": 8,
+    "slug": "rouka-no-kagami",
+    "title": "廊下の鏡",
+    "level": 5,
+    "register": "述懐",
+    "pages": 25,
+    "stars": null,
+    "note": ""
+  }
+]

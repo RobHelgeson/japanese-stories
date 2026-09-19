@@ -69,12 +69,12 @@
       "slug": "tokei-no-oto",
       "title": "時計の音",
       "level": 1,
-      "versions": ["v1"],
+      "versions": ["v1", "v2"],
       "_new_words": "Declared here rather than in approved-words.json, which stays a short global list of permanent allowances. These are per-story teaching words: all four are the story's own subject matter, so they recur without the prose working at it. check.py does not flag them because the particle-splitting fallback accepts 部品 as 部+品 and 歯車 as 歯+車, so they have to be declared to be marked.",
       "new_words": {
         "部品": "watch parts — framed by the drawer of sorted boxes before it is ever used alone",
         "歯車": "gear — framed as the contents of the smallest box, too small to hold in the fingers",
-        "針": "hand of a watch — framed as three of them, then named long, short and 秒針, which is already known",
+        "針": "hand of a watch — framed p7 by the already-known 秒針 in the line before it, 細い秒針まではっきり見えた, so the bare 針 arrives as the set that second hand belongs to. Carries the stopped-at-three-ten thread, and the night the watch runs for hours without a hand advancing",
         "振り子": "pendulum — framed by the wall of shop clocks all swinging at the same speed"
       }
     },
@@ -82,52 +82,52 @@
       "slug": "maigo-no-tegami",
       "title": "迷子の手紙",
       "level": 2,
-      "versions": ["v1"],
+      "versions": ["v1", "v2"],
       "new_words": {
-        "便箋": "letter paper — framed as 折った便箋が一枚だけ入っていた with the blank lower half described next; recurs as the son's sheet, hers, and the reply's",
-        "消印": "postmark — framed by 切手の上には、町の名前と日にちが、小さな丸の中に押してあった before it is named; later dates the son's wait and identifies the reply's origin",
-        "表札": "nameplate — framed as 戸の横に掛かっている表札には、私の名字が入っている, which is the right-address/wrong-name premise made physical. Passes check.py via the 表+札 fallback, so it must be declared to be marked"
+        "便箋": "letter paper — framed p8 by 中から、折った便箋が一枚だけ出てきた with the blank lower half described in the next line; recurs as the son's sheet, hers, and the reply's",
+        "消印": "postmark — framed p4 by position first and contents second, 切手の上の消印を読んで、日にちを数えた followed by 小さな丸の中に、遠い町の名前と三月四日が押してある; later dates the son's wait and identifies the reply's origin",
+        "表札": "nameplate — framed p1 by 玄関の横の表札を確かめると、そこは松田という私の名字になっている, which is the right-address/wrong-name premise made physical. Passes check.py via the 表+札 fallback, so it must be declared to be marked"
       }
     },
     {
       "slug": "shuden",
       "title": "終電",
       "level": 3,
-      "versions": ["v1"],
-      "_feature": "Untagged two-person dialogue. 40 of 41 quoted lines carry no attribution and the train conversation is 100% untagged, with speakers held by register: he is long and over-polite, she answers in four to eight characters. The single kept attribution is the manager's remembered line on page 4, so the reader sees one tagged line before the mode changes. Longest untagged run is 10, against 3 and 4 in the stories either side.",
+      "versions": ["v1", "v2"],
+      "_feature": "Untagged two-person dialogue. 38 of 39 quoted lines carry no attribution and the train conversation is 100% untagged, with speakers held by register: he asks, at length and over-politely, and she answers short. The single kept attribution is the manager's remembered line on page 4, so the reader sees one tagged line before the mode changes. Longest untagged run is 10, against 1 and 2 in the stories either side. Measured 2026-09-19: her replies run 2 to 22 characters against a median of 9, so the cue is question-versus-answer and register, not a length band — an earlier version of this key claimed four to eight and was never true of either draft.",
       "new_words": {
-        "網棚": "luggage rack — framed as 席の上には荷物を乗せる網棚があって; it is the object of the first exchange and the closing image of that thread",
-        "車掌": "conductor — framed by 制服を着た車掌が、切符を確かめながら, where the uniform and the tickets fix the meaning; carries the commuter-pass beat",
-        "乗客": "passenger — framed beside the already-known 客 and given a count, 乗客が四人しかいなくて; tracks the train emptying"
+        "網棚": "luggage rack — framed p3 by the narrator's own aborted use of it, 荷物を網棚に上げようとして、やめた, with 足元に置いておく方が、降りる時に楽だ fixing it against the floor in the next line. It is the object of the first exchange with her and the closing image of that thread",
+        "乗客": "passenger — framed p3 by a count in a car already called 空いている, 今夜も車内には乗客が四人しかいなくて、皆、離れた席に座っていた; tracks the train emptying until only the two of them are left"
       }
     },
     {
       "slug": "entotsu-no-kemuri",
       "title": "煙突の煙",
       "level": 3,
-      "versions": [],
+      "versions": ["v1"],
       "_note": "The first story written through the two-gate flow: brief resolved and confirmed before drafting, premise and afterword written in English before any Japanese existed.",
       "_premise": "A woman returns for a week to clear her late father's apartment and goes to the neighbourhood bathhouse every evening of its last week. The owner has been keeping the water hot past closing for three months, waiting for a regular who came late from the factory. That regular was her father, and nobody told the owner he had died. Beats, each joined by だから or しかし: (1) clearing the apartment, chimney visible from the window / (2) as a child, the smoke going out meant he was on his way home / (3) first evening, closing Sunday, almost no customers / (4) the owner does not recognise her and says nothing / (5) PLANT: one 桶 kept aside, upside down, never handed out / (6) she says nothing and keeps returning to look for it / (7) the smoke keeps going up after closing, every night / (8) she asks; he says he is waiting for a regular from the factory / (9) TURN: she works out who, and that she never told him / (10) she tells him; he turns the 桶 over and fills it; from the window the smoke stops early for the first time.",
       "brief": {
         "pages": 25,
         "register": "quiet-realism",
-        "new_words": 5,
+        "new_words": 6,
         "leech_seeds": 8
       },
       "new_words": {
-        "湯気": "steam — framed p5 by 湯気で鏡が白くなっていて、何も映らなかった, so the mirrors showing nothing carries the meaning before the word is explained. Recurs over the bath, off the refilled 桶 at the turn, and under the ceiling on the last night",
-        "桶": "washing bucket — framed p7 as the thing handed across the 番台 with the soap, then described old with a blackened bottom. The upside-down one is the story's plant and its payoff, so it repeats without the prose reaching",
-        "番台": "the raised attendant's desk — framed p6 by 入り口の上にあって、そこからは男の方も女の方もよく見える, which is the whole point of the object. It is where the owner is in every scene he appears in",
-        "煙突": "chimney — framed p2 from the window as 細くて、高くて、町のどの建物よりも上に立っている before it does any work. Carries the signalling thread: the childhood memory, the smoke after closing, and the last line",
-        "湯船": "the bath itself, as against washing — framed p9 by 体を洗ってから、湯船に入った and immediately by being too hot to get into. Recurs at the close, where she does not stop"
+        "湯気": "steam — framed p5 by 戸を開けると、湯気が外へ流れ出した, so the word is shown doing something visible before anything is said about it, and the fogged mirrors follow in the next line. Recurs over the bath, off the filled 桶 at the turn, and under the ceiling on the last night",
+        "桶": "washing bucket — framed p7 as the thing you fetch for yourself, 桶は棚から自分で取る, with the stack described bottoms-up in the next line. The one left mouth-up is the story's plant and its payoff, so it repeats without the prose reaching",
+        "番台": "the raised attendant's desk — framed p6 by what crosses it rather than by what it is: the owner takes the money without a word and passes the soap up from underneath. It is where he is in every scene until he climbs down from it at the turn",
+        "煙突": "chimney — framed p2 by 煙突は町のどの建物よりも高いので、この部屋からでもよく見える, which is the reason the signalling works at all. Carries that thread: the childhood memory, the smoke after closing, and the last line",
+        "湯船": "the bath itself, as against washing — framed p8 by 体を洗ってから、湯船に入った and immediately by being too hot to get into. Recurs at the close, where she does not stop",
+        "廃業": "going out of business — framed p4 by the notice at the door, 今度の日曜日で廃業する、と書いてあった, and by the narrator standing and reading the word. Deliberately paired against the already-known 閉店, which stays in the story for the nightly closing hour: 閉店の時間は過ぎているはずだった is what makes her look up at the smoke, and 廃業 is what the week is counting down to. Added 2026-09-19; brief.new_words raised 5 to 6 for it"
       }
     },
     {
       "slug": "neko-o-sagasu-tantei",
       "title": "猫を探す探偵",
       "level": 4,
-      "versions": ["v1"],
-      "_feature": "A plot held across 30 pages: the boxes clue is planted on page 7 and not recalled until page 20, and the reader is expected to reach the answer from facts already on the page. This story is also the one exception to the no-thesis rule; it is allowed to state its closing claim outright.",
+      "versions": ["v1", "v2"],
+      "_feature": "A plot held across 30 pages: the boxes clue is planted on page 8 and not recalled until page 21, and the reader is expected to reach the answer from facts already on the page. The second plant is the detective's own: a book borrowed at twelve and never returned, p22, which makes his decision about the boy a fact about him rather than a position he argues. The story now ends on that book, the cold office and a fee that does not cover the rent. THE NO-THESIS EXCEPTION WAS RETIRED 2026-09-19. This key used to read 'the one exception to the no-thesis rule; it is allowed to state its closing claim outright', which licensed the last two lines, 探偵の仕事は真実を見つけることじゃない。見つけた真実をどうするかだ。 Four evaluators independently named that pair as the clearest proof of an English short-story pattern in the corpus. The afterword mechanism now says it in English on the last page, which is where it belongs, so the lines are cut and the exception does not survive them.",
       "_new_words": "This story's four teaching words predate the per-story mechanism and still live in approved-words.json, where they are marked correctly. Left there rather than moved, to avoid churn; new stories should declare theirs here instead.",
       "new_words": {}
     },
@@ -135,21 +135,21 @@
       "slug": "shiro-no-kane",
       "title": "城の鐘",
       "level": 5,
-      "versions": ["v1"],
-      "_feature": "Nested time frames: a story told in the past about a casting forty years earlier. The distinction everything turns on is stated exactly once, in dialogue, on page 11. Level 5 is the sparse N2 edge, four such forms used once each.",
+      "versions": ["v1", "v2"],
+      "_feature": "Nested time frames: a story told in the past about a casting forty years earlier. The distinction everything turns on is stated exactly once, in dialogue, on page 12. Level 5 is the sparse N2 edge, four such forms used once each.",
       "_note": "王, 従う, 罰, 叫ぶ and 段/二百段 predate the per-story mechanism and remain in approved-words.json. 段 is the weakest of them as a teaching word: two of its six occurrences sit inside 二百段, which Ichiran parses as a single token, so the reader marks the unit rather than teaching the counter.",
       "new_words": {
-        "響く": "to resound, carry — a bell story needs the verb. Framed p7 by explicit contrast: 形の良い鐘は打った後も音が長く響き、悪い鐘は音がすぐに死ぬ. Recurs at the king's death, the princess's bad bell, the palm on the tower bell, and the apprentice's strike",
-        "金属": "metal — framed p3 by melting and heat, 金属を溶かす日だけ、部屋は地獄のように熱くなった, then poured, cooled, and made thin at the top. Accepted by check.py via the 金+属 fallback, so it must be declared to be marked"
+        "響く": "to resound, carry — a bell story needs the verb. Framed p8 by explicit contrast: 形の良い鐘は打った後も音が長く響き、悪い鐘は音がすぐに途切れる. Recurs at the king's death, the princess's bad bell, the palm on the tower bell, and the apprentice's strike",
+        "金属": "metal — framed p3 by melting and heat, 金属を溶かす日だけ、部屋は息ができないほど熱くなる, then poured, cooled, and made thin at the top. Accepted by check.py via the 金+属 fallback, so it must be declared to be marked"
       }
     },
     {
       "slug": "ikanakatta-hito-no-chizu",
       "title": "行かなかった人の地図",
       "level": 5,
-      "versions": [],
+      "versions": ["v1"],
       "_feature": "The longest story in the corpus and the first with a supernatural element. folktale register carries the magic for free: the 主 on the pass is furniture, nobody explains it, and it costs nothing from the new-word budget because 主, 姿, 影, 声, 問う, 通す are all known. The 主 scene also gives the にとって focus a structural home, asking all three travellers the same question.",
-      "_note": "grammar_focus にとって was chosen because the construction and the theme are the same thing: one object meaning something different to each person who holds it, and it lands on seven separate pages. 地図のとおりに is the other repeated frame and carries とおり. MISSES ITS PAGE BRIEF: 48 pages against 40 briefed, +20%. Recorded rather than corrected. The brief was the thing that was wrong: a twelve-beat structure with a six-page set piece in the middle does not fit in 40 pages, and 40 was picked off the requested 30-50 range before the beat sheet existed. Gate 1 should follow Gate 2 in length-setting, or the page number should be revisited once the beats are known.",
+      "_note": "grammar_focus にとって was chosen because the construction and the theme are the same thing: one object meaning something different to each person who holds it. It lands four times, once per holder — 祖父 p5, 甚平 p19, 蓮 p24, 梓 p27 — which is the set the 主 scene is built to collect. 地図のとおりに is the other repeated frame and carries とおり. MEETS ITS PAGE BRIEF AT 44 (briefed 40, band 36-44). This note used to record a 48-page MISS and blame the brief: 'a twelve-beat structure with a six-page set piece in the middle does not fit in 40 pages'. That was wrong, and the 2026-09-19 revision is the proof — all twelve beats and the whole 主 scene are still here at 44. What did not fit was the over-explanation: the two definitional lines that handed the reader 峠 and 崖 outright (峠というのは、山と山の間の、一番低いところである / 崖とは、岩が真っ直ぐに立っているところである), and the narrator restating what a scene had just shown (人が歩けば足跡が残るのだから…). Both words are now framed by what happens to them instead. The brief was reachable; the prose was not yet tight.",
       "_premise": "梓's grandfather spent fifty years drawing one map, of a mountain road he never walked, copied from his father's telling. Dying, he asks her to go and see whether the tree at the end of it is still standing. She hires 甚平, an old guide who crosses those mountains without maps, and every landmark on the paper turns out to be wrong. Beats, each joined by だから or しかし: (1) the dying grandfather asks her to check the tree / (2) 甚平 reads the map once and says the bridge is in the wrong place / (3) three days in, every landmark matches and 蓮 stops laughing / (4) PLANT: no bridge at the river, and four small 印 beside it on the map that she cannot explain / (5) the detour along the 岸 and up to the 峠 / (6) the 主 asks each of them what they came to do; 梓's answer is her grandfather's, not her own / (7) at the 崖 the road is missing, 蓮 says an old man drew a road out of stories, and 甚平 finds the road under the slide / (8) the village on the map is empty, no 足跡 / (9) TURN, once, in dialogue: 千代 remembers the bridge falling the year of the great snow, seventy-five years ago, five years before the grandfather was born / (10) PAYOFF: the 印 are counts of how many times his father told of each landmark, so the map is scaled to memory rather than distance / (11) the tree is there, and the sea, which on the map is one straight blue line / (12) home: he does not ask about the tree, he asks whether the sea was blue.",
       "brief": {
         "pages": 40,
@@ -159,21 +159,21 @@
         "grammar_focus": ["にとって"]
       },
       "new_words": {
-        "印": "mark — the story's own subject matter and its plant. Framed p3 by どの目印のそばにも、小さな印が並んでいた, which fixes it against the already-known 目印 it sits beside. Recurs at the bridge, the village, the rock and the tree, and is what the turn is made of",
+        "印": "mark — the story's own subject matter and its plant. Framed p4 by the act of making one, 祖父が地図へ小さな印を一つ書き足すのを見たことがある, a page after the already-known 目印 it will turn out to be counting. Recurs at the bridge, the village, the rock and the tree, and is what the turn is made of",
         "頼る": "to rely on — framed p1 by the villagers who will not use the map, then sharpened p9 in 蓮's challenge, 行ったことのない人が描いた地図に頼るんですか, where the object of the reliance is the whole question of the story. Recurs whenever the map is trusted or set aside",
-        "導く": "to lead, guide — framed p7 as what 梓 must find someone to do, and again p26 by 甚平's answer to the 主, この二人を北へ導くために来た, beside the already-known 案内 in the same breath. The guide's own word for what he does",
-        "峠": "mountain pass — framed p17 by explicit definition after 甚平 draws the route in the dirt, 峠というのは、山と山の間の、一番低いところである. The setting of the 主 scene and the middle third of the journey",
-        "崖": "cliff — framed p30 by definition, 崖とは、岩が真っ直ぐに立っているところである, immediately after the map shows a road beneath one. Carries the buried-road beat that proves the map is early rather than false",
-        "岩": "rock, boulder — framed p13 as the first landmark that matches, 岩は真ん中から二つに割れていて、割れ目に草が生えていた. Recurs as the split rock, the rock slope of the climb, and the slide at the 崖",
-        "岸": "riverbank — framed p13 by 岸には草が生えているだけで、何も立っていなかった, the absence of the bridge fixing what a bank is. The detour is three days of walking it",
-        "足跡": "footprint — framed p18 by 甚平 reading animal tracks in the earth, then p33 by its own absence and then stated plainly, 人が歩けば足跡が残る. Marks the empty village, and the party's own are the last image before the climb"
+        "導く": "to lead, guide — framed p6 by the one name the whole village gives her, あの男が導いてくれる, and again p23 by 甚平's answer to the 主, この二人を北へ導くために来た, beside the already-known 案内 in the same breath. The guide's own word for what he does",
+        "峠": "mountain pass — framed p17 without a definition: 甚平 draws two mountains in the dirt, presses his finger into the low place between them and names it, 岸を上って、ここを越える。峠だ. The setting of the 主 scene and the middle third of the journey",
+        "崖": "cliff — framed p29 by what it does to the sky, 道の右側に岩が立ち上がって、上の方は空しか見えなくなった, one line before the map shows a road running beneath one. Carries the buried-road beat that proves the map is early rather than false",
+        "岩": "rock, boulder — named p3 in the map's list of landmarks, then framed p11 as the first of them to match, with her hand on it: 真ん中から二つに割れていて、割れ目に草が生えている. Recurs as the split rock, the rock slope of the climb, and the slide at the 崖",
+        "岸": "riverbank — framed p13 by the width of the water, 流れは速く、向こうの岸は遠い, then p14 by walking it and finding nothing standing on it. The detour is three days of that",
+        "足跡": "footprint — framed p18 by 甚平 reading tracks in the earth and naming what is not in them, 動物の足跡ばかりで、人の足跡は一つもない. Marks the empty village p33, and the party's own are the last thing in the grass before the climb"
       }
     },
     {
       "slug": "rouka-no-kagami",
       "title": "廊下の鏡",
       "level": 5,
-      "versions": [],
+      "versions": ["v1"],
       "_feature": "First story in the 述懐 register, and the first in the corpus to end on a claim rather than an image. The register was added for it. Also the first multi-construction grammar_focus: ものの, 一方で and にとって together, chosen because concession, contrast and perspective are the three things a looking-back voice actually does, so the focus and the register reinforce each other instead of the focus being sprinkled on afterwards.",
       "_note": "THE RISK IS THE ENDING and it was named at Gate 2 before drafting. 'Ends on a claim' sits one step from the closing-thesis defect. The guard is that the claim corrects a fact about a PERSON — 祖母は、不思議なことを信じる人ではなかった — and contradicts a phrase the reader has already been given in dialogue on p10, 「おばあさんは、不思議なことを信じる人だから」. It is a correction, not a moral, and the narrator earns it by watching the hallway go dark rather than by concluding anything. THE MIRROR IS NEVER A FIGURE: it is cleaned, wrapped, carried, cracked, lifted and re-hung, and the prose never once uses it for memory or for looking back. That was a standing constraint from Rob, not a discovery. Every clue is physical and early: it hangs where nobody dresses, it faces a window rather than a room, it is polished on bright days and not dull ones, she is twice shown cleaning it and never once looking into it, and the child needs no lamp at the turn.",
       "_premise": "A mirror hangs at the turn of a dark hallway in one house for sixty years, through a grandmother, a mother and a daughter, each of whom polishes it, wraps it and hangs it back on the same nail. Only when the last of them takes the house apart and lifts it off the wall does she find out what it was for: hung at an angle to the one window, it carried light around the corner into the windowless back of the house. Beats, each joined by だから or しかし: (1) the narrator, 71, is emptying the house and leaves the heavy mirror for last / (2) she notices she has worked all day at the turn without a lamp and thinks nothing of it, because she never has / (3) the grandmother carried the mirror in when she married, chose its place herself, and asked one thing, 動かさないでください / (4) she polished it constantly and only on clear days; PLANT: 一方で, never once seen looking at her own reflection / (5) the family settled on 不思議なことを信じる人, stated in dialogue / (6) she died and nobody moved it, the instruction outliving the reason / (7) the mother kept the rule without the reason, and at the roof repair wrapped it herself and made the workmen return the nail to the same hole / (8) asked why, she could only say her mother had asked her not to / (9) the narrator read all of it as a keepsake and stopped thinking / (10) TURN, physical and not a realization: she lifts it off the nail to wrap it and the back of the hallway goes dark around her while she is holding it / (11) she puts it back three times, and by the third is counting years rather than checking / (12) PAYOFF: the polishing, the weather and the averted eyes all resolve at once / (13) the claim, once: 祖母は、不思議なことを信じる人ではなかった.",
@@ -186,10 +186,10 @@
       },
       "new_words": {
         "光": "light, as a noun — the thing the mirror actually carries, and deliberately withheld until the payoff. 光る is already known, so the noun is the new form. Framed at the turn by 光が、曲がり角を回って奥に届いた, where the sentence before it has just shown the hallway going dark. Recurs through the resolution",
-        "斜め": "at an angle — the mechanism of the whole story. Framed p7 by contrast with the flat alternative, まっすぐ壁に向けるのではなく、少し斜めにして掛けた. Recurs at the roof repair, where the mother restores the angle, and at the payoff",
+        "斜め": "at an angle — the mechanism of the whole story. Framed p7 by contrast with the flat alternative, 壁と同じ向きにまっすぐ掛けるのではなく、少し斜めにした. Recurs at the roof repair, where the mother restores the angle, and at the payoff",
         "釘": "nail — what fixes the position across three generations. Framed p2 by the act itself, 壁に釘を一本打って、そこに掛けた. Recurs as the same hole at the repair, as 三代、同じ釘, and at the lifting off",
-        "向き": "the way a thing faces, orientation — distinct from 斜め, which is that the orientation is oblique. Framed p7 by 鏡の向きは、玄関の窓のほうを向いていた, beside the already-known 向く that fixes it. Recurs wherever the mirror is set or restored",
-        "埃": "dust — why the polishing was frequent rather than fussy, and it is held back as an explanation until the payoff. Framed p9 by its own absence, 埃がついていなくても、晴れた日には必ず磨いた, which makes the polishing strange before it makes it sensible"
+        "向き": "the way a thing faces, orientation — distinct from 斜め, which is that the orientation is oblique. Framed p7 in the same sentence that introduces 斜め, 壁と同じ向きに, and fixed by the already-known 向く in the next line, 鏡は玄関の窓のほうを向いている. Recurs wherever the mirror is set or restored",
+        "埃": "dust — why the polishing was frequent rather than fussy, and it is held back as an explanation until the payoff. Framed p9 by its own absence, 埃がついていなくても、晴れた日には必ず磨く, which makes the polishing strange before it makes it sensible"
       }
     }
   ]

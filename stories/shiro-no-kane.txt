@@ -11,8 +11,8 @@
 
 私は鐘を作る職人の弟子だった。
 > I was apprenticed to a bell-founder.
-師匠は八十を過ぎ、大きな声で呼んでも顔を上げないほど耳が聞こえなかった。
-> My master was past eighty, and so deaf that you could call to him loudly and he would not raise his head.
+師匠は八十を過ぎていて、大きな声で呼んでも顔を上げない。
+> My master was past eighty, and you could call to him at the top of your voice and he would not look up.
 それでも、鐘の音だけは分かるのだと言っていた。
 > Even so, he said the one thing he could still make out was the sound of a bell.
 「音は耳で聞くものじゃない。体で聞くものだ」
@@ -20,12 +20,12 @@
 
 仕事場は城の地下にあった。
 > The workshop was under the castle.
-夏でも冷たくて、壁は濡れて黒くなっていた。
-> It was cold even in summer, and the walls were wet and black.
-金属を溶かす日だけ、部屋は地獄のように熱くなった。
-> Only on the days we melted metal did the room turn hot as hell.
-師匠はその熱の｜中《なか》で六十年働き、｜国中《くにじゅう》の鐘はこの部屋から出た。
-> My master had worked in that heat for sixty years, and the bells of the whole country came out of this room.
+夏でも冷たく、壁は濡れて黒い。
+> Cold even in summer, the walls wet and black.
+金属を溶かす日だけ、部屋は息ができないほど熱くなる。
+> Only on the days we melted metal did the room grow too hot to breathe in.
+師匠はその熱の｜中《なか》で六十年働き、｜国中《くにじゅう》の鐘はこの部屋から生まれた。
+> My master had worked in that heat for sixty years, and every bell in the country was born in that room.
 
 鐘を作るのは、｜型《かた》を作ることから始まる。
 > Making a bell begins with making the mould.
@@ -40,153 +40,167 @@
 
 私が弟子になったのは、十二の｜年《とし》だった。
 > I became an apprentice at twelve.
-親はいなかったから、城に置いてもらうしかなかった。
-> I had no parents, so there was nowhere for me but the castle.
+親はなく、城に置いてもらうしかなかった。
+> I had no parents, and nowhere but the castle would have me.
 師匠は優しくはなかったが、酷くもなかった。
-> My master was not kind, but he was not cruel either.
-最初の一年は道具を洗うことばかりで、私は理由を聞かずに従った。
+> My master was not a kind man, but he was not a cruel one either.
+最初の一年は道具を洗うばかりで、私は理由を聞かずに従った。
 > For the first year the work was nothing but washing tools, and I obeyed without asking why.
+冬は水が冷えて、洗っているうちに指の皮が何度も割れることがあった。
+> In winter the water went cold, and the skin of my fingers would split as I washed.
 
 「音を覚えろ」と師匠は言った。
 > "Learn the sound," my master said.
 小さな鐘を並べて、順番に打たせる。
 > He would line up the small bells and have me strike them in order.
 どれか一つが違えば、すぐに私の手が止まる。
-> If any one of them was wrong, my hand stopped at once.
-「今のは低い。土が多い」
-> "That one is low. Too much clay."
+> If any one of them was wrong, my hand stopped of its own accord.
+「今のは低い。｜土《つち》が多いな」
+> "That one is low. Too much clay in it."
+
+「聞こえるんですか」と、一度だけ聞いたことがある。
+> Once, and only once, I asked him whether he could hear them.
+「わしの耳はもう聞こえん。｜床《ゆか》が教えてくれる」
+> "My ears are finished. The floor tells me."
+それから師匠は、私の手を小さな鐘の｜表《おもて》に当てさせて、それを打った。
+> Then he laid my hand flat against the side of one of the small bells and struck it.
+金属が震えているのが、手のひらに伝わってくる。
+> I could feel the metal shaking, right through my palm.
 
 十年で、私も少しは分かるようになった。
 > In ten years I came to understand a little myself.
-形の良い鐘は打った後も音が長く響き、悪い鐘は音がすぐに死ぬ。
-> A well-shaped bell goes on sounding long after the strike; a bad one's sound dies at once.
+形の良い鐘は打った後も音が長く響き、悪い鐘は音がすぐに途切れる。
+> A well-made bell goes on sounding long after the strike; a bad one breaks off at once.
 師匠はそれを「鐘が息を止める」と言った。
-> My master called that "the bell stopping its breath."
-耳が聞こえないのに、その判断は正確だった。
-> He could not hear, and still his judgement was exact.
+> My master called that "the bell holding its breath."
+雨の続く日には、同じ鐘が違う音になる。
+> When the rain sets in for days, the same bell gives a different note.
+耳が聞こえないのに、師匠が音を間違えたことは一度もない。
+> He was deaf, and he never once got a sound wrong.
 
 師匠が倒れたのは、冬の初めだった。
 > My master collapsed at the beginning of winter.
-その朝、師匠は来なかった。
-> That morning he did not come.
+その朝、師匠は仕事場に来ない。
+> That morning he did not come down to the workshop.
 一度もなかったことだ。
 > That had never happened once.
-私が部屋へ｜行《い》くと、布団の｜中《なか》で、その｜人《ひと》は天井を見ていた。
-> When I went to his room, he lay in his bedding looking at the ceiling.
+私が部屋へ｜行《い》くと、布団の｜中《なか》で天井を見ている。
+> When I went to his room he was lying in his bedding, looking at the ceiling.
 「来たか」と、私の顔を見ずに言った。
-> "So you came," he said, without looking at my face.
+> "So you came," he said, without turning to look at me.
 
 医者は三日だと言った。
 > The doctor said three days.
 師匠は薬を断って、水だけを飲んだ。
-> My master refused the medicine and drank only water.
+> My master refused the medicine and took nothing but water.
 ｜二日目《ふつかめ》の夜、私を近くに呼んだ。
 > On the second night he called me close.
-「塔の鐘の話をする」
-> "I will tell you about the bell in the tower."
-
-「あの鐘は、私が四十の時に作った。当時の王の命令だ。戦争のための鐘だった。前の戦争で、この国は三万人を失っている。それなのに王は、次の鐘を作れと言った。私は作らされた」
-> "I made that bell when I was forty. It was an order from the king of that day. A bell for war. In the last war this country lost thirty thousand men. And even so the king told me to cast the next one. I was made to do it."
+「わしが死ぬ前に、塔の鐘の話をしておく」
+> "Before I go, I will tell you about the bell in the tower."
 
 私は黙って聞いていた。
 > I listened without speaking.
-「私は型を、少しだけ違う形にした。｜上《うえ》の金属を薄くして、｜下《した》を厚くした。あの鐘は、強く打てば必ず割れる。弱く打てば、良い音がする」
-> "I made the mould a little different. I made the metal thin at the top and thick at the bottom. Strike that bell hard and it will crack without fail. Strike it softly and it gives a good sound."
+「あの鐘は、わしが四十の時に作った。当時の王の命令だ。戦争のための鐘だった。前の戦争で、この国の｜民《たみ》が三万人死んだ。それなのに王は、次の鐘を作れと言った。わしは作らされた」
+> "I made that bell when I was forty. It was an order from the king of that day. A bell for war. Thirty thousand of this country's people died in the last one. And still the king told me to cast the next bell. They made me do it."
 
-音だけを覚えてきた私にとって、それは聞くまでもないことだった。
-> For someone who had spent ten years learning nothing but sound, it was not a thing that needed asking.
+「わしは型を、少しだけ違う形にした。｜上《うえ》の金属を薄くして、｜下《した》を厚くした。あの鐘は、強く打てば必ず割れる。弱く打てば、良い音がする」
+> "I made the mould a little out of true. Thin at the top, thick at the bottom. Strike that bell hard and it cracks, every time. Strike it softly and it sings."
+音だけを覚えてきた私に、それは聞くまでもないことだった。
+> I had spent ten years learning nothing but sound, and I did not have to be told why.
 薄い金属に力が集まる。
-> The force gathers where the metal is thin.
-「けれど戦争の時、｜人《ひと》は弱く打たない。力の全部を使う。それが戦争というものだ」
-> "But in war, no one strikes softly. They use everything they have. That is what war is."
+> Force gathers where the metal is thin.
+「けれど戦争の時、｜人《ひと》は弱く打たん。力の全部を使う。それが戦争というものだ」
+> "But nobody strikes softly in a war. They put everything they have into it. That is what a war is."
 
-師匠は四十年前に、戦争が始まる日の音を決めていたのだ。
-> Forty years earlier, my master had decided what sound the first day of a war would make.
-六十年働いた｜人《ひと》の、たった一つの策だった。
-> It was the one stratagem of a man who had worked sixty years.
+師匠が四十年前に決めていたのは、戦争が始まる日の音だ。
+> What my master had settled, forty years before, was the sound the first day of a war would make.
+六十年働いた｜人《ひと》が作った、たった一つの仕掛けなのだ。
+> In sixty years of work it was the one contrivance he ever built.
 「これは罪だ」と師匠は言った。
-> "This is a crime," my master said.
-「王の命令に逆らった。私は裏切り者だ。死んでからでも、｜罰《ばつ》を受けるのだろう」
-> "I defied the king's order. I am a traitor. Even after I am dead, I expect I will take the punishment."
+> "This is a crime," he said.
+「王の命令に逆らった。わしは裏切り者だ。死んだあとも、｜罰《ばつ》を受けるのだろう」
+> "I went against the king's order. I am a traitor. I expect the punishment will find me after I am dead."
 
 「なぜ私に話すんですか」と私は聞いた。
 > "Why are you telling me?" I asked.
 師匠は初めて私の｜方《ほう》を見た。
-> For the first time, my master turned to look at me.
-「お前が次の職人だからだ。あの鐘の修理を命じられて、知らないまま直してしまえば、私の六十年が無くなる」
-> "Because you are the next founder. You will be ordered to repair that bell, and if you fix it without knowing, my sixty years are gone."
+> For the first time, my master turned his head towards me.
+「お前が次の職人だからだ。あの鐘の修理を命じられて、知らないまま直してしまえば、わしの六十年が無駄になるぞ」
+> "Because you are the next founder. They will order you to repair that bell, and if you mend it without knowing, my sixty years come to nothing."
 
 その夜、師匠は死んだ。
 > My master died that night.
 朝が来る前だった。
-> It was before morning came.
-私は一人で仕事場に降りて、火のない台の前に、朝まで座っていた。
-> I went down to the workshop alone and sat before the cold bench until morning.
-自分が何を渡されたのか、まだ分からなかった。
-> I did not yet understand what had been handed to me.
+> It was before morning.
+私は一人で仕事場に降りて、火のない台の前に座ったまま、朝が来るまで動かなかった。
+> I went down alone to the workshop and sat in front of the cold bench, and did not move until morning.
+何を渡されたのか、その時はまだ分からない。
+> What it was he had handed me, I did not yet know.
 
 春に、王が死んだ。
 > In spring, the king died.
-師匠にあの鐘を作らせた王だった。
-> It was the king who had made my master cast that bell.
+師匠にあの鐘を作らせた、あの王だ。
+> The very king who had made my master cast that bell.
 ｜国中《くにじゅう》が塔を見たが、鐘は響かなかった。
 > The whole country looked to the tower, and the bell did not sound.
-新しい王が、それを止めたからだ。
-> The new king stopped it.
-「鐘は戦争の時に取っておく」と、その｜人《ひと》は言った。
-> "We will save the bell for the war," he said.
+止めたのは、新しい王だった。
+> It was the new king who stopped it.
+「鐘は戦争の時に取っておく」と新しい王は言った。
+> "We will keep the bell for the war," he said.
 
 新しい王は若くて声が大きく、国境の向こうの国を前から嫌っていた。
-> The new king was young and loud-voiced, and he had long hated the country across the border.
-｜今年《ことし》のうちに襲うつもりらしいと、宮廷の誰かが言った。
-> Someone at court said he apparently meant to attack before the year was out.
-戦争の話は毎日出て、反対の意見を言う貴族は少しずつ減った。
-> Talk of war came up every day, and the nobles who voiced any opposition grew fewer little by little.
+> The new king was young and loud, and he had hated the country across the border for years.
+｜今年《ことし》のうちに攻めるつもりらしいと、宮廷の誰かが言った。
+> Someone at court said he meant to attack before the year was out.
+戦争の話は毎日出る。
+> There was talk of war every day.
+反対の意見を言う貴族は、一人ずつ黙っていった。
+> One by one, the nobles who spoke against it fell quiet.
 残った者は、王の言葉に従った。
-> Those who remained went along with whatever the king said.
+> Those who were left agreed with whatever the king said.
 
 夏の初め、騎士の隊長が仕事場に来た。
-> At the start of summer, the captain of the knights came to the workshop.
+> At the start of summer, the captain of the knights came down to the workshop.
 目の静かな、私より年上の｜人《ひと》だった。
 > He had quiet eyes, and he was older than I was.
-「鐘は打てる状態か」と、その｜人《ひと》は聞いた。
-> "Is the bell in a state to be struck?" he asked.
+「鐘は打てる状態か」と隊長は聞いた。
+> "Is the bell fit to be struck?" he asked.
 「音は出ます」と私は答えた。
 > "It will sound," I answered.
 
 嘘ではないものの、本当のことでもなかった。
-> It was not a lie, and it was not the truth either.
+> It was not a lie, and it was not the truth.
 隊長は私の顔を長く見ていた。
-> The captain looked at my face for a long time.
-「師匠と同じ答え方をする」と言って、その｜人《ひと》は出て｜行《い》った。
+> The captain looked at my face for a long while.
+「師匠と同じ答え方をする」と言って、出て｜行《い》った。
 > "You answer the way your master did," he said, and went out.
 知りたかったのなら、聞き方が違ったはずだ。
-> If he had wanted to know, he would surely have asked it some other way.
+> If he had wanted to know, he would have asked it some other way.
 
 その夜、王女が地下に降りてきた。
 > That night the princess came down to the cellar.
 一人で、侍女も連れずに来た。
-> She came alone, without even a lady-in-waiting.
+> Alone, without so much as a lady-in-waiting.
 「あなたが新しい職人ね」
 > "So you are the new founder."
 私は黙って頭を下げた。
 > I bowed without a word.
 
-貴族が一人ずつ口を閉じていく一方で、王女だけは戦争に反対だと言った。
-> While the nobles were closing their mouths one by one, the princess alone said that she was against the war.
+他の貴族が何も言わなくなった一方で、王女だけは戦争に反対だと言った。
+> The other nobles had stopped saying anything at all, and she alone said openly that she was against the war.
 それができたのは、王の妹だからだ。
-> She could do that because she was the king's sister.
-「兄は本気よ」と、その｜人《ひと》は言った。
+> She could afford to, being the king's sister.
+「兄は本気よ」と王女は言った。
 > "My brother means it," she said.
-「秋のうちに、あの鐘を打つ計画よ」
-> "He plans to strike that bell before autumn is out."
+「秋のうちに、あの鐘を打つつもりでいるの」
+> "He intends to have that bell struck before autumn is over."
 
 「打ったら、どうなるの」
 > "And if it is struck, what happens?"
 私は答えなかった。
 > I did not answer.
 王女は台の上の小さな鐘を一つ取って、指で軽く打った。
-> The princess took one of the small bells from the bench and tapped it lightly with a finger.
+> She picked up one of the small bells from the bench and tapped it with a fingernail.
 音はどこにも響かず、短く消えた。
 > The sound carried nowhere. It was short, and gone.
 
@@ -196,13 +210,13 @@
 > "Yes," I said.
 「｜上《うえ》が薄すぎます」
 > "The top is too thin."
-言ってしまってから口を憎んだが、本当のことを言いたかったのだ。
-> Once it was out I hated my own mouth, but I had wanted to tell the truth.
+言ってしまってから口が滑ったと思ったが、本当のことを言いたかったのだ。
+> The moment it was out I knew my tongue had run away with me, and still it was the truth I had wanted to tell.
 
 王女は鐘を置いて、私の顔を見た。
-> The princess set the bell down and looked at my face.
-賢い｜人《ひと》の目だった。
-> They were the eyes of a clever person.
+> She set the bell down and looked at my face.
+賢い｜人《ひと》の目だ。
+> The eyes of a clever woman.
 「塔の鐘も、そうなの」
 > "Is the tower bell the same?"
 私には、嘘をつく覚悟がまだできていなかった。
@@ -210,161 +224,169 @@
 
 その｜七日後《なのかご》、私は牢に入れられた。
 > Seven days later I was put in a cell.
-｜罰《ばつ》の理由は誰も言わなかった。
-> No one said what the punishment was for.
+何の罪かは、誰も言わない。
+> Nobody would say what the charge was.
 誰が話したのかは、今も分からない。
 > Who talked, I still do not know.
 王女ではないと、私は信じている。
 > I believe it was not the princess.
-牢は地下より冷たく、外の明るさが一つも入らなかった。
-> The cell was colder than the cellar, and not a trace of the light outside came in.
+牢は地下より冷たく、窓がないので朝が来ても分からなかった。
+> The cell was colder than the cellar, and it had no window, so morning came without my knowing it.
 
-看守は｜罰《ばつ》の話をせず、食べ物を置いて扉を閉めるだけだった。
-> The guard said nothing about the punishment; he set down food and shut the door, and that was all.
+看守は｜罰《ばつ》の話をしない。
+> The guard never spoke of the punishment.
+食べ物を置いて、扉を閉めるだけだった。
+> He set down the food and shut the door, and that was all.
 ｜三日目《みっかめ》の夕方、眠ろうとしたところに隊長が来た。
-> On the evening of the third day, just as I was about to sleep, the captain came.
-鍵を持たずに、扉の前に立っていた。
-> He carried no key, and stood in front of the door.
+> On the evening of the third day, just as I was settling down to sleep, the captain came.
+鍵を持たずに、扉の前に立っている。
+> He stood in front of the door with no key on him.
 
-「鐘は割れるのか」と、その｜人《ひと》は聞いた。
+「鐘は割れるのか」と隊長は聞いた。
 > "Will the bell crack?" he asked.
 「割れます」と私は答えた。
 > "It will crack," I answered.
 もう隠す意味がなかった。
-> There was no longer any point in hiding it.
+> There was nothing left to hide.
 「そう作られています」
 > "It was made that way."
 隊長は驚かなかった。
 > The captain showed no surprise.
 
 隊長は長く黙っていた。
-> The captain was silent for a long time.
+> He was silent for a long time.
 それから、低い声で言った。
-> Then he spoke in a low voice.
+> Then he spoke, in a low voice.
 「私の父は、前の戦争で死んだ。私は騎士だ。命令には従う」
 > "My father died in the last war. I am a knight. I follow orders."
 
 「だが、割れた鐘の音を国が聞けば」
-> "But if the country hears the sound of a cracked bell..."
-そこで、その｜人《ひと》は言葉を止めた。
+> "But if the country hears a cracked bell..."
+そこで、隊長は言葉を止めた。
 > There he stopped.
-言わなかった部分の｜方《ほう》が、大きかった。
-> The part he did not say was the larger part.
+言わなかった部分の｜方《ほう》が、重かった。
+> The part he left unsaid weighed the more.
 命令には従うと言った｜人《ひと》が、鍵も持たずに牢へ来ていた。
 > A man who had just said he follows orders had come to a cell without a key.
 
 秋の終わりの朝、私は牢から出された。
-> On a morning at the end of autumn, I was taken out of the cell.
+> On a morning at the end of autumn, I was brought out of the cell.
 戦争が始まるはずの朝だった。
-> It was the morning on which the war was to begin.
+> It was the morning the war was to begin.
 広場には｜国中《くにじゅう》の｜人《ひと》が集まり、王は玉座を外に出させて座っていた。
-> The whole country had gathered in the square, and the king had had his throne carried outside and sat on it.
-｜人《ひと》の｜中《なか》から、誰かが何か叫んだ。
-> Out of the crowd, somebody shouted something.
+> The whole country was gathered in the square, and the king had had his throne carried out and sat on it.
+集まった者の｜中《なか》から、誰かが何か叫んだ。
+> Somewhere in the crowd, a voice shouted something.
 
 「お前が打て」と王は言った。
 > "You will strike it," the king said.
-罪人に打たせるのを、王は｜罰《ばつ》として選んだのだろう。
-> The king must have chosen it as a punishment, making a criminal strike it.
-塔の扉を開けたのは隊長で、その｜人《ひと》は私の目を見て何も言わなかった。
-> It was the captain who opened the tower door, and he looked me in the eye and said nothing.
-王の命令に従って、私は階段を上がった。
+牢に入れた男に打たせるのを、王は｜罰《ばつ》として選んだのだろう。
+> The punishment, I suppose, was to have the man he had jailed strike it himself.
+塔の扉を開けたのは隊長だ。
+> It was the captain who opened the tower door.
+私の目を見て、何も言わなかった。
+> He looked me in the eye and said nothing.
+王の命令に従って、私は階段を上った。
 > Obeying the king's order, I climbed the stairs.
 
 ｜二百段《にひゃくだん》ある。
 > Two hundred steps.
-弟子の頃、毎月この段を上がって鐘を洗わされた。
-> As an apprentice I was made to climb these steps every month to wash the bell.
-その朝は｜一段《いちだん》ずつ数えながら上がり、途中で段に座って休んだ。
-> That morning I climbed counting them one at a time, and halfway up I sat down on a step to rest.
-上に着いた時、鐘は思っていたよりずっと大きく、師匠が四十の時に作ったものだった。
-> At the top the bell was far larger than I had thought, and this was what my master had made at forty.
+弟子の頃、毎月この階段を上って鐘を洗わされたが、段を数えたことは一度もなかった。
+> As an apprentice I had been sent up them every month to wash the bell, and I had never once counted them.
+その朝は｜一段《いちだん》ずつ数えながら上がり、途中で座って休んだ。
+> That morning I counted them one by one, and halfway up I sat down to rest.
+上に着くと、鐘は思っていたよりずっと大きい。
+> At the top the bell was far bigger than I had remembered.
+師匠が四十の時に作ったものだ。
+> This was what my master had made at forty.
 
-｜下《した》からは、何万人もの声が聞こえた。
-> From below I could hear the voices of tens of thousands.
-鐘の｜表《おもて》から、その声が手のひらに低く響いてきた。
-> Through the surface of the bell those voices came sounding low into my palm.
+｜下《した》からは、何万もの声が聞こえた。
+> From below came the voices of tens of thousands.
+鐘の｜表《おもて》から、その声が手のひらに低く響いてくる。
+> Through the side of the bell those voices came up low into my palm.
 弱く打つか、強く打つか。
 > Softly, or hard.
-決めるのは、私の腕一本だった。
-> The choice rested on my one arm.
+決めるのは、腕の振り方ひとつだ。
+> It came down to how I swung my arm, and nothing else.
 
 私は師匠の言葉を思い出した。
-> I remembered my master's words.
+> I remembered what my master had said.
 「音は耳で聞くものじゃない。体で聞くものだ」
 > "Sound is not something you hear with your ears. It is something you hear with your body."
-四十年前、あの｜人《ひと》は一人で決めて、誰にも言わずに四十年待った。
-> Forty years ago that man decided it alone, told no one, and waited forty years.
+四十年前、師匠は一人で決めて、誰にも言わずに四十年待った。
+> Forty years ago he had decided alone, told nobody, and waited forty years.
 
-鐘を打つための｜木《き》を、手が痛くなるほど強く握った。
-> I gripped the wooden beam for striking the bell until my hands hurt.
-そして、力の全部を使って打った。
-> And I struck with all my strength.
-音は、一度だけ｜空《そら》を割った。
+鐘を打つための｜木《き》を、両手で握る。
+> I took the wooden beam in both hands.
+手が痛くなるほど強く握る。
+> I gripped it until my hands hurt.
+息を吸って、力の全部を使って打った。
+> I drew in a breath and swung with everything in me.
+音が、一度だけ｜空《そら》を割る。
 > The sound split the sky, once.
-それから、鐘が息を止めた。
-> Then the bell stopped its breath.
+それから、何も聞こえなくなった。
+> After that there was nothing to hear.
 
-師匠の言ったとおり、鐘は｜上《うえ》から｜下《した》まで割れた。
-> Just as my master had said, the bell cracked from top to bottom.
-広場の何万人が、同じ音を聞いた。
+師匠の言ったとおり、鐘は｜上《うえ》から｜下《した》まで割れていた。
+> Just as my master had said, the bell had cracked from top to bottom.
+広場の何万もの｜人《ひと》が、同じ音を聞いた。
 > The tens of thousands in the square all heard the same sound.
-戦争の鐘が、戦争の朝に死んだ。
-> The war bell died on the morning of the war.
-誰も叫ばなかった。
-> No one shouted.
-静かになるまで、長い時間がかかった。
-> It was a long time before there was quiet.
+戦争のための鐘が、戦争の朝に息を止めた。
+> The bell made for war held its breath on the morning of the war.
+声が一つずつ消えていく。
+> One by one the voices went out.
+広場が静かになるまで、長い時間がかかった。
+> It was a long time before the square was quiet.
 
 何が起きたのかを、誰も説明できなかった。
-> No one could explain what had happened.
-王は立ち上がって何か叫び、もう一度叫び、三度目に叫んだ時には声が割れていた。
-> The king stood up and shouted something, and shouted again, and by the third time his voice had cracked.
-けれど、その声はもう誰にも届かなかった。
-> But his voice no longer reached anyone.
+> Nobody could explain what had happened.
+王は立ち上がって何か叫び、もう一度叫んだ。
+> The king got to his feet and shouted something, and shouted it again.
+声が割れている。
+> His voice was cracking.
+けれど、その声はもう誰にも届かない。
+> And it was no longer reaching anyone.
 ｜人《ひと》は｜皆《みな》、塔の上を見ていた。
 > Every one of them was looking at the top of the tower.
 
-｜二百段《にひゃくだん》を降りる間、誰も私に触らなかった。
-> Going down the two hundred steps, no one laid a hand on me.
+｜二百段《にひゃくだん》を降りる間、誰も私に手を出さなかった。
+> Coming down the two hundred steps, nobody laid a hand on me.
 私は牢に戻された。
 > I was put back in the cell.
 その冬、戦争は始まらなかった。
 > That winter, the war did not begin.
 そのわけを口にする者はいなかった。
 > No one would say aloud why.
-春に、王女が私を出した。
-> In spring, the princess had me released.
+春に、王女が牢から出してくれた。
+> In spring, the princess had me let out.
 
-「兄は玉座を降りたわ」と、その｜人《ひと》は言った。
-> "My brother has stepped down from the throne," she said.
+「兄は王の｜位《くらい》を降りたわ」と王女は言った。
+> "My brother has given up the crown," she said.
 「割れた鐘の王と呼ばれるのを、我慢できなかったのよ」
-> "He could not bear being called the king of the cracked bell."
+> "He could not stand being called the king of the cracked bell."
 私への｜罰《ばつ》も、それで終わった。
-> My own punishment ended there too.
-私は師匠の罪を、自分の物にした。
-> I took my master's crime and made it my own.
+> That was the end of my punishment too.
+私は師匠の罪を、自分のものとして引き受けた。
+> I took my master's crime on myself and answered for it.
 けれど、罪だとはもう思っていない。
 > But I no longer think of it as a crime.
 
 あれから長い｜年月《ねんげつ》が｜経《た》った。
 > Long years have gone by since.
 今、私は弟子を一人持っている。
-> Now I have one apprentice.
+> Now I have an apprentice of my own.
 十二の子供で、親がいない。
 > A child of twelve, with no parents.
-毎日、小さな鐘を並べて打たせているが、あの鐘の話はまだしていない。
-> Every day I line up the small bells and have the child strike them, but I have said nothing yet about that bell.
+毎日、小さな鐘を並べて打たせる。
+> Every day I line up the small bells and have the child strike them.
+あの鐘の話は、まだしていない。
+> About that bell I have said nothing yet.
 
 ｜今朝《けさ》、この子は小さな鐘の一つを強く打った。
 > This morning the child struck one of the small bells hard.
-音は壁に響いて、しばらく消えなかった。
-> The sound rang off the walls and did not fade for a while.
+音は壁に響いて、しばらく消えない。
+> The sound came back off the walls and would not fade.
+子供は手を止めて、私を見た。
+> The child stopped, and looked at me.
 私は止めなかった。
 > I did not stop the child.
-いつか話す日が来るだろう。
-> A day will come when I tell.
-師匠が私に渡したのは、秘密ではなかった。
-> What my master handed me was not a secret.
-選ぶ権利だったのだと、今は分かる。
-> It was the right to choose. I understand that now.

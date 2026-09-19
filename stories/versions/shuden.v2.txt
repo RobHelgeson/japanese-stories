@@ -2,10 +2,10 @@
 
 金曜日の夜、十一時を過ぎていた。
 > It was Friday night, past eleven.
-｜改札《かいさつ》を通る｜前《まえ》に、私は定期券をもう一度｜出《だ》してみた。
-> Before going through the ticket gate I took out my commuter pass and looked at it one more time.
-｜表《おもて》には私の名前と、会社のある駅の名前が並んでいる。
-> On the front are my name and the name of the station the company sits beside.
+｜改札《かいさつ》を通る｜前《まえ》に、私は定期券をもう一度｜出《だ》して見た。
+> Before going through the ticket gate, I took out my commuter pass and looked at it one more time.
+｜表《おもて》には会社の名前が小さく書かれている。
+> On the front the company's name is written in small letters.
 来月からは、この定期券は使えない。
 > From next month this pass will not work.
 会社を辞めたことを、私はまだ誰にも話していない。
@@ -13,29 +13,29 @@
 話す相手がいないからだ。
 > There is no one to tell.
 
-｜階段《かいだん》を降りると、ホームに冷たい｜風《かぜ》が吹いていた。
-> When I came down the stairs a cold wind was blowing along the platform.
+｜階段《かいだん》を降りると、ホームに冷たい｜風《かぜ》が通っていた。
+> When I came down the stairs, cold wind was moving along the platform.
 終電を待つ｜人《ひと》は少ない。
 > Few people wait for the last train.
 ｜皆《みな》が｜下《した》を向いたまま、誰とも話さない。
 > All of them keep looking down, speaking to no one.
-案内放送が流れて、終電が三分遅れていることが分かった。
-> An announcement came over the platform, and I learned the last train was running three minutes late.
+案内放送が鳴って、終電が三分遅れていることが分かった。
+> An announcement sounded, and I learned the last train was running three minutes late.
 三分だけれど、ホームで待つ｜間《あいだ》はとても長く感じた。
 > Three minutes, and still the wait on the platform felt very long.
 
-この線の終電は、いつも｜空《す》いている。
-> On this line the last train is always empty.
+終電は、いつも｜空《す》いている。
+> The last train is always empty.
 今夜も車内には｜乗客《じょうきゃく》が｜四人《よにん》しかいなくて、｜皆《みな》、離れた席に座っていた。
 > Tonight too there were only four passengers in the car, and each of them sat in a seat apart from the others.
-終電に乗る｜人《ひと》は、｜皆《みな》どこか疲れた顔をしている。
-> Everyone who rides the last train has a tired look about them.
-私は窓の近くに座り、荷物を｜網棚《あみだな》に上げようとして、やめた。
-> I sat down near the window, started to lift my bag onto the rack, and stopped.
-足元に置いておく｜方《ほう》が、降りる時に楽だ。
-> Easier at my feet, when the time came to get off.
+終電に乗るのは、疲れた顔ばかりだ。
+> The last train carries nothing but tired faces.
+私は窓の近くに座って、荷物を足元に置いた。
+> I sat near the window and put my bag at my feet.
+席の｜上《うえ》には荷物を乗せる｜網棚《あみだな》があって、今夜はそこに何も乗っていない。
+> Above the seats ran the rack for luggage, and tonight there was nothing on it.
 電車が動き出すと、外の明かりが長い線になって流れた。
-> When the train began to move, the lights outside ran past in long lines.
+> When the train started moving, the lights outside ran past in long lines.
 
 部長は最後まで丁寧だった。
 > My manager was courteous to the end.
@@ -45,8 +45,8 @@
 > "Your work was accurate," my manager said.
 同じ言葉を、私は何度も｜言《い》われた。
 > The same sentence, said to me again and again.
-どの言葉も「た」で終わる。
-> Every one of them ends in the past tense.
+全部、過去の形だった。
+> All of it was in the past tense.
 辞めたのは私だけれど、決めたのは私ではない。
 > I was the one who quit, but I was not the one who decided.
 
@@ -59,14 +59,14 @@
 会社の私の席は、来週からは｜他《ほか》の｜人《ひと》の席だ。
 > From next week my seat at the company is somebody else's seat.
 
-次の駅で、若い｜女性《じょせい》が乗ってきた。
+次の駅で、若い女の｜人《ひと》が乗ってきた。
 > At the next station a young woman got on.
 大きな荷物を二つ持っていて、｜片方《かたほう》は肩に｜掛《か》けていた。
 > She had two large bags, one of them over her shoulder.
-少し迷ってから、私の向かいの席に座った。
+彼女は少し迷ってから、私の向かいの席に座った。
 > She hesitated a little, and then sat down across from me.
-荷物は二つとも、自分の足元に置いた。
-> She set both bags down at her own feet.
+二つの荷物は、どちらも彼女の足元に置かれた。
+> Both bags were set down at her feet.
 荷物の｜中《なか》で、何かが小さく鳴った。
 > Inside one of them something knocked quietly.
 
@@ -80,8 +80,10 @@
 > "They look heavy."
 「重いです」
 > "They are."
-「｜割《わ》れる｜物《もの》が入っているので、｜下《した》に置いておきます」
-> "There are things in there that break, so I'll keep them down here."
+「｜割《わ》れる｜物《もの》が入っているので」
+> "There are things in there that break."
+「｜下《した》に置いておきます」
+> "I'll keep them down here."
 「それなら、その｜方《ほう》がいいですね」
 > "In that case, better that way."
 「はい」
@@ -91,16 +93,16 @@
 > The rack stayed empty.
 彼女は荷物を一つ膝の｜上《うえ》に乗せて、両手で｜支《ささ》えた。
 > She lifted one bag onto her lap and held it with both hands.
-ふと目が合って、二人とも少し笑った。
-> Our eyes happened to meet, and we both smiled a little.
+私と目が合って、二人とも少し笑った。
+> Our eyes met, and we both smiled a little.
 今度は緊張しなかった。
 > This time I was not nervous.
 「引っ越しですか」
 > "Moving?"
 「そうなんです」
 > "That's right."
-「朝の｜新幹線《しんかんせん》に乗ります」
-> "I'm taking the morning bullet train."
+「｜明日《あした》の朝、東京に着きます」
+> "I get into Tokyo tomorrow morning."
 
 彼女の返事はいつも短い。
 > Her answers were always short.
@@ -134,25 +136,23 @@
 だから私は、ただ黙っていた。
 > So I said nothing.
 
-彼女はまだ、切符を手に持っている。
-> She still had her ticket in her hand.
-｜片道《かたみち》の切符だ。
-> A one-way ticket.
-私は定期券をポケットから出して、もう一度｜表《おもて》を見た。
-> I took my pass out of my pocket and looked at the front of it again.
-これで同じ駅と駅の｜間《あいだ》を、何百回も｜往復《おうふく》した。
-> With this I had gone back and forth between the same two stations hundreds of times.
-来月には、ただの紙になる。
-> Next month it becomes a piece of paper and nothing else.
+制服を着た｜車掌《しゃしょう》が、切符を確かめながら通路をゆっくり歩いてきた。
+> A conductor in uniform came slowly up the aisle, checking tickets as he went.
+私は定期券を出したけれど、｜車掌《しゃしょう》はそれを一度も見ずに｜前《まえ》を通った。
+> I held out my pass, but he went straight by without once looking at it.
+この定期券を｜車掌《しゃしょう》に見せるのは、今夜が最後だ。
+> Tonight is the last time I show this pass to a conductor.
+彼女は切符を手に持って、｜車掌《しゃしょう》が来るのを待っていた。
+> She had her ticket ready in her hand, waiting for him to reach her.
+｜車掌《しゃしょう》は彼女の切符だけを見て、小さく｜頷《うなず》いた。
+> He looked only at her ticket and gave a small nod.
 
-その時、電車の音が急に変わった。
-> Then the sound of the train changed all at once.
-窓の外は真っ暗で、何も見えない。
-> Outside the window it was pitch dark and I could see nothing.
-それでも、長い橋を｜渡《わた》っているのだと分かった。
-> Even so, I knew we were crossing a long bridge.
-｜下《した》には川があるはずだ。
-> There would be a river underneath us.
+電車は川の橋を｜渡《わた》っていた。
+> The train was crossing the bridge over the river.
+窓の外は真っ暗で、水も見えない。
+> Outside the window it was pitch dark, and I could not see the water.
+それでも音が変わったので、橋だと分かった。
+> Still, the sound changed, and that was how I knew it was the bridge.
 彼女も同じ｜方《ほう》を見ている。
 > She was looking the same way.
 駅ごとに｜乗客《じょうきゃく》が｜一人《ひとり》ずつ降りていって、車内は少しずつ静かになっていった。
@@ -180,8 +180,8 @@
 それが、この夜で一番ありがたかった。
 > That was what I was most grateful for that night.
 
-荷物を少し開けて、｜中《なか》を見せてくれた。
-> She opened one of the bags a little and let me see what was inside.
+彼女は荷物を少し開けて、｜中《なか》を見せた。
+> She opened one of the bags a little and showed me what was inside.
 紙に｜包《つつ》んだ茶碗が、いくつも入っている。
 > Inside were rice bowls, a good many of them, each wrapped in paper.
 「母の｜物《もの》です」
@@ -201,7 +201,7 @@
 「まだです」
 > "Not yet."
 
-遠慮しているのかと私は思ったけれど、そうではないらしい。
+彼女は遠慮しているのかと私は思ったけれど、そうではないらしい。
 > I had thought she was holding back to be polite, but apparently that was not it.
 私は何か｜言《い》いたかった。
 > I wanted to say something.
@@ -224,8 +224,6 @@
 > "Tokyo is a big place."
 「広い｜方《ほう》がいいです」
 > "Bigger is better."
-彼女は少し黙ってから、続けた。
-> She was quiet a moment, then went on.
 「知らない｜人《ひと》が多いほど、楽なんです」
 > "The more strangers there are, the easier it is."
 「そういうものですか」
@@ -233,9 +231,9 @@
 「そういうものです」
 > "That's how it is."
 
-彼女はそこで初めて、声を出して笑った。
-> There, for the first time, she laughed out loud.
-私の言葉には意味がなかったのに、真面目に受け取ってくれた。
+彼女はそこで、初めてしっかり笑った。
+> There, for the first time, she smiled properly.
+私の言葉には意味がなかったのに、彼女は真面目に受け取ってくれた。
 > There was no meaning in anything I had said, and still she took it seriously.
 扉が開いて、冷たい｜風《かぜ》が入ってきた。
 > The doors opened and cold air came in.
@@ -257,29 +255,36 @@
 > The road home felt brighter than usual.
 町の明かりは、昨日と同じはずだ。
 > The lights of the town should be the same as yesterday.
-今夜、私は初めて「今日までは」と｜言《い》った。
-> Tonight, for the first time, I had said it out loud: until today.
-たった｜五文字《ごもじ》だ。
-> Five characters, and that was the whole of it.
+辞めたことを、今日初めて自分の言葉で｜言《い》えたからだろう。
+> Probably because today, for the first time, I had said in my own words that I had quit.
+「今日までは」という、たった｜五文字《ごもじ》で。
+> In just five characters. "Until today."
 
-部屋に入って、｜明《あ》かりをつけずに座った。
+部屋に入って、照明をつけずに座った。
 > I went into my room and sat down without turning on the light.
 机の｜上《うえ》に、会社の書類を置いた。
 > I put the company's papers on the desk.
-｜明日《あした》、全部片付けよう。そして、履歴書を書こう。
-> Tomorrow I will clear all of it away. And then I will write a resume.
+｜明日《あした》、全部片付けよう。
+> Tomorrow I will clear all of it away.
+そして、履歴書を書こう。
+> And then I will write a resume.
+
 すぐに見つからなくてもいい。
 > It does not have to be found right away.
 東京でもいいし、もっと遠い町でもいい。
 > Tokyo would do, or some town farther away than that.
+帰る家がないということは、どこへでも｜行《い》けるということだ。
+> Having no home to go back to means you can go anywhere.
+きっと本人は、そんな意味で｜言《い》っていない。
+> She surely did not mean it that way.
+でも言葉は、聞いた人の物になる。
+> But words become the property of the one who hears them.
 
-私はやっと｜明《あ》かりをつけた。
+私はやっと照明をつけた。
 > At last I turned on the light.
 机の｜上《うえ》の書類が、白く｜光《ひか》った。
 > The papers on the desk shone white.
-｜一番上《いちばんうえ》の紙を｜裏返《うらがえ》した。
-> I turned the top sheet over.
-裏は白いままだ。
-> The back of it was blank.
+｜一番上《いちばんうえ》の紙を｜裏返《うらがえ》すと、裏には何も書かれていない。
+> I turned the top sheet over, and the back of it was blank.
 私はそこに、｜行《い》ったことのない町の名前を書き始めた。
 > On it I began to write the names of towns I had never been to.
