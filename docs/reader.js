@@ -1996,6 +1996,29 @@
         function init() {
           cache();
           els.title.textContent = DATA.title || "";
+          // The title was the one string in the reader with no reading available:
+          // the contents card prints the authored kana above each title and the
+          // reader dropped it, so ｜行《い》かなかった｜人《ひと》の｜地図《ちず》
+          // arrived unaided. Revealed on tap rather than shown beside it, because
+          // the header is a fixed one-line strip whose height the page box is
+          // padded by — a second line there costs reading space on every screen
+          // for something wanted once. Tap is also what every other reading in
+          // this reader answers to, so the title now behaves like the text does.
+          if (DATA.titleKana) {
+            els.title.dataset.kana = DATA.titleKana;
+            els.title.classList.add("has-kana");
+            els.title.setAttribute("role", "button");
+            els.title.setAttribute("tabindex", "0");
+            els.title.setAttribute("aria-label", DATA.title + " — 読みを表示");
+            const flip = () => {
+              const showing = els.title.classList.toggle("kana");
+              els.title.textContent = showing ? DATA.titleKana : DATA.title;
+            };
+            els.title.addEventListener("click", flip);
+            els.title.addEventListener("keydown", (e) => {
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); }
+            });
+          }
           // Where the contents page sits relative to this file is a fact about
           // where the file was written, so the tool that chose that — rebuild.py,
           // which puts version builds one directory down in docs/versions/ —
