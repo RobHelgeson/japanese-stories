@@ -1937,8 +1937,38 @@ def connect(br, doc=None, revs=None):
     )
 
 
-def rec(page, at, **kw):
-    r = {"page": page, "sub": 0, "of": 25, "done": False, "at": at}
+SYNC_SLUG = "tokei-no-oto"
+
+
+@functools.lru_cache(maxsize=None)
+def built_pages(slug):
+    """How many pages `slug` has, derived from its source rather than written down.
+
+    From the source and not from docs/, because docs/ is what these suites are
+    testing: a count read off the artifact agrees with the artifact even when the
+    artifact is wrong.
+    """
+    _, pages = build.parse_story(stats.STORIES / f"{slug}.txt")
+    return len(pages)
+
+
+def rec(page, at, slug=SYNC_SLUG, **kw):
+    """A stored progress record, with `of` matching the story it is for.
+
+    `of` was the literal 25 for a long time — 時計の音's count before the
+    revisions took it to 24. reader.js restores which screen of a page you were
+    on only `if (saved.of === of)`, on the argument that a different page count
+    means the story changed underneath the record. A hardcoded count the story
+    has left behind can never satisfy that, so the branch was dead for every
+    record this factory built, in the sync, manage, index and review suites at
+    once. It went quiet rather than red because every rec() sets sub: 0, so the
+    restore it skipped had nothing to restore.
+
+    Pass `of=` explicitly where a mismatch is the point — a record from a device
+    that read an older build is a real thing to test, and it is then stated
+    rather than inherited.
+    """
+    r = {"page": page, "sub": 0, "of": built_pages(slug), "done": False, "at": at}
     r.update(kw)
     return r
 
@@ -1990,7 +2020,14 @@ def suite_sync(br, rep, base):
                 {"addr": s["addr"]})
 
         # ---- boot: the reader moved first, so local intent wins -------------
-        connect(br, {slug: rec(20, int(time.time() * 1000) + 60000)})
+        # Seeded from the story's length rather than at a literal 20. reader.js
+        # clamps a stored page to of - 1 on the entry path, so a seed past the
+        # end lands on the last page instead, and the assertion below stops being
+        # able to fail: it would be asserting the reader is not at an index the
+        # clamp has made unreachable. Four from the end is inside any story the
+        # corpus holds and leaves room for the step.
+        seeded = built_pages(slug) - 4
+        connect(br, {slug: rec(seeded, int(time.time() * 1000) + 60000)})
         gist(br, delay=1200)
         br.reload()
         br.eval(LIB)
@@ -1998,7 +2035,7 @@ def suite_sync(br, rep, base):
         br.eval("new Promise(r => setTimeout(r, 1800))", await_promise=True)
         s = br.eval("H.snap()")
         rep.add("sync", "a-turned-page-is-not-yanked-by-a-late-pull",
-                s["addr"]["page"] != 19, {"addr": s["addr"]})
+                s["addr"]["page"] != seeded - 1, {"addr": s["addr"], "seeded": seeded})
         gist(br, delay=0)
 
         # ---- a no-op push writes nothing ------------------------------------
@@ -2227,7 +2264,13 @@ def suite_index(br, rep, base):
                 br.eval(f"{res}.getAttribute('href')") == "tokei-no-oto.html",
                 br.eval(f"{res}.getAttribute('href')"))
 
-        load({mid: rec(7, 1000, of=16)})
+        # `of` is deliberately NOT the built count here, and the two were the
+        # same number until 2026-09-19: the record said 16, 迷子の手紙 is 16
+        # pages, and a row printing either one passed. The case names the built
+        # count as the thing it checks, so the record has to disagree with it for
+        # the check to mean anything.
+        mid_pages = built_pages(mid)
+        load({mid: rec(7, 1000, of=mid_pages + 83)})
         rep.add("index", "a-story-in-hand-becomes-the-continue-row",
                 br.eval(label) == "続き" and br.eval(title) == "迷子の手紙", br.eval(title))
         # The one thing the row exists to do. Everything else about it is a
@@ -2235,10 +2278,10 @@ def suite_index(br, rep, base):
         rep.add("index", "and-links-back-into-that-story",
                 br.eval(f"{res}.getAttribute('href')") == "maigo-no-tegami.html",
                 br.eval(f"{res}.getAttribute('href')"))
-        # 16 is the built page count on the card, not the `of` the record
-        # carries — that is only what some device believed when it last read.
+        # The built page count on the card, not the `of` the record carries —
+        # that is only what some device believed when it last read.
         rep.add("index", "with-the-position-against-the-built-page-count",
-                br.eval(pct) == "7 / 16", br.eval(pct))
+                br.eval(pct) == f"7 / {mid_pages}", br.eval(pct))
 
         # Two open at once is the two-device case, and the later stamp is the
         # one you are actually in the middle of.
