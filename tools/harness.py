@@ -3289,6 +3289,43 @@ def suite_en_ruby(br, rep, base):
                     row["ok"], row["detail"])
 
 
+def suite_title_kana(br, rep, base):
+    """The title flips to its authored reading on tap, and back.
+
+    Runs over every story in the corpus rather than one, because the reading is
+    looked up by title against stories-index.md and a lookup that misses fails
+    silently — the title simply stays put, which is what it did before this
+    existed. One story passing says nothing about the other seven.
+    """
+    for slug in [s["slug"] for s in stats.CORPUS["stories"]]:
+        br.emulate(*PHONE[1:])
+        br.goto(f"{base}/{slug}.html")
+        br.eval(LIB)
+        surface = br.eval("DATA.title")
+        kana = br.eval("DATA.titleKana")
+        rep.add("title-kana", f"{slug}/carries-a-reading", bool(kana), kana)
+        rep.add("title-kana", f"{slug}/starts-on-the-surface",
+                br.eval("document.getElementById('title').textContent") == surface,
+                br.eval("document.getElementById('title').textContent"))
+        rep.add("title-kana", f"{slug}/is-marked-tappable",
+                br.eval("document.getElementById('title').classList.contains('has-kana')"), None)
+        br.eval("document.getElementById('title').click()")
+        rep.add("title-kana", f"{slug}/tapping-shows-the-reading",
+                br.eval("document.getElementById('title').textContent") == kana,
+                br.eval("document.getElementById('title').textContent"))
+        # Back, not stuck: the reading is the detour and the title is the place
+        # the header returns to.
+        br.eval("document.getElementById('title').click()")
+        rep.add("title-kana", f"{slug}/and-tapping-again-restores-it",
+                br.eval("document.getElementById('title').textContent") == surface,
+                br.eval("document.getElementById('title').textContent"))
+        # No markup may reach the heading. It is the one string in the reader set
+        # by textContent on both sides of the flip, so a reading that arrived as
+        # ruby would show its tags rather than render them.
+        rep.add("title-kana", f"{slug}/neither-side-carries-markup",
+                "<" not in surface and "<" not in kana and "｜" not in kana, {"t": surface, "k": kana})
+
+
 def suite_persistence(br, rep, base):
     br.emulate(*PHONE[1:])
     a, b = "tokei-no-oto", "maigo-no-tegami"
@@ -3426,6 +3463,8 @@ def main():
             suite_marks(br, rep, base)
             print("\n===== ふりがな in a translation =====")
             suite_en_ruby(br, rep, base)
+            print("\n===== 題名の読み =====")
+            suite_title_kana(br, rep, base)
             print("\n===== persistence =====")
             suite_persistence(br, rep, base)
             print("\n===== degradation =====")

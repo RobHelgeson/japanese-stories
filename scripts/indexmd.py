@@ -64,8 +64,20 @@ def section(index_md, heading):
 
 
 def summaries(index_md):
-    """Spoiler-light blurbs for the contents page, with ruby stripped."""
-    return {k: (r, furigana.strip(t)) for k, (r, t) in section(index_md, "Summaries").items()}
+    """Spoiler-light blurbs for the contents page, as HTML with furigana preserved.
+
+    Rendered rather than stripped, which makes this symmetrical with `afterwords`
+    below. The two sections sit beside each other in the same file, in the same
+    bullet grammar, and an annotation written in one of them rendered while the
+    same annotation in the other vanished. Nothing was losing a reading yet — no
+    summary carries markup today — but the asymmetry was silent, and the way it
+    would have surfaced is a blurb that quietly reads differently from the
+    afterword it sits above.
+
+    Callers insert this without escaping, as they already do for afterwords:
+    `ruby_html` escapes per segment, so prose cannot inject tags.
+    """
+    return {k: (r, ruby_html(t)) for k, (r, t) in section(index_md, "Summaries").items()}
 
 
 def afterwords(index_md):

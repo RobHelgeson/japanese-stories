@@ -98,7 +98,10 @@ def card(story, summary, versions=()):
     # which made adding a story a two-file operation with a hard stop in the
     # middle of a rebuild; the gap is now visible on the page and in a warning.
     rt = f'<div class="rt">{html.escape(reading)}</div>\n        ' if reading else ""
-    sum_p = f'<p class="sum">{html.escape(text)}</p>' if text else '<p class="sum none">—</p>'
+    # Not escaped: indexmd.summaries returns ruby_html output, which escapes each
+    # segment itself so an annotation renders and the prose around it cannot
+    # inject tags. Same contract as the afterword the reader folds in.
+    sum_p = f'<p class="sum">{text}</p>' if text else '<p class="sum none">—</p>'
     # data-title rather than reading the <h2> back: the heading carries the
     # level chip too, so its textContent is not the title.
     return f"""    <div class="cell" data-slug="{html.escape(slug)}" data-pages="{story["pages"]}" data-title="{title}"{f' data-level="{lv}"' if lv is not None else ""}>

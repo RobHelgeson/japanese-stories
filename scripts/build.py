@@ -434,9 +434,19 @@ def main():
     # the Japanese.
     index_md = args.story.parent / "stories-index.md"
     afterword = indexmd.afterwords(index_md).get(title, "") if index_md.exists() else ""
+    # The title's own reading, which the contents card has always shown and the
+    # reader dropped. `title` is the ruby-stripped surface, because the <h1> is
+    # set by textContent and no markup may reach it, so the reading travels
+    # beside it as plain text rather than inside it as markup. Only four of the
+    # eight story files annotate their own # line; stories-index.md annotates
+    # all eight, so it is the source here as it is for the card.
+    title_kana = (
+        indexmd.summaries(index_md).get(title, ("", ""))[0] if index_md.exists() else ""
+    )
 
     data = {
         "title": title,
+        "titleKana": title_kana,
         # Read tracking keys on this. The title is not stable enough — a version
         # build shares its parent's title, which would merge their progress.
         "slug": args.story.stem,
