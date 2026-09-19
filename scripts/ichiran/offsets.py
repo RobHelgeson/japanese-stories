@@ -43,18 +43,35 @@ class Placed:
     """A word, and the span of the source text it covers.
 
     `text` is what the document actually says; `word.surface` is what Ichiran
-    called it. They differ only where a canonical surface had to be carried into
-    a gap, which keeping compounds whole has made rare — `canonical` is how a
-    caller tells, and is None when there is nothing to tell.
+    called it. They differ two ways, and a caller has to tell them apart because
+    the reading on hand means something different in each.
+
+    `part_of` is set on a piece that came out of `spread`, and carries the
+    compound it was cut from: (surface, reading, this piece's offset into it).
+    The compound is the node that knows both what was printed and how the whole
+    of it reads, so a caller aligns THAT and takes the slice at the offset — no
+    guessing needed, because the reading covers exactly the text it was printed
+    beside.
+
+    `canonical` is the other case: a surface Ichiran returned for text the
+    document does not contain, carried into a gap by `_gap`. There is no longer
+    surface to align against, only a word whose reading describes more than is
+    written, so the reading has to be cut down instead — `furigana.truncate`.
+    Keeping compounds whole has made this rare, and it does not occur at all in
+    the eight stories as of 2026-09-19, but it stays reachable for text that
+    drops a word, which is why it is not merged into the case above.
     """
 
     word: object
     text: str
     start: int
     end: int
+    part_of: tuple = ()
 
     @property
     def canonical(self):
+        if self.part_of:
+            return None
         return self.word.surface if self.word.surface != self.text else None
 
 
@@ -157,6 +174,11 @@ def spread(piece):
                     text=piece.text[at:at + width],
                     start=piece.start + at,
                     end=piece.start + at + width,
+                    # What was printed and how all of it reads, which only the
+                    # compound knows. A component's own surface is canonical —
+                    # 熱すぎて's parts are 熱い and すぎて and the document holds
+                    # neither — so its reading describes a word that is not here.
+                    part_of=(piece.text, parse.kana, at),
                 )
             )
         at += width

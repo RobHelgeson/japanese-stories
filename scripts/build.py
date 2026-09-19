@@ -128,9 +128,16 @@ def to_token(tok, known, weak, approved, authored=None, accents=None):
     if not ichiran.has_kanji(surface):
         return {"t": surface}
     kana = word.kana
-    # Set when Ichiran named this token something the document does not contain -
-    # 熱すぎて is 熱い + すぎて, so `surface` is 熱 and the reading on hand is あつい.
-    # See ichiran.offsets.spread.
+    # Two ways Ichiran's reading describes something other than the text printed
+    # here, and they are answered differently. See ichiran.offsets.Placed.
+    #
+    # `part_of` - this is one component of a compound, and the compound carries
+    # both the printed surface and the reading of all of it. Align that and take
+    # the slice; nothing has to be cut down or guessed.
+    part_of = tok.part_of
+    # `canonical` - a surface carried into a gap, where there is no longer text to
+    # align against and the reading on hand covers more than is written. Rare
+    # enough that the eight stories contain none, but reachable.
     lemma = tok.canonical
     # An author annotation wins over both Ichiran and the global override table:
     # it is per-occurrence, so it is the only one of the three that can be right
@@ -139,17 +146,23 @@ def to_token(tok, known, weak, approved, authored=None, accents=None):
     if reading:
         if reading != kana:
             applied[f"{surface} {kana}→{reading} (authored)"] += 1
-        kana, lemma = reading, None
+        kana, lemma, part_of = reading, None, ()
     elif surface in OVERRIDES and OVERRIDES[surface] != kana:
         applied[f"{surface} {kana}→{OVERRIDES[surface]}"] += 1
-        kana, lemma = OVERRIDES[surface], None
+        kana, lemma, part_of = OVERRIDES[surface], None, ()
     # Both of those state a reading for the text that is actually here, so they
-    # settle the question and the cut below is not wanted. Only Ichiran's own
-    # reading needs one, because only it describes a longer word.
-    if lemma:
-        cut = furigana.truncate(furigana.align(lemma, kana), surface)
+    # settle the question and neither branch below is wanted. Only Ichiran's own
+    # reading needs one, because only it describes something other than this span.
+    if part_of:
+        whole, whole_kana, at = part_of
+        cut = furigana.portion(furigana.align(whole, whole_kana), at, at + len(surface))
         if cut is None:
             return {"t": surface}  # no honest reading for this span; say nothing
+        pairs, kana = cut
+    elif lemma:
+        cut = furigana.truncate(furigana.align(lemma, kana), surface)
+        if cut is None:
+            return {"t": surface}
         pairs, kana = cut
     else:
         pairs = furigana.align(surface, kana)

@@ -233,9 +233,14 @@ def spreading():
     got = [(p.text, p.start, p.end) for p in parts]
     want = [("湯", 0, 1), ("が", 1, 2), ("熱", 2, 3), ("すぎて", 3, 6)]
     good = got == want
-    # The point of spreading: 熱 is placed, and it still knows it is 熱い.
+    # The point of spreading: 熱 is placed, and it still knows what it was cut
+    # from. The compound, not the component — 熱すぎて and あつすぎて cover exactly
+    # the text that was printed, so a caller slices that at offset 0 and gets あつ.
+    # The component's own 熱い/あつい describes a word the document does not hold,
+    # which is why `canonical` is None here and a cut is not needed.
     carried = next((p for p in parts if p.text == "熱"), None)
-    good &= carried is not None and carried.canonical == "熱い"
+    good &= carried is not None and carried.part_of == ("熱すぎて", "あつすぎて", 0)
+    good &= carried is not None and carried.canonical is None
     print(f"  {'ok  ' if good else 'FAIL'} 熱すぎて placed whole, split into 熱 + すぎて")
     if not good:
         print(f"       want {want}")

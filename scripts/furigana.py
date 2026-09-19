@@ -163,6 +163,46 @@ def align(surface, reading):
     return solve(0, 0) or [(surface, reading)]
 
 
+def portion(pairs, start, end):
+    """The part of `pairs` covering `[start, end)` of the text they align.
+
+    For a compound's component. The compound node is the one that knows both what
+    was printed and how the whole of it reads — 熱すぎて and あつすぎて — so
+    aligning THAT and taking the slice at the component's offset gives each part
+    its own reading directly. 熱 gets あつ because あつ is what sits over 熱 in the
+    compound's own alignment, not because あつい was cut down to fit.
+
+    That is the difference from `truncate`, which is given a reading for a word
+    the document does not contain and has to shorten it. Here nothing is
+    shortened: the alignment already covers exactly the printed text, and this
+    reads a span out of it.
+
+    Returns (pairs, kana), or None when the boundary falls inside a kanji run —
+    its reading covers the whole run and cannot be apportioned across it, which is
+    the same refusal `truncate` makes and for the same reason.
+    """
+    out, at = [], 0
+    for text, ruby in pairs:
+        lo, hi = at, at + len(text)
+        at = hi
+        if hi <= start or lo >= end:
+            continue
+        if lo >= start and hi <= end:
+            out.append((text, ruby))
+            continue
+        # Straddles a boundary. Only a kana run can be split, because its reading
+        # is its own text; a kanji run's ruby covers the run and nothing says how
+        # to divide it.
+        if ruby is not None:
+            return None
+        cut = text[max(start - lo, 0):min(end - lo, len(text))]
+        if cut:
+            out.append((cut, None))
+    if not out:
+        return None
+    return out, _to_hira("".join(t if r is None else r for t, r in out))
+
+
 def truncate(pairs, text):
     """`pairs` cut down to `text`, a shorter run starting at the same place.
 
