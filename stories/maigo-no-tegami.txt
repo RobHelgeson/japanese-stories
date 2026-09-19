@@ -5,11 +5,11 @@
 封筒には私の住所が書いてあったが、｜宛名《あてな》は違っていた。
 > The envelope had my address on it, but the wrong name.
 「青山 ｜梓《あずさ》様」と、細かい｜字《じ》で書いてある。
-> "To Ms. Azusa Aoyama," written in a small, careful hand.
+> "To Ms. ｜梓《あずさ》 ｜青山《あおやま》," written in a small, careful hand.
 私はその名前を知らなかった。
 > I didn't know the name.
 ｜玄関《げんかん》の横の｜表札《ひょうさつ》を｜確《たし》かめると、そこは｜松田《まつだ》という私の｜名字《みょうじ》になっている。
-> I went and checked the nameplate beside the front door, and it read Matsuda, my own surname.
+> I went and checked the nameplate beside the front door, and it read ｜松田《まつだ》, my own surname.
 住所だけを見て、｜表札《ひょうさつ》は見なかったのだろう。
 > Someone had gone by the address alone and never glanced at the nameplate.
 
@@ -25,7 +25,7 @@
 封筒の裏には、｜差出人《さしだしにん》の名前があった。
 > On the back of the envelope was the sender's name.
 「青山 ｜澪《みお》」と書いてある。
-> "Mio Aoyama," it said.
+> "｜澪《みお》 ｜青山《あおやま》," it said.
 住所は遠い町のものだった。
 > The address was in a town far away.
 ｜名字《みょうじ》が同じなので、家族なのだろうと私は思った。
@@ -45,7 +45,7 @@
 ｜庭《にわ》で｜洗濯物《せんたくもの》を｜干《ほ》しながら、奥さんは私の話を聞いた。
 > She listened to me while she hung out the washing in the garden.
 「青山さんね。｜去年《きょねん》の冬まで、お宅に住んでいた｜女《おんな》の｜人《ひと》よ」
-> "Oh, Ms. Aoyama. The woman who was living in your house until last winter."
+> "Oh, Ms. ｜青山《あおやま》. The woman who was living in your house until last winter."
 
 奥さんの話では、その｜人《ひと》は静かな｜人《ひと》だったらしい。
 > By her account, she had been a quiet sort of person.
@@ -59,7 +59,7 @@
 引っ越した｜人《ひと》の手紙は、｜郵便局《ゆうびんきょく》が新しい住所へ送ってくれる。
 > When a person moves, the post office sends their letters on to the new address.
 しかし、青山さんは新しい住所を出していない。
-> Ms. Aoyama, however, had left no new address.
+> Ms. ｜青山《あおやま》, however, had left no new address.
 そのため、この手紙はどこにも寄らずに、まっすぐここへ来た。
 > So the letter had come straight here without stopping anywhere.
 
@@ -81,7 +81,7 @@
 そこだけ、｜字《じ》が少し大きくなっているように見えた。
 > Just there, the writing looked a little larger.
 「｜先月《せんげつ》、子供が生まれた。名前は｜月子《つきこ》だ。一度会いに｜行《い》きたい。｜返事《へんじ》を待っている」
-> "A child was born last month. Her name is Tsukiko. I want to come and see you, just once. I'll be waiting to hear from you."
+> "A child was born last month. Her name is ｜月子《つきこ》. I want to come and see you, just once. I'll be waiting to hear from you."
 書き直したところは、一つもなかった。
 > Not one place on the sheet had been written over.
 
@@ -99,13 +99,13 @@
 その夜、私は自分の机に紙を広げた。
 > That night I spread a sheet of paper on my desk.
 「青山」と書いたところで、手が止まった。
-> I got as far as writing "Aoyama," and my hand stopped.
+> I got as far as writing "｜青山《あおやま》," and my hand stopped.
 この家の青山さんと、遠い町の青山さん。
-> The Aoyama of this house, and the Aoyama of a town far away.
+> The ｜青山《あおやま》 of this house, and the ｜青山《あおやま》 of a town far away.
 知らない｜人《ひと》の｜死《し》を知らない｜人《ひと》に伝える｜役目《やくめ》を、誰が私に頼んだわけでもない。
 > Nobody had asked me to take on the job of telling a stranger that a stranger had died.
 青山｜梓《あずさ》さんの顔を、私は知らない。
-> I have never seen Azusa Aoyama's face.
+> I have never seen ｜梓《あずさ》 ｜青山《あおやま》's face.
 声も知らない。
 > Nor heard her voice.
 知らないのに、この｜返事《へんじ》を書くのは私だ。
@@ -118,7 +118,7 @@
 私は短く、丁寧に書いた。
 > I wrote briefly, and politely.
 青山｜梓《あずさ》さんはもうこの家にいないこと。
-> That Ms. Azusa Aoyama was no longer living in this house.
+> That Ms. ｜梓《あずさ》 ｜青山《あおやま》 was no longer living in this house.
 ｜去年《きょねん》の冬に亡くなったこと。
 > That she had died last winter.
 
@@ -159,13 +159,13 @@
 それだけが、｜真《ま》ん｜中《なか》に書いてあった。
 > That was all, written in the middle of the page.
 封筒の裏を見ると、｜差出人《さしだしにん》の名前の｜下《した》に、小さい｜字《じ》で「｜月子《つきこ》」と書いてあった。
-> When I turned the envelope over, below the sender's name, in small letters, was "Tsukiko."
+> When I turned the envelope over, below the sender's name, in small letters, was "｜月子《つきこ》."
 
 私はその手紙を、｜宛名《あてな》の違う封筒と一緒に引き出しの奥へ入れた。
 > I put the letter at the back of a drawer, together with the envelope that had the wrong name on it.
 それからは、買い物に出かける時間が、毎日同じになった。
 > After that, the hour I went out to shop was the same one every day.
 気づいたのは、隣の奥さんが「｜松田《まつだ》さんも静かな｜人《ひと》ね」と言った時だ。
-> I noticed it only when the wife next door said, "You're a quiet one yourself, Mrs. Matsuda."
+> I noticed it only when the wife next door said, "You're a quiet one yourself, Mrs. ｜松田《まつだ》."
 私は何も答えず、｜頭《あたま》を｜下《さ》げて家へ帰った。
 > I said nothing. I bowed my head and went back inside.
