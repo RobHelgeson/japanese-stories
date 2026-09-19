@@ -992,6 +992,18 @@ window.H = (() => {
     }
     return null;
   }
+
+  // liveSentence(), narrowed to one whose translation carries a reading. Same
+  // resolve-against-the-live-screen contract: the track recycles cells, so this
+  // is called again at the moment of the tap rather than carried out of a walk.
+  function liveAnnotated() {
+    for (const cand of document.querySelectorAll("#track .cell.is-current .s[data-en]")) {
+      if (!cand.dataset.en.includes("<ruby")) continue;
+      const pt = bareSpot(cand);
+      if (pt) return { s: cand, pt };
+    }
+    return null;
+  }
   const isLit = (node) => !!node && node.classList.contains("lit");
   // An HTML string parsed inert, so a test can ask what it means rather than
   // what it says. <template> and not innerHTML on a live node: nothing here
@@ -1269,7 +1281,9 @@ window.H = (() => {
   // A translation that names someone annotates the name the way the story does,
   // ｜梓《あずさ》, and the panel used to print that markup at the reader because
   // it set textContent. Driven from its own suite because it needs a story whose
-  // translations carry furigana, and sheet() above runs on one that does not.
+  // translations carry furigana; suite_en_ruby runs it once on each of them,
+  // because the shapes differ story by story — a name mid-sentence and a
+  // possessive ｜松田《まつだ》's are 迷子の手紙's and nowhere else.
   async function enRuby() {
     const out = [];
     const add = (name, ok, detail) => out.push({ name, ok: !!ok, detail });
@@ -1287,21 +1301,21 @@ window.H = (() => {
     add("en-ruby/the-story-still-has-annotated-translations", annotated.length > 0,
         { count: annotated.length });
 
-    // Same forward walk as sheet(), narrowed to a sentence whose translation
-    // carries a reading and which has a bare spot to tap.
-    let a = Paginator.first(), hit = null;
-    for (let i = 0; i < 80 && a && !hit; i++) {
+    // Same forward walk as sheet(): turn pages until a screen carries one.
+    let a = Paginator.first(), found = false;
+    for (let i = 0; i < 80 && a && !found; i++) {
       Track.goTo(a, false);
       await sleep(10);
-      for (const cand of document.querySelectorAll("#track .cell.is-current .s[data-en]")) {
-        if (!cand.dataset.en.includes("<ruby")) continue;
-        const pt = bareSpot(cand);
-        if (pt) { hit = { s: cand, pt }; break; }
-      }
-      a = Paginator.next(a);
+      found = !!liveAnnotated();
+      if (!found) a = Paginator.next(a);
     }
-    if (!hit) return out.concat([{ name: "en-ruby/fixture", ok: false, detail: { at: "walk" } }]);
+    if (!found) return out.concat([{ name: "en-ruby/fixture", ok: false, detail: { at: "walk" } }]);
 
+    // Resolved again here rather than carried out of the walk above, for the
+    // reason liveSentence() states: the track recycles cells, so the node that
+    // matched is not necessarily the node now on screen.
+    const hit = liveAnnotated();
+    if (!hit) return out.concat([{ name: "en-ruby/fixture", ok: false, detail: { at: "tap" } }]);
     await doubleTapAt(hit.pt);
     const rt = body.querySelector("rt");
     // The reading is a real <rt> the browser lays out over the name, and none of
@@ -1311,6 +1325,21 @@ window.H = (() => {
         { open: Sheet.isOpen(), rt: rt && rt.textContent,
           body: body.textContent.slice(0, 60) });
 
+    // And it is visible. rt is opacity 0 globally until the ふ gate, which
+    // apply_prefs leaves off, so #sheet-body's opt-out is the only thing showing
+    // the panel's reading — and deleting it breaks nothing above, because !!rt
+    // is still true and textContent does not care about opacity. The page's own
+    // reading is the control: without it "opacity 1" would pass just as well
+    // with the gate on, and the row would not be about the opt-out at all.
+    let pageRt = null;
+    for (const cand of document.querySelectorAll("#track .cell.is-current rt")) {
+      if (!cand.closest(".lit, .w.new, .after")) { pageRt = cand; break; }
+    }
+    const opacityOf = (n) => (n ? getComputedStyle(n).opacity : null);
+    add("en-ruby/the-reading-is-visible-while-the-page's-is-not",
+        !!rt && !!pageRt && opacityOf(rt) === "1" && opacityOf(pageRt) === "0",
+        { panel: opacityOf(rt), page: opacityOf(pageRt), control: !!pageRt });
+
     // What the panel says out loud is the sentence with the readings taken back
     // out: 梓, never ｜梓《あずさ》 and never 梓あずさ. Read off #live, the live
     // region Chrome.announce writes, so this is the string a screen reader gets
@@ -1319,7 +1348,7 @@ window.H = (() => {
     for (const n of want.querySelectorAll("rt, rp")) n.remove();
     const said = document.getElementById("live").textContent;
     add("en-ruby/the-panel-speaks-the-name-without-its-reading",
-        said === want.textContent && !raw.test(said) && !said.includes(rt.textContent),
+        said === want.textContent && !raw.test(said) && !!rt && !said.includes(rt.textContent),
         { said: said.slice(0, 60), want: want.textContent.slice(0, 60) });
     return out;
   }
@@ -3176,20 +3205,45 @@ def suite_marks(br, rep, base):
                  "position": m.get("emPos")})
 
 
-def suite_en_ruby(br, rep, base):
-    """The one story whose translations annotate the names they use.
+def annotated_stories():
+    """Slugs whose translations carry ｜漢字《かな》, read from the sources.
 
-    Its 70 ｜漢字《かな》 English lines are the whole reason the panel renders HTML
-    at all, and no other story reaches that path — so this runs where the fixture
-    is rather than folding into suite_behaviour, which reads 時計の音.
+    Not a hand list. It was one, naming 行かなかった人の地図 as "the one story
+    whose translations annotate the names they use" — true when it was written
+    and false one commit later, once the name conversion put annotations into
+    迷子の手紙 and 猫を探す探偵. A leak scan that walks the story it was told
+    about rather than the stories that exist is the shape of gap this whole
+    branch is closing.
     """
-    slug = "ikanakatta-hito-no-chizu"
-    br.emulate(*PHONE[1:])
-    br.goto(f"{base}/{slug}.html")
-    br.eval(LIB)
-    apply_prefs(br, "vertical", False, 28)
-    for row in br.eval("H.enRuby()", await_promise=True):
-        rep.add("en-ruby", row["name"].split("/", 1)[1], row["ok"], row["detail"])
+    out = []
+    for s in stats.CORPUS["stories"]:
+        src = stats.STORIES / f"{s['slug']}.txt"
+        lines = src.read_text(encoding="utf-8").splitlines()
+        if any(l.startswith(">") and "｜" in l for l in lines):
+            out.append(s["slug"])
+    return out
+
+
+def suite_en_ruby(br, rep, base):
+    """Every story whose translations annotate the names they use.
+
+    The ｜漢字《かな》 English lines are the whole reason the panel renders HTML
+    rather than setting textContent, so this runs where the fixtures are rather
+    than folding into suite_behaviour, which reads 時計の音 and has none.
+
+    It runs once per story because the shapes differ: 行かなかった人の地図 has a
+    name opening a sentence, 迷子の手紙 has one mid-clause and a possessive
+    ｜松田《まつだ》's, and an escaper that mishandled either would ship raw
+    markup with a single-story scan entirely green.
+    """
+    for slug in annotated_stories():
+        br.emulate(*PHONE[1:])
+        br.goto(f"{base}/{slug}.html")
+        br.eval(LIB)
+        apply_prefs(br, "vertical", False, 28)
+        for row in br.eval("H.enRuby()", await_promise=True):
+            rep.add("en-ruby", f"{slug}/{row['name'].split('/', 1)[1]}",
+                    row["ok"], row["detail"])
 
 
 def suite_persistence(br, rep, base):

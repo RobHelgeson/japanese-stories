@@ -14,10 +14,14 @@ import furigana
 BULLET = re.compile(r"^- \*\*(.+?)\*\*\s*[—-]\s*(.+)$")
 
 
-def strip_ruby(text):
-    return furigana.strip(text)
-
-
+# MARKUP replaced this module's own looser copy, which accepted any reading and
+# could not see the bare 漢字《かな》 form. That is the right direction — one
+# module owning the grammar is what stops the two drifting again — but it does
+# narrow what a reading may contain to kana, and a reading MARKUP will not match
+# falls through to html.escape and ships as literal markup rather than rendering.
+# Latent, not live: old and new match identically across every story and every
+# line of stories-index.md. Worth knowing because Rob's own convention writes
+# ｜ka《・》 for a per-character reading, and ・ is exactly the shape that misses.
 def ruby_html(text):
     """｜漢字《かな》 rendered as <ruby>, everything else HTML-escaped.
 
@@ -61,7 +65,7 @@ def section(index_md, heading):
 
 def summaries(index_md):
     """Spoiler-light blurbs for the contents page, with ruby stripped."""
-    return {k: (r, strip_ruby(t)) for k, (r, t) in section(index_md, "Summaries").items()}
+    return {k: (r, furigana.strip(t)) for k, (r, t) in section(index_md, "Summaries").items()}
 
 
 def afterwords(index_md):

@@ -1427,13 +1427,14 @@
         // Node text with every reading dropped — the <rt> is an annotation on the
         // surface, not part of it, so this is 私 where textContent is 私わたし.
         // Used for the headword above and for what the panel says out loud.
+        // The readings taken back out: 梓, not 梓あずさ. Same form the copy
+        // handler uses, and depth-independent on purpose — walking direct
+        // children only would truncate the moment ruby_html emits an <rp> or
+        // anything wraps a name, and it would do it silently.
         function withoutRuby(node) {
-          let out = "";
-          for (const n of node.childNodes) {
-            if (n.nodeType === 3) out += n.data;
-            else if (n.nodeName === "RUBY" && n.firstChild) out += n.firstChild.textContent;
-          }
-          return out;
+          const frag = node.cloneNode(true);
+          for (const r of frag.querySelectorAll("rt, rp")) r.remove();
+          return frag.textContent;
         }
 
         function chip(cls, text) {
@@ -1712,8 +1713,11 @@
         if (!sel || sel.isCollapsed || !e.clipboardData) return;
         const frag = document.createDocumentFragment();
         for (let i = 0; i < sel.rangeCount; i++) frag.append(sel.getRangeAt(i).cloneContents());
-        // Nothing annotated in range — a gloss, a translation, the stats — so the
-        // engine's own serialisation is already right, block structure and all.
+        // Nothing annotated in range — a gloss, the stats — so the engine's own
+        // serialisation is already right, block structure and all. A translation
+        // used to be on that list and no longer is: one that names someone
+        // carries ruby now, so it takes the strip below and loses its text/html
+        // flavour. The plain text is correct; the richer flavour is the cost.
         if (!frag.querySelector("rt")) return;
         for (const rt of frag.querySelectorAll("rt, rp")) rt.remove();
         // textContent alone would run two paragraphs together.

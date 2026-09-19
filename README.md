@@ -1,6 +1,6 @@
 # 日本語 Known-Word Stories
 
-Short Japanese stories written entirely inside a fixed known-word set, and a reader that shows furigana only when you ask for it.
+Short Japanese stories written entirely inside a fixed known-word set, and a reader that keeps the story's furigana hidden until you ask for it.
 
 **📖 Read them: <https://robhelgeson.github.io/japanese-stories/>**
 
@@ -20,7 +20,7 @@ Text is vertical by default, as Japanese literary prose is, and a page never scr
 | Tap again                  | put the reading away                                 |
 | Double tap a kanji word    | its meaning, in a sheet at the foot of the page      |
 | Tap between words          | the reading for the whole sentence                   |
-| Double tap between words   | that sentence in English                             |
+| Double tap between words   | that sentence in English, names carrying their reading |
 | `f`                        | reveal every reading at once (also 設 → ふりがな)    |
 | Swipe                      | turn the page (touch; on a mouse use the arrows)     |
 | `←` `→`                    | turn pages, following the binding direction          |
@@ -29,6 +29,8 @@ Text is vertical by default, as Japanese literary prose is, and a page never scr
 | `目次`                     | back to the contents page                            |
 
 Kana, particles and punctuation are not wrapped as words, so "between words" is about half of every line and easy to hit with a thumb. Which is also why the bars have their own gesture: every tap on the text now means something, so the strip the bars occupy is what is left to summon them with. It is a toggle rather than a summons, because it is the only gesture that can be — there is nowhere else to tap that does not already belong to a word or a sentence.
+
+The gate is over the **story**. A translation that names someone annotates the name the way the story does, and the panel always shows that reading — a name written 梓 with its reading hidden is not a thing the English can teach you, and it is the one place where hiding it costs the reader something rather than asking them to try first.
 
 On a mouse, hovering a word reveals its reading and a double click opens the sheet. `Tab` reaches every kanji word and every translated sentence, and `Enter` opens the sheet directly — a sentence with no translation is not a tab stop, because there would be nothing to open.
 
