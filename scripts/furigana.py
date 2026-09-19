@@ -20,34 +20,72 @@ def pair(m):
     return (m.group(1) or m.group(3), m.group(2) or m.group(4))
 
 
+def _misaligned(surface, reading):
+    """True when a marker run holds both kinds of character and will not split.
+
+    align() places a reading by matching the surface's own kana against it, so a
+    mixed run that still comes back as one unsplit pair is a run whose kana are
+    not in its reading. That is what over-capture looks like: どこにも見 with the
+    reading み. A legitimate marker form always splits, because the kana it spans
+    are the head of its own reading — ｜この家《このいえ》 anchors この and leaves
+    家 to いえ, ｜真ん中《まんなか》 anchors the ん infix.
+
+    A pure-kanji or pure-kana run is one run and cannot split, so it is not asked
+    to: ｜見《み》 is a redundant marker, not a fault.
+    """
+    runs = _runs(surface)
+    if len({kana for kana, _ in runs}) < 2:
+        return False
+    return len(align(surface, reading)) == 1
+
+
 def stray_markers(line):
-    """Character offsets of every ｜ in `line` that opens no annotation.
+    """Character offsets of every ｜ in `line` that opens no sound annotation.
 
-    MARKUP's marker alternative is ｜([^《｜\\n]+)《…》, whose run may not contain a
-    second ｜ and may not cross a newline. A ｜ standing in front of a kana-only
-    run therefore matches nothing at all — ｜どこにも has no 《》 to close it, and
-    ｜そのままにしておいた。 runs to the end of the line — and because neither
-    strip() nor parse() has an else branch, an unmatched ｜ is not a warning and
-    not a counter. It is copied through as ordinary text, reaches ichiran.align()
-    and is emitted as a token, so a literal ｜ ships into the published reader.
-    Two lines in the corpus do exactly that today.
+    Two faults, because a ｜ has two ways to go wrong and only one of them is
+    visible in the output.
 
-    The predicate is "every ｜ is the start of a MARKUP match", which is exact
-    rather than approximate: ｜ cannot occur anywhere else inside a match, since
-    group 1 excludes it, group 3 is kanji and both readings are kana. So a ｜ at
-    any other offset opens nothing.
+    **A ｜ that matches nothing.** MARKUP's marker alternative is
+    ｜([^《｜\\n]+)《…》, whose run may not contain a second ｜ and may not cross a
+    newline. ｜どこにも has no 《》 to close it and ｜そのままにしておいた。 runs to
+    the end of the line, so neither matches — and because neither strip() nor
+    parse() has an else branch, an unmatched ｜ is not a warning and not a
+    counter. It is copied through as ordinary text, reaches ichiran.align() and
+    is emitted as a token, so a literal ｜ ships into the published reader.
 
-    It must not fire on the legitimate marker form, which is the whole reason the
-    marker exists — ｜この家《このいえ》 and ｜そこに立《そこにた》 annotate a run
-    that starts with kana, and the bare-kanji alternative could not reach them.
-    Those match, so their ｜ is a match start and is not reported.
+    **A ｜ that matches too much.** Group 1 is greedy and forbids only a second
+    ｜, so a stray marker standing before kana swallows whatever 《kana》 comes
+    next on the line: ｜どこにも見《み》えなく matches as a single annotation with
+    the run どこにも見 and the reading み, and the reader gets ruby み set over
+    five characters. Nothing is lost and nothing looks broken, which is why this
+    is the worse of the two. _misaligned() above is the test.
+
+    That second shape is why "every ｜ is the start of a MARKUP match" is not the
+    predicate, though it is tempting and it was the first one written here. It is
+    exact for the question it asks — ｜ cannot occur anywhere else inside a match,
+    since group 1 excludes it, group 3 is kanji and both readings are kana — but
+    that question is not the fault. The corpus's two real faults were reported by
+    it only because each happened to carry a second ｜ that blocked the greedy
+    run; removing that second ｜ made the line worse and the check silent.
+
+    Neither shape may fire on the legitimate marker form, which is the whole
+    reason the marker exists: ｜この家《このいえ》 and ｜そこに立《そこにた》
+    annotate a run that starts with kana, and the bare-kanji alternative could
+    not reach them. They match, and they align, so they are not reported.
 
     This lives here because furigana.py is the only module that owns the markup
     grammar: build.py, check.py and stats.py all reach markup through strip() and
     parse(), so one predicate beside MARKUP covers every consumer.
     """
-    opens = {m.start() for m in MARKUP.finditer(line) if m.group(1) is not None}
-    return [i for i, c in enumerate(line) if c == "｜" and i not in opens]
+    opens, bad = set(), []
+    for m in MARKUP.finditer(line):
+        if m.group(1) is None:
+            continue
+        opens.add(m.start())
+        if _misaligned(m.group(1), m.group(2)):
+            bad.append(m.start())
+    bad += [i for i, c in enumerate(line) if c == "｜" and i not in opens]
+    return sorted(bad)
 
 
 def strip(text):
@@ -197,6 +235,19 @@ MARKER_SELFTEST = [
     # looks like. Neither can match, and both used to be silent.
     ("｜どこにも", [0]),
     ("｜｜見《み》る", [0]),
+    # The over-capture, which is the same two faults with the blocking ｜ removed.
+    # These match, so an offsets-of-unmatched-｜ predicate reports nothing and the
+    # reader gets み set over five characters. This is the worse shape and the
+    # only one with no visible symptom.
+    ("｜道《みち》が｜どこにも見《み》えなくなっていた。", [7]),
+    ("｜向《む》きも、｜そのままに見《み》ておいた。", [8]),
+    ("｜どこにも見《み》えなくなっていた。", [0]),
+    # Legitimate mixed runs, which over-capture detection must leave alone: a
+    # kana prefix, a kana infix and a kana suffix. MARKUP's own comment names the
+    # last two as the reason the marker form accepts kana at all.
+    ("｜真ん中《まんなか》に立っていた。", []),
+    ("｜申し込む《もうしこむ》ことにした。", []),
+    ("｜お母《おかあ》さんが呼んでいる。", []),
     # The bare-kanji alternative carries no marker and must not be asked for one.
     ("見《み》える。", []),
     ("そのままにしておいた。", []),

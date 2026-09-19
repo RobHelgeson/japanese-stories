@@ -425,23 +425,33 @@ def check_brief(a, story):
 
 
 def check_ruby(path):
-    """Ruby markup in the source that will not survive a build.
+    """Ruby markup in the source that a build will get wrong.
 
     Every other check here runs on furigana.strip()ed text, which is exactly
     where a broken annotation stops being visible: an unclosed ｜ strips to
-    itself, so the line reads as prose and measures as prose. The only place it
-    surfaces is the built reader, as a literal ｜ in the middle of a sentence.
+    itself, so the line reads as prose and measures as prose, and the only place
+    it surfaces is the built reader as a literal ｜ mid-sentence. A ｜ that
+    over-captures is quieter still — it strips to plausible text and ships as
+    ruby set over the wrong span. furigana.stray_markers finds both; one module
+    owns the markup grammar and the predicate lives beside it.
 
-    Reads the raw file rather than sentences(), because the markup is stripped
-    before that returns and because a translation line carries annotations too.
-    The predicate is furigana.stray_markers — one module owns the grammar.
+    Reads the raw file rather than sentences(), because sentences() strips the
+    markup before returning and drops the > and # lines entirely.
+
+    WHAT THIS DOES NOT COVER: a *well-formed* annotation on a > translation line.
+    That is a real fault — build.py stores a translation line verbatim, so its
+    ruby ships into the reader as raw ｜漢字《かな》 markup — but it is not a
+    stray marker and stray_markers will not report it, because there is nothing
+    wrong with the markup. It is wrong only for where it is. Reading the raw file
+    means those lines are scanned; it does not mean this check knows what to say
+    about them. Fixing it belongs on the build path, not in an optional report.
     """
     fails = []
     for n, line in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), 1):
         for col in furigana.stray_markers(line):
             fails.append(
-                f"line {n}: ｜ at character {col} opens no annotation "
-                f"and will ship as text — …{line[max(0, col - 4):col + 12]}…"
+                f"line {n}, column {col + 1}: ｜ opens no sound annotation "
+                f"— …{line[max(0, col - 4):col + 12]}…"
             )
     return fails
 
