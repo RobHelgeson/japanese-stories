@@ -278,6 +278,28 @@ class Parse:
         return forms[0] if forms else None
 
     @property
+    def dictionary_readings(self):
+        """(written form, kana) for each entry this parse resolved to, ranked.
+
+        A caller showing a dictionary form to a learner needs its reading, not
+        the surface's: 描かれて is えがかれて, and the entry it resolves to is
+        描く 【えがく】. Reading the kana off the surface would label the lemma
+        with the inflected word's pronunciation.
+        """
+        out = []
+        for step in self.chain:
+            pair = _split_reading(step.reading)
+            if pair[0] and pair not in out:
+                out.append(pair)
+        return tuple(out)
+
+    @property
+    def lemma_kana(self):
+        """Kana for `lemma` — the dictionary form's reading, or the surface's."""
+        readings = self.dictionary_readings
+        return readings[0][1] if readings else self.kana
+
+    @property
     def lemma(self):
         """The dictionary form, falling back to the surface where there is none.
 
@@ -360,10 +382,23 @@ def _via_chain(step):
             yield from _via_chain(child)
 
 
+def _split_reading(reading):
+    """A "書く 【かく】" reading string as (written form, kana).
+
+    All 337,950 recorded readings are either this shape or a bare form with no
+    【】 at all, in which case the form is its own kana — which is what a
+    kana-only word looks like.
+    """
+    head, sep, tail = reading.partition("【")
+    if not sep:
+        form = reading.strip()
+        return form, form
+    return head.strip(), tail.rstrip("】").strip()
+
+
 def _headword(reading):
     """The written form out of a "書く 【かく】" reading string."""
-    head, sep, _ = reading.partition("【")
-    return head.strip() if sep else reading.strip()
+    return _split_reading(reading)[0]
 
 
 @dataclass(frozen=True)
@@ -411,6 +446,22 @@ class Word:
     @property
     def lemma(self):
         return self.preferred.lemma
+
+    @property
+    def lemma_kana(self):
+        return self.preferred.lemma_kana
+
+    @property
+    def dictionary_readings(self):
+        return self.preferred.dictionary_readings
+
+    @property
+    def seq(self):
+        return self.preferred.seq
+
+    @property
+    def pos(self):
+        return self.preferred.pos
 
     @property
     def inflections(self):
