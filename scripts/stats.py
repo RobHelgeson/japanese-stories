@@ -438,6 +438,18 @@ def check_ruby(path):
     Reads the raw file rather than sentences(), because sentences() strips the
     markup before returning and drops the > and # lines entirely.
 
+    ARCHIVED DRAFTS ARE NOT SCANNED, AND THAT IS AN ACCIDENT. main() walks
+    corpus.json's live stories, so stories/versions/<slug>.<v>.txt is never
+    passed here — not because a frozen draft was judged exempt, but because
+    nothing ever walked it. It is not exempt: rebuild.py --versions builds those
+    same sources through build.py into docs/versions/, so a broken annotation in
+    one ships exactly as it would from a live story. As of 2026-09-19 two of them
+    carry a stray ｜ (ikanakatta-hito-no-chizu.v1, rouka-no-kagami.v1) and
+    neither has ever been built — corpus.json declares the versions and no HTML
+    exists for them — so the next --versions run would publish both faults with
+    nothing having complained. Scanning them needs no Ichiran and no analyze();
+    it is this function over a wider list of paths.
+
     WHAT THIS DOES NOT COVER: a *well-formed* annotation on a > translation line.
     That is a real fault — build.py stores a translation line verbatim, so its
     ruby ships into the reader as raw ｜漢字《かな》 markup — but it is not a

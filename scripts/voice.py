@@ -205,10 +205,13 @@ TRIM = "。！？…―—・、，,」』）］〉》　 "
 # 学んだ and 静かなんだ agree on なんだ. Reading ん as explanatory therefore called
 # 読んだ present, and 誰も来ませんでした explanatory, because ませんでした also ends
 # in んでした. Both were caught by the fixture table below. のだ's ん form is a
-# spoken register and does not occur in narration in either corpus — 0 of 865
-# narration sentences here and 0 of the authentic 常体 set — so ん is read as
-# 音便 past instead. A story that narrates in 〜んだ would be miscounted; the
-# fixture table pins that case so the limitation cannot drift silently.
+# spoken register and does not occur in narration in either corpus — no sentence
+# in these stories or in the authentic 常体 set narrates in 〜んだ (checked
+# 2026-09-19) — so ん is read as 音便 past instead. The claim is the absence, not
+# a count: a total of narration sentences is true of one afternoon's corpus and
+# tells you nothing about whether the form has appeared since. A story that
+# narrates in 〜んだ would be miscounted; the fixture table pins that case so the
+# limitation cannot drift silently.
 NODA_PAST = re.compile(r"の(?:だった|であった|でした)$")
 NODA_NONPAST = re.compile(r"の(?:だ|である|です|だろう|であろう|でしょう)$")
 
@@ -224,8 +227,12 @@ POLITE_NONPAST = re.compile(r"(?:ます|ません|ましょう|です|でしょ�
 # 泳いだ is knowingly NOT counted, because い+だ is also every adjectival noun in
 # the language — きらいだ, きれいだ, みたいだ, くらいだ — and separating them needs
 # a closed stem list whose misses would INVENT past tense. The undercount is
-# measured rather than assumed: zero sentences in this corpus end that way and
-# one does in the plain reference set (ぬいだ, in 花をうめる).
+# measured rather than assumed: no sentence in these stories ends that way, and
+# the plain reference set holds one — 泉ある家's （酔ったぐれ、大きらいだ, which is
+# the adjectival noun rather than the verb, so the undercount costs nothing there
+# either (checked 2026-09-19). The example is the load-bearing part: what matters
+# is that an いだ ending in real 常体 prose can be found and inspected, not how
+# many there were on the day.
 ONBIN_DA = re.compile(r"んだ$")
 
 # Third person, kanji only. See the docstring's note on かれ. The lookahead on the
