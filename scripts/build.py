@@ -116,16 +116,17 @@ def authored_reading(authored, surface):
 
 
 def to_token(tok, known, weak, approved, authored=None, accents=None):
-    if "raw" in tok:
-        return {"t": tok["raw"]}
-    surface = tok["surface"]
+    if isinstance(tok, ichiran.Raw):
+        return {"t": tok.text}
+    word = tok.word
+    surface = tok.text
     if not ichiran.has_kanji(surface):
         return {"t": surface}
-    kana = tok["kana"]
+    kana = word.kana
     # Set when Ichiran named this token something the document does not contain -
     # 熱すぎて is 熱い + すぎて, so `surface` is 熱 and the reading on hand is あつい.
-    # See ichiran._gap.
-    lemma = tok.get("lemma")
+    # See ichiran.offsets.spread.
+    lemma = tok.canonical
     # An author annotation wins over both Ichiran and the global override table:
     # it is per-occurrence, so it is the only one of the three that can be right
     # about a token whose reading genuinely varies by context.
@@ -151,15 +152,15 @@ def to_token(tok, known, weak, approved, authored=None, accents=None):
         "t": surface,
         "r": pairs,
         "k": kana,
-        "g": tok["gloss"],
+        "g": word.gloss(),
     }
-    hit = next((f for f in (surface, *tok["bases"]) if f in weak), None)
+    hit = next((f for f in (surface, *word.dictionary_forms) if f in weak), None)
     if hit:
         entry["w"] = hit  # the dictionary form, so the index lists 焦る not 焦って
-    new = next((f for f in (surface, *tok["bases"]) if f in approved), None)
+    new = next((f for f in (surface, *word.dictionary_forms) if f in approved), None)
     if new:
         entry["n"] = new  # approved but not yet known — reader shows its reading
-    if not check.is_known(tok, known):
+    if not check.is_known(word, known):
         entry["u"] = 1
     if accents is not None:
         hit = accents.key(surface, kana)
@@ -378,16 +379,16 @@ def main():
         """
         out = []
         for tok in aligned:
-            if tok["end"] <= start or tok["start"] >= end:
+            if tok.end <= start or tok.start >= end:
                 continue
-            if "raw" in tok:
-                text = joined[max(tok["start"], start) : min(tok["end"], end)]
+            if isinstance(tok, ichiran.Raw):
+                text = joined[max(tok.start, start) : min(tok.end, end)]
                 text = text.strip("\n")
                 if text:
                     out.append({"t": text})
-            elif start <= tok["start"] < end:
+            elif start <= tok.start < end:
                 out.append(
-                    to_token(tok, known, weak, approved, doc_ruby.get(tok["start"]), accents)
+                    to_token(tok, known, weak, approved, doc_ruby.get(tok.start), accents)
                 )
         return out
 

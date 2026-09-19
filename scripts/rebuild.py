@@ -60,21 +60,39 @@ def build_modules(root="build"):
     set, so a story would report "up to date" against a stale data file — which
     is the failure this function exists to prevent, arriving through its own
     error handling.
+
+    A local module may be a file or a package directory, and the difference has
+    to be handled here rather than assumed away: `{p.stem for p in glob("*.py")}`
+    does not see a package, so importing one would drop it from `local`, skip it
+    silently, and leave every story reporting "up to date" against a stale data
+    file. That is this function's own failure mode, reached by the one shape of
+    import it did not know about.
     """
-    local = {p.stem for p in HERE.glob("*.py")}
+    local = {p.stem: [p] for p in HERE.glob("*.py")}
+    for d in HERE.iterdir():
+        if d.is_dir() and (d / "__init__.py").exists():
+            local[d.name] = sorted(d.glob("*.py"))
+
     seen, stack = set(), [root]
     while stack:
         name = stack.pop()
-        if name in seen:
+        if name in seen or name not in local:
             continue
         seen.add(name)
-        tree = ast.parse((HERE / f"{name}.py").read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                stack += [a.name for a in node.names if a.name in local]
-            elif isinstance(node, ast.ImportFrom) and node.module in local:
-                stack.append(node.module)
-    return {HERE / f"{name}.py" for name in seen}
+        for path in local[name]:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    stack += [a.name for a in node.names if a.name in local]
+                elif (
+                    isinstance(node, ast.ImportFrom)
+                    and not node.level  # `from .model import` names a sibling, not scripts/model.py
+                    and node.module in local
+                ):
+                    stack.append(node.module)
+    # Every file of a package, because editing any one of them changes what the
+    # build does — and the data files it produces.
+    return {path for name in seen for path in local[name]}
 
 
 def targets(src_dir, out_dir):

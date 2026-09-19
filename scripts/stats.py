@@ -226,16 +226,11 @@ def vocabulary(jp, basis="surface"):
         import ichiran
 
         def keep(t):
-            lemma = t["bases"][0] if t["bases"] else t["surface"]
             # The literal predicate the surface basis has always used, not
             # ichiran.has_kanji, whose wider ranges would move settled numbers.
-            return any("一" <= c <= "鿿" for c in (t["surface"] if basis == "surface" else lemma))
+            return any("一" <= c <= "鿿" for c in (t.surface if basis == "surface" else t.lemma))
 
-        toks = [
-            (t["bases"][0] if t["bases"] else t["surface"])
-            for t in ichiran.tokens(body)
-            if keep(t)
-        ]
+        toks = [t.lemma for t in ichiran.tokens(body) if keep(t)]
         return toks, True
     except Exception:
         return [w for s in jp for w in KANJI_RUN.findall(s)], False
@@ -253,8 +248,8 @@ def _sentence_tokens(jp):
     for s in jp:
         spans.append((cursor, cursor + len(s)))
         cursor += len(s) + 1
-    aligned = [t for t in ichiran.align(joined) if "raw" not in t]
-    return [[t for t in aligned if start <= t["start"] < end] for start, end in spans]
+    aligned = [t for t in ichiran.align(joined) if isinstance(t, ichiran.Placed)]
+    return [[t for t in aligned if start <= t.start < end] for start, end in spans]
 
 
 def _relative_clause(toks, classes):
@@ -265,12 +260,12 @@ def _relative_clause(toks, classes):
     It undercounts rather than inventing subordination that is not there.
     """
     for a, b in zip(toks, toks[1:]):
-        cls = classes.get(a["bases"][0] if a["bases"] else a["surface"], [])
+        cls = classes.get(a.word.lemma, [])
         if not any(c in pos.VERB_CLASSES or c in ADJ_I for c in cls):
             continue
-        if not RENTAI.search(a["surface"]) or not ichiran.has_kanji(b["surface"]):
+        if not RENTAI.search(a.text) or not ichiran.has_kanji(b.text):
             continue
-        bcls = classes.get(b["bases"][0] if b["bases"] else b["surface"], [])
+        bcls = classes.get(b.word.lemma, [])
         if any(c in pos.VERB_CLASSES for c in bcls):
             continue
         return True

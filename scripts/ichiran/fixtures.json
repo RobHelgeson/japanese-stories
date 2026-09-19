@@ -1,0 +1,401 @@
+{
+ "alternative": {
+  "alternative": [
+   {
+    "reading": "平 【だいら】",
+    "text": "平",
+    "kana": "だいら",
+    "score": 5,
+    "seq": 2839880,
+    "gloss": [
+     {
+      "pos": "[n-suf]",
+      "gloss": "plain; plateau; tableland",
+      "info": "after a place name"
+     }
+    ],
+    "conj": []
+   },
+   {
+    "reading": "平 【ひら】",
+    "text": "平",
+    "kana": "ひら",
+    "score": 5,
+    "seq": 1506890,
+    "gloss": [
+     {
+      "pos": "[n]",
+      "gloss": "something broad and flat"
+     }
+    ],
+    "conj": []
+   },
+   {
+    "reading": "平 【へい】",
+    "text": "平",
+    "kana": "へい",
+    "score": 5,
+    "seq": 2839017,
+    "gloss": [
+     {
+      "pos": "[pref]",
+      "gloss": "nth year in the Heisei era (1989.1.8-2019.4.30)"
+     }
+    ],
+    "conj": []
+   }
+  ]
+ },
+ "compound-contracted": {
+  "reading": "熱すぎて 【あつすぎて】",
+  "text": "熱すぎて",
+  "kana": "あつすぎて",
+  "score": 432,
+  "compound": [
+   "熱い",
+   "すぎて"
+  ],
+  "components": [
+   {
+    "reading": "熱い 【あつい】",
+    "text": "熱い",
+    "kana": "あつい",
+    "score": 0,
+    "seq": 1467720,
+    "gloss": [
+     {
+      "pos": "[adj-i]",
+      "gloss": "hot (to the touch)"
+     }
+    ],
+    "conj": []
+   },
+   {
+    "reading": "すぎて",
+    "text": "すぎて",
+    "kana": "すぎて",
+    "score": 0,
+    "seq": 10582852,
+    "suffix": "to be too (much) ...",
+    "conj": [
+     {
+      "prop": [
+       {
+        "pos": "v1",
+        "type": "Conjunctive (~te)"
+       }
+      ],
+      "reading": "過ぎる 【すぎる】",
+      "gloss": [
+       {
+        "pos": "[v1,vi]",
+        "gloss": "to pass through; to pass by; to go beyond"
+       }
+      ],
+      "readok": true
+     }
+    ]
+   }
+  ]
+ },
+ "compound-contracted-3": {
+  "reading": "こりこりしてる",
+  "text": "こりこりしてる",
+  "kana": "こりこり してる",
+  "score": 616,
+  "compound": [
+   "こりこり",
+   "して",
+   "いる"
+  ],
+  "components": [
+   {
+    "reading": "こりこり",
+    "text": "こりこり",
+    "kana": "こりこり",
+    "score": 0,
+    "seq": 2414740,
+    "gloss": [
+     {
+      "pos": "[adv,adv-to,vs]",
+      "gloss": "crisp (like a pickle); crunchy"
+     }
+    ],
+    "conj": []
+   },
+   {
+    "reading": "して",
+    "text": "して",
+    "kana": "して",
+    "score": 0,
+    "seq": 10285148,
+    "suffix": "makes a verb from a noun",
+    "conj": [
+     {
+      "prop": [
+       {
+        "pos": "vs-i",
+        "type": "Conjunctive (~te)"
+       }
+      ],
+      "reading": "為る 【する】",
+      "gloss": [
+       {
+        "pos": "[vs-i]",
+        "gloss": "to do; to carry out; to perform"
+       }
+      ],
+      "readok": true
+     }
+    ]
+   },
+   {
+    "reading": "いる",
+    "text": "いる",
+    "kana": "いる",
+    "score": 0,
+    "seq": 1577980,
+    "suffix": "indicates continuing action (to be ...ing)",
+    "conj": []
+   }
+  ]
+ },
+ "compound-plain": {
+  "reading": "入っている 【はいっている】",
+  "text": "入っている",
+  "kana": "はいっている",
+  "score": 406,
+  "compound": [
+   "入って",
+   "いる"
+  ],
+  "components": [
+   {
+    "reading": "入って 【はいって】",
+    "text": "入って",
+    "kana": "はいって",
+    "score": 0,
+    "seq": 10230906,
+    "conj": [
+     {
+      "prop": [
+       {
+        "pos": "v5r",
+        "type": "Conjunctive (~te)"
+       }
+      ],
+      "reading": "入る 【はいる】",
+      "gloss": [
+       {
+        "pos": "[v5r,vi]",
+        "gloss": "to enter; to go into"
+       }
+      ],
+      "readok": true
+     }
+    ]
+   },
+   {
+    "reading": "いる",
+    "text": "いる",
+    "kana": "いる",
+    "score": 0,
+    "seq": 1577980,
+    "suffix": "indicates continuing action (to be ...ing)",
+    "conj": []
+   }
+  ]
+ },
+ "conj-one-step": {
+  "reading": "行った 【おこなった】",
+  "text": "行った",
+  "kana": "おこなった",
+  "score": 112,
+  "seq": 10163024,
+  "conj": [
+   {
+    "prop": [
+     {
+      "pos": "v5u",
+      "type": "Past (~ta)"
+     }
+    ],
+    "reading": "行う 【おこなう】",
+    "gloss": [
+     {
+      "pos": "[vt,v5u]",
+      "gloss": "to perform; to do; to conduct oneself; to carry out"
+     }
+    ],
+    "readok": true
+   }
+  ]
+ },
+ "conj-resolved-beside-via": {
+  "reading": "片付けて 【かたづけて】",
+  "text": "片付けて",
+  "kana": "かたづけて",
+  "score": 0,
+  "seq": 10602583,
+  "conj": [
+   {
+    "prop": [
+     {
+      "pos": "v1",
+      "type": "Conjunctive (~te)"
+     }
+    ],
+    "reading": "片付ける 【かたづける】",
+    "gloss": [
+     {
+      "pos": "[v1,vt]",
+      "gloss": "to tidy up; to put in order; to straighten up; to put away"
+     }
+    ],
+    "readok": true
+   },
+   {
+    "prop": [
+     {
+      "pos": "v1",
+      "type": "Conjunctive (~te)"
+     }
+    ],
+    "via": [
+     {
+      "prop": [
+       {
+        "pos": "v5k",
+        "type": "Potential"
+       }
+      ],
+      "reading": "片付く 【かたづく】",
+      "gloss": [
+       {
+        "pos": "[v5k,vi]",
+        "gloss": "to be put in order; to be put to rights"
+       }
+      ],
+      "readok": true
+     }
+    ],
+    "readok": true
+   }
+  ]
+ },
+ "conj-two-resolved": {
+  "reading": "つけず",
+  "text": "つけず",
+  "kana": "つけず",
+  "score": 36,
+  "seq": 10191881,
+  "conj": [
+   {
+    "prop": [
+     {
+      "pos": "v1",
+      "type": "Non-past",
+      "neg": true
+     }
+    ],
+    "reading": "付ける 【つける】",
+    "gloss": [
+     {
+      "pos": "[v1,vt]",
+      "gloss": "to attach; to join; to add; to append; to affix; to stick; to glue; to fasten; to sew on; to apply (ointment)"
+     }
+    ],
+    "readok": true
+   },
+   {
+    "prop": [
+     {
+      "pos": "v5k",
+      "type": "Potential",
+      "neg": true
+     }
+    ],
+    "reading": "付く 【つく】",
+    "gloss": [
+     {
+      "pos": "[v5k,vi]",
+      "gloss": "to be attached; to be connected with; to adhere; to stick; to cling"
+     }
+    ],
+    "readok": true
+   },
+   {
+    "prop": [
+     {
+      "pos": "v5k",
+      "type": "Potential",
+      "neg": true
+     }
+    ],
+    "reading": "着く 【つく】",
+    "gloss": [
+     {
+      "pos": "[v5k,vi]",
+      "gloss": "to arrive at; to reach"
+     }
+    ],
+    "readok": true
+   }
+  ]
+ },
+ "conj-via-only": {
+  "reading": "つけた",
+  "text": "つけた",
+  "kana": "つけた",
+  "score": 27,
+  "seq": 10995550,
+  "conj": [
+   {
+    "prop": [
+     {
+      "pos": "v1",
+      "type": "Past (~ta)"
+     }
+    ],
+    "via": [
+     {
+      "prop": [
+       {
+        "pos": "v5k",
+        "type": "Potential"
+       }
+      ],
+      "reading": "突く 【つく】",
+      "gloss": [
+       {
+        "pos": "[v5k,vt]",
+        "gloss": "to prick; to stab"
+       }
+      ],
+      "readok": true
+     }
+    ],
+    "readok": true
+   }
+  ]
+ },
+ "counter": {
+  "reading": "七十一 【ななじゅう​いち】",
+  "text": "七十一",
+  "kana": "ななじゅう​いち",
+  "score": 442,
+  "counter": {
+   "value": "Value: 71",
+   "ordinal": []
+  }
+ },
+ "suffix": {
+  "reading": "いる",
+  "text": "いる",
+  "kana": "いる",
+  "score": 0,
+  "seq": 1577980,
+  "suffix": "indicates continuing action (to be ...ing)",
+  "conj": []
+ }
+}

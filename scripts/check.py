@@ -57,11 +57,12 @@ def _segmentable(form, known):
     return walk(0)
 
 
-def is_known(tok, known):
-    for form in (tok["surface"], *tok["bases"]):
+def is_known(word, known):
+    forms = (word.surface, *word.dictionary_forms)
+    for form in forms:
         if form in known:
             return True
-    for form in (tok["surface"], *tok["bases"]):
+    for form in forms:
         if _segmentable(form, known):
             FALLBACKS[form] += 1
             return True
@@ -72,12 +73,12 @@ def check(text, known=None):
     known = known or load()
     unknown = Counter()
     total = 0
-    for tok in ichiran.tokens(text):
-        if not re.search(r"[ぁ-ゟ゠-ヿ㐀-䶿一-鿿]", tok["surface"]):
+    for word in ichiran.tokens(text):
+        if not re.search(r"[ぁ-ゟ゠-ヿ㐀-䶿一-鿿]", word.surface):
             continue
         total += 1
-        if not is_known(tok, known):
-            unknown[f"{tok['surface']} ({'/'.join(tok['bases'])}) 【{tok['kana']}】"] += 1
+        if not is_known(word, known):
+            unknown[f"{word.surface} ({'/'.join(word.dictionary_forms)}) 【{word.kana}】"] += 1
     return total, unknown
 
 
