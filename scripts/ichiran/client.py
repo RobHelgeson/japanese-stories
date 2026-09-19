@@ -15,6 +15,7 @@ cheap as the number of stories grows.
 import hashlib
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -38,8 +39,22 @@ def cache_dir():
     return Path(os.environ.get(CACHE_ENV) or DEFAULT_CACHE)
 
 
-def _urls():
-    raw = os.environ.get(ENV, "").strip()
+# A host that answers on the second try is the normal case here, not the
+# exceptional one: Ichiran runs in Docker on a machine that sleeps, and the
+# first request after it wakes can time out while the container comes back.
+RETRY_DELAYS = (2, 5, 10)
+
+
+def _urls(url=None):
+    """The servers to try, in order. An explicit url wins over the environment.
+
+    Callers outside this repo pass the URL — a skill has it on its own command
+    line and has no reason to reach through an environment variable to deliver
+    it. Inside the repo nothing passes one, so the env var stays the only
+    configuration and the error below is still what an unset one produces.
+    """
+    raw = url if url else os.environ.get(ENV, "")
+    raw = raw.strip()
     if not raw:
         raise RuntimeError(
             f"{ENV} is not set. Point it at an Ichiran server, e.g.\n"
@@ -49,23 +64,40 @@ def _urls():
     return [u.strip().rstrip("/") for u in raw.split(",") if u.strip()]
 
 
-def fetch(text):
-    """One segmentation request, trying each configured URL in turn."""
+def fetch(text, url=None, timeout=180, retries=len(RETRY_DELAYS)):
+    """One segmentation request, trying each configured URL in turn.
+
+    Every URL is tried before any of them is retried, because the usual reason
+    to configure two is that one of them is an mDNS name python's resolver
+    cannot see — retrying that one first just spends the backoff on a name that
+    will never resolve.
+    """
     payload = json.dumps({"text": text}).encode()
-    urls = _urls()
+    urls = _urls(url)
     last = None
-    for base in urls:
-        req = urllib.request.Request(
-            f"{base}/segmentation",
-            data=payload,
-            headers={"Content-Type": "application/json"},
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=180) as r:
-                return json.load(r)
-        except urllib.error.URLError as e:
-            last = e
+    for attempt in range(max(1, retries)):
+        for base in urls:
+            req = urllib.request.Request(
+                f"{base}/segmentation",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as r:
+                    return json.load(r)
+            except (urllib.error.URLError, TimeoutError, OSError) as e:
+                last = e
+        if attempt < retries - 1:
+            time.sleep(RETRY_DELAYS[min(attempt, len(RETRY_DELAYS) - 1)])
     raise RuntimeError(f"Ichiran unreachable on {urls}: {last}")
+
+
+def probe(url=None, timeout=10):
+    """Whether Ichiran answers at all. One try, no retries, never raises."""
+    try:
+        return bool(fetch("テスト", url=url, timeout=timeout, retries=1))
+    except Exception:
+        return False
 
 
 def _path(text):
@@ -98,15 +130,22 @@ def store(text, value):
     return value
 
 
-def segment(text):
-    """Cached segmentation. Only a text this machine has never seen hits Ichiran."""
+def segment(text, url=None, cache=True):
+    """Cached segmentation. Only a text this machine has never seen hits Ichiran.
+
+    `cache=False` is for callers whose texts are not a corpus — a one-off word
+    lookup has nothing to gain from a cache entry and no reason to leave one in
+    somebody else's directory.
+    """
     global hits, misses
+    if not cache:
+        return fetch(text, url=url)
     hit = cached(text)
     if hit is not None:
         hits += 1
         return hit
     misses += 1
-    return store(text, fetch(text))
+    return store(text, fetch(text, url=url))
 
 
 def stats():

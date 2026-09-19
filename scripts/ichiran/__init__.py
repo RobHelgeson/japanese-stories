@@ -41,7 +41,7 @@ win an import:
 
 import re
 
-from .client import cached, clear, fetch, segment, stats
+from .client import cached, clear, fetch, probe, segment, stats
 from .model import Counter, Inflection, Parse, Sense, Step, Word
 from .offsets import Placed, Raw, align, place
 from .walk import Document, Interlude, Run, flatten, read
@@ -53,12 +53,12 @@ def has_kanji(s):
     return bool(KANJI.search(s))
 
 
-def words(text):
+def words(text, url=None, cache=True):
     """Every word in `text`, compounds kept whole, in reading order."""
-    return read(segment(text)).words
+    return read(segment(text, url=url, cache=cache)).words
 
 
-def tokens(text):
+def tokens(text, url=None, cache=True):
     """Every word in `text`, compounds split into their parts.
 
     For callers counting vocabulary rather than pointing at the page: a
@@ -67,12 +67,12 @@ def tokens(text):
     `align` instead, where the compound stays whole because it is the only node
     that knows the written form.
     """
-    return tuple(part for word in words(text) for part in flatten(word))
+    return tuple(part for word in words(text, url=url, cache=cache) for part in flatten(word))
 
 
 __all__ = [
     "Counter", "Document", "Inflection", "Interlude", "Parse", "Placed", "Raw",
     "Run", "Sense", "Step", "Word", "align", "cached", "clear", "fetch",
-    "flatten", "has_kanji", "place", "read", "segment", "stats", "tokens",
-    "words",
+    "flatten", "has_kanji", "place", "probe", "read", "segment", "stats",
+    "tokens", "words",
 ]
