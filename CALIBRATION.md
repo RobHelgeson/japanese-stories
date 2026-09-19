@@ -10,7 +10,9 @@ This used to live inside `corpus.json` as `_comment` keys on the `budgets` block
 
 They scale with story length. A fixed "5+ occurrences per new word" would have spent 5.7% of the shortest story's content tokens on two words, which reads as engineered, so the occurrence minimum is a rate too.
 
-The mandatory requirement is qualitative and no script checks it: **a new word's first occurrence must sit in a sentence that frames its meaning.**
+The mandatory requirement is qualitative and no script checks it: **at its first occurrence the word must be doing something — an action or a consequence, never a sentence whose only business is to say what it means.** See `AUTHORING.md` § The budgets, which holds the rule and the worked failures.
+
+> **Corrected 2026-09-19.** This read "a new word's first occurrence must sit in a sentence that frames its meaning," and apposition frames the meaning, so apposition is what the corpus produced — 峠というのは、山と山の間の、一番低いところである。 and five more like it. Four evaluators reading the corpus in Japanese only named that construction the clearest single tell that the text was not written for a Japanese reader. The rule was retired in `AUTHORING.md` and this file kept the old wording, which is the more dangerous of the two places to leave it: the budgets are argued here, so this is where someone checks what the rule was.
 
 ## `min_repeated_share` 0.4
 
@@ -42,7 +44,7 @@ Re-measured 2026-09-15 after the quote-turn merge, which redefined a source line
 
 **Read beside, never gate on.** See `AUTHORING.md` § Metrics are floors, not targets.
 
-1. **The corpus is compressed on sentence length, and this is the finding.** `mean_len` 16.3–21.0 against a bin-matched 28.5–32.6; `stdev_len` 6.4–11.6 against 18.9–21.2; `pct_over_30` 3.8–18.6 against 35.2–43.0, every story below its own bin. Measured in Ichiran **tokens**, which orthography does not move, the gap is 8.9 per sentence against 12.0 — **1.34x**. In characters it reads 1.60x, and the difference between the two is kana: children's books spend more characters on the same content. Quote the token figure.
+1. **The corpus is compressed on sentence length.** This was the finding of the 2026-09-15 pass and it stands; it stopped being the _only_ finding on 2026-09-19, when a register-controlled re-measurement found a second and independent gap in predicate variety — see § A second gap, in the predicates. `mean_len` 16.3–21.0 against a bin-matched 28.5–32.6; `stdev_len` 6.4–11.6 against 18.9–21.2; `pct_over_30` 3.8–18.6 against 35.2–43.0, every story below its own bin. Measured in Ichiran **tokens**, which orthography does not move, the gap is 8.9 per sentence against 12.0 — **1.34x**. In characters it reads 1.60x, and the difference between the two is kana: children's books spend more characters on the same content. Quote the token figure.
 2. **Not on subordination.** Bin-matched we are at or above authentic in the short and long bins — 43.9–53.0 against 50.0, and 58.8 against 52.4 — and straddle it in the mid, 51.1–53.5 against 51.7. The expectation that opened this work was that the corpus would be flatter here. It is not.
 3. **`min_sentence_stdev` 6.0 is very low against authentic prose** (bin-matched 18.9–21.2). Not raised, and it must not be: "variance bought long-only" is already a documented failure mode, and a persuasive external number is precisely how it would recur. A craft observation for the revision pass, nothing more.
 4. **`min_repeated_share` 0.4 is vindicated and conservative.** Bin-matched we recycle harder than authentic prose in every bin: short 48.7–64.4 against 36.7, mid 60.7–63.5 against 49.5, long 72.7 against 51.6.
@@ -65,6 +67,33 @@ python3 reference.py --compare    # our numbers beside authentic 児童文学
 
 `reference.py`'s own docstring records all four at length, and `scripts/reference.json` — the manifest of sampled 青空文庫 texts — is read by that script and nothing else.
 
+## A second gap, in the predicates
+
+Added 2026-09-19, after four evaluators read all eight stories in Japanese only and returned the same verdict independently: English-designed, Japanese-rendered.
+
+**The band above cannot answer a question about voice, and the first attempt to make it answer one was wrong.** The 25 sampled texts are **87% ですます調** — ました 977, でした 152, のです 117 among their top endings — while this corpus is 100% plain form. Sentence-final concentration measured across that split measures politeness. An analysis that did not control for it produced a list of five forms this corpus supposedly never uses; four of them turned out to be at or above the authentic rate.
+
+Re-split by narration register, the plain-form subset is three texts — ｜泉《いずみ》ある｜家《いえ》 (宮沢賢治), ｜花《はな》をうめる and ｜久助君《きゅうすけくん》の｜話《はなし》 (新美南吉). **n=3, 318 sentences.** That n is the weak point in every figure below, and ｜花《はな》をうめる carries the first-person comparison by itself. More plain-form sampling is the highest-value follow-up this file has open.
+
+| Claim                              | Ours             | Authentic plain-form | Verdict                                                          |
+| ---------------------------------- | ---------------- | -------------------- | ---------------------------------------------------------------- |
+| かった/ていた/だった dominate      | top-3 25.0–54.5% | top-3 18.6–28.6%     | **Real** — 城の鐘 41.2, 行かなかった人の地図 49.1, 煙突の煙 54.5 |
+| Ending 3-gram entropy              | med 4.89         | med 5.63             | **Real** — 7 of 8 below the authentic minimum                    |
+| Past-tense share                   | 62.0–90.1%       | 56.1–66.4%           | **Real** — 5 of 8 above the authentic maximum                    |
+| Longest same-tense run             | 6–34             | ceiling 14           | **Real** — 城の鐘 34, 行かなかった人の地図 33                    |
+| 〜のだ系                           | med 3.3%         | med 7.0%             | **Real, inverted** — thin, not absent as first claimed           |
+| 私 density                         | 18.7–34.7        | 45.1 (花をうめる)    | **Dead** — we are _below_ authentic                              |
+| ｜体言止《たいげんど》め           | 0.0–2.2%         | 0.0–1.0%             | **Dead** — we use it _more_                                      |
+| 〜ようだ / かもしれない / だろうか | 0–2.8%           | 0–2.1%               | **Dead** — all at or above                                       |
+
+**The two gaps are independent, and this is the part that matters for drafting.** Within these eight stories, mean sentence length correlates with ending entropy at **r = −0.475** — weakly _negative_. 行かなかった人の地図 has the longest sentences in the corpus and the second-flattest endings. Closing the 1.34x length gap will not close the predicate gap and may work against it.
+
+That is also why this section exists rather than a revised finding 1. Bundling them is how "variance bought long-only" recurs, and a persuasive external number is exactly how it would.
+
+**`scripts/voice.py` reports these and gates nothing**, on this file's own standing rule. It deliberately does not measure the four dead rows: rewarding ｜体言止《たいげんど》め or かもしれない would invent a target authentic prose does not hit, which is the failure this file keeps recording.
+
+It also clears the bar correction (b) set — a new measure must not restate `mean_len`. The −0.475 is that evidence.
+
 ## The asymmetry
 
 The corpus applies opposite strategies to its two axes, and only one of them was a decision.
@@ -81,13 +110,19 @@ Kept because each one was wrong in a way worth not repeating.
 
 **(a) The figures were re-measured, 2026-09-15**, after the quote-turn merge redefined a source line as a whole speech turn. Both corpora moved. The length gap has shrunk each time an artifact came out of it — 1.81x (characters, old split), then 1.51x (tokens, old split), now 1.34x (tokens, correct split). It is real, and it is smaller than first reported.
 
-**(b) A clause-density measure was built and reverted.** The theory was that `subordinate_share` saturates because it is binary, so counting subordination _events_ would expose a gap. It produces a number, and the number does not mean that: events per 100 characters run 2.76 here against 2.43 authentic — this corpus is already denser per character — and events per sentence correlate with `mean_len` at r=0.805, restating a measure already reported. The implementation was unsound besides: `TE_CHAIN` requires a kanji after て/で and so undercounts kana-heavy reference text (r=0.53 with a text's kanji ratio), the instrumental particle で before a kanji noun counts as a clause, ので double-counts against `TE_CHAIN`, and 前に matches 目の前に. **The corpus's problem is that its sentences are short, not that its clauses are sparse.**
+**(b) A clause-density measure was built and reverted.** The theory was that `subordinate_share` saturates because it is binary, so counting subordination _events_ would expose a gap. It produces a number, and the number does not mean that: events per 100 characters run 2.76 here against 2.43 authentic — this corpus is already denser per character — and events per sentence correlate with `mean_len` at r=0.805, restating a measure already reported. The implementation was unsound besides: `TE_CHAIN` requires a kanji after て/で and so undercounts kana-heavy reference text (r=0.53 with a text's kanji ratio), the instrumental particle で before a kanji noun counts as a clause, ので double-counts against `TE_CHAIN`, and 前に matches 目の前に. **The corpus's problem on this axis is that its sentences are short, not that its clauses are sparse.** Narrowed 2026-09-19 — the sentence used to end at "problem," which read as a claim about the corpus entire. It is a claim about clause density only, and § A second gap, in the predicates is the thing it does not cover.
 
 **(c) `corpus_bins()` counted characters over source lines while `measure()` reports `chars` over `prose_sentences`.** Once a line became a speech turn the two drifted enough that a story fell outside its own corpus's range and binned as `None`, crashing `--compare`. Both now count the same way, and reference bins are computed live rather than read from the manifest, which records whatever `--sample` measured at the time.
 
 **(d) `ichiran.align()` let its cursor run to wherever a token's surface next turned up.** Ichiran returns a canonical surface for some inflections — 熱すぎて segments as 熱い + すぎて while the text holds 熱 — so the lemma is not there to be found at the cursor, and an unbounded `str.find` matched a later occurrence and took the cursor with it, orphaning every token in between. インドラの網 aligned 22 of its 1683 tokens; the reference set as a whole aligned 78.3%. **Fixed 2026-09-16**: a gap is crossed only when the tokens already dropped can account for its word characters, punctuation being free. The reference set now aligns 99.9%, and this corpus's own alignment is byte-identical either way — which is why exactly one figure moved. Reference `subordinate_share` in the mid bin was reading 48.7 and reads 51.7, and the pooled IQR floor moves 41.6 to 43.9. Finding (2) survives and is weaker for it: the mid bin is parity, not above.
 
 **(e) `min_sentence_stdev` 6.0 was documented as the best value any story had hit.** It is a floor just under the lowest. See § `min_sentence_stdev` 6.0.
+
+**(f) The first タ/ル measurement counted the copula as past tense, 2026-09-19.** The rule was "the sentence ends in た or だ," which is right for 〜た of every kind and wrong for だ. 時計の音だ, 三ヶ月だ, 話す相手がいないからだ, それだけだ and every 〜のだ / 〜のである scored as past: 54 narration sentences across the corpus, all of them non-past, each one inspected. The corrected rule treats だ as past only as ｜音便《おんびん》 after ん — 読んだ, 死んだ. Colloquial んだ is read as 音便 and pinned as a known miss in `voice.py`'s fixture table; it is rare in 地の文.
+
+Past share drops 4–11 points per story and the ｜城《しろ》の｜鐘《かね》 run goes **34 → 23**, ｜時計《とけい》の｜音《おと》 **17 → 8**. So the corpus was already alternating in places the measurement could not see, and two stories that looked like the worst cases were not.
+
+**The finding survives and is sharper for it.** Five of eight still sit above the authentic maximum, and the ranking changed: ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 now holds the longest run alone at 33, where ｜城《しろ》の｜鐘《かね》 had appeared to. Worth recording because the wrong number was _more_ alarming than the right one, and a measure that flatters its own finding is the kind this file exists to catch.
 
 ## Two claims the reading order once made, both false
 

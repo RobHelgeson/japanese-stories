@@ -4,13 +4,13 @@ Write a story the reader can read without a dictionary, at a declared difficulty
 
 Everything below is enforced or measured by the scripts in `scripts/`. Run them; do not eyeball.
 
-**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written. Only then draft.
+**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written. Only then draft — and the draft runs the other way round, in Japanese, a page at a time, with the English written last. See § Drafting.
 
 ## Before writing
 
 ```bash
 cd scripts
-export ICHIRAN_URL=http://localhost:3005
+export ICHIRAN_URL=http://localhost:3005   # or wherever your Ichiran runs; comma-separate fallbacks
 python3 have.py 単語1 単語2 ...      # ✓ known / ✗ not / ✓ (weak) leech. Batch 30-50.
 python3 stats.py                      # every story against its declared level
 python3 reviews.py                    # what the reader thought of the ones so far
@@ -79,10 +79,6 @@ The rules below are what to do. The prohibitions further down are what not to do
 - **Concrete before abstract.** An abstract noun has to be earned by a physical detail that came first. This serves the vocabulary constraint too: concrete nouns are what the known set is richest in.
 - **Withhold, never confuse.** The reader sees one sentence at a time and the inference chains run thirty-plus sentences. Information must stay retrievable — plant it concretely, and never ask the reader to hold an ambiguity across pages.
 
-### The English has to stand alone
-
-Read only the `>` lines, top to bottom, ignoring the Japanese. **It must be a short story worth reading.** Not a gloss track, not a sequence of captions. This is half of what actually gets read, and it is the cheapest strong check available.
-
 ### Register
 
 `quiet-realism` is the default and describes the current six: one concrete object at the centre, close narration, ends on an image rather than a claim. That was a house style that fell out of the recycling requirement rather than a decision, so it is now a declared choice — `folktale` and `procedural` already exist in the corpus as undeclared one-offs. Register changes voice and structure. It never relaxes the narrow-domain rule, because the object at the centre is the recycling engine.
@@ -105,13 +101,52 @@ Rates, not counts, computed from the story's own token count by `stats.py`:
 | Repeated-word share              | ≥40% of tokens are words appearing 3+ times |
 | Sentence length stdev            | ≥6.0                                        |
 
-**The mandatory rule about new words is qualitative and no script checks it: the first occurrence must sit in a sentence that frames the meaning from context.** Repetition past that is what makes the word stick, but framing is what makes it derivable rather than a lookup.
+**The mandatory rule about new words is qualitative and no script checks it: at its first occurrence the word must be doing something. It appears in an action or in a consequence — never in a sentence whose only business is to say what it means.** Repetition past that is what makes the word stick, but a first occurrence the reader can act on is what makes it derivable rather than a lookup.
+
+This rule used to read "the first occurrence must sit in a sentence that frames the meaning from context," and apposition frames the meaning from context. So apposition is what the corpus produced. The four evaluators who read all eight stories in Japanese only, in September 2026, named this the single clearest tell that the text had not been written for a Japanese reader — one of them called it decisive on its own.
+
+```
+✗ ｜峠《とうげ》というのは、｜山《やま》と｜山《やま》の｜間《あいだ》の、｜一番《いちばん》｜低《ひく》いところである。
+✗ ｜崖《がけ》とは、｜岩《いわ》が｜真《ま》っ｜直《す》ぐに｜立《た》っているところである。
+✗ 番台は入り口の上にあって、そこからは男の方も女の方もよく見える。
+✗ 席の｜上《うえ》には荷物を乗せる｜網棚《あみだな》があって、今夜はそこに何も乗っていない。
+✗ 制服を着た｜車掌《しゃしょう》が、切符を確かめながら通路をゆっくり歩いてきた。
+✗ ｜表《おもて》には、針が三本あった。
+```
+
+Every one of 峠, 崖, 番台, 網棚, 車掌 and 針 is a declared new word doing exactly what the old rule asked for. Three shapes, and the third is the one that hides:
+
+- **The copula gloss** — というのは / とは. A dictionary entry with a 。 on it.
+- **The existence statement** — 〜があって, 〜があった. Nothing happens; a thing is reported to be present so that it can be named.
+- **The definitional pre-modifier** — 荷物を乗せる｜網棚《あみだな》, 制服を着た｜車掌《しゃしょう》. The main verb is an action, so the line passes a quick read, but the relative clause ahead of the noun is still the gloss: a rack for putting luggage on, a man wearing a uniform.
+
+The 番台 line costs more than the others. It is wrong on the facts — a 番台 sits at the boundary of the 男湯 and the 女湯, not above the entrance — and the sightline it spends a whole sentence establishing is never used again in the story. Later in the same story the same word carries its own weight without any help: ｜石鹸《せっけん》と｜桶《おけ》を、番台の｜下《した》から私に｜渡《わた》しただけだった。 The owner reaches under it and hands something over. That is what 番台 means, and it introduces the new word 桶 in the same breath.
+
+```
+✓ ｜祖母《そぼ》が｜壁《かべ》に｜釘《くぎ》を｜一本《いっぽん》｜打《う》って、そこに｜掛《か》けたものだ。
+```
+
+Nobody is told what a 釘 is. It gets driven into a wall and something gets hung on it, and the reader has the word.
 
 Corollary for word choice: admit a new word only when it is the story's own subject matter, so it recurs without the prose working at it. ｜城《しろ》の｜鐘《かね》 repeats ｜鐘《かね》 36 times because it is about bells. If a draft has to reach to repeat a word, it is the wrong word.
 
 Per-story new words go in that story's `new_words` block in `corpus.json`, **not** in `approved-words.json`, which stays a short global list of permanent allowances. Declaring is required rather than optional: `check.py`'s particle-splitting fallback accepts ｜部品《ぶひん》 as 部 + 品, so the unknown detector never sees compounds, and an undeclared new word gets no marking in the reader.
 
 Leech words come from `vocab.weak_forms()` — kanji words tagged leech in Anki and above the known threshold. Reading one in context beats another card review. Use them where they fit; never force one.
+
+## Drafting
+
+**Draft a page at a time — four to five sentences — as continuous Japanese prose, with no English anywhere in the buffer. Split it to lines and write the translations afterwards.**
+
+The old order was sentence by sentence: a Japanese line, its `>` line, the next Japanese line. In September 2026 four native-level evaluators read all eight stories in Japanese only, with English and furigana stripped and the repo unreachable, and returned the same verdict independently — English-designed, Japanese-rendered, 5.0 to 6.5 out of 10 on naturalness.
+
+The mechanism is tense. Past-tense share across the corpus runs 62–90% against an authentic plain-form 56–66%, and the longest unbroken same-tense run reaches 33 sentences in ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 and 23 in ｜城《しろ》の｜鐘《かね》 and ｜煙突《えんとつ》の｜煙《けむり》, against an authentic 11–15. Japanese narration moves between タ and ル inside a scene and the reader does not notice; the English past does not move, and **tense is the one thing an English sentence cannot leave open.** So a Japanese sentence written into a slot beside a finished English one has had タ or ル chosen for it before a word of Japanese exists. Written forward as prose, with nothing English beside it, the choice happens where it belongs — at the paragraph, against what came before it in Japanese.
+
+Three of the eight — ｜時計《とけい》の｜音《おと》, ｜迷子《まいご》の｜手紙《てがみ》, ｜終電《しゅうでん》 — sit inside the authentic band on both figures. This is drift, not a floor the language imposes, which is why the fix is an order of operations and not a number.
+
+**Gate 2 does not move.** The beat sheet stays in English. What it tests is whether a story exists at all, English tests that perfectly well, and the beat sheets are the best artifact this repo has produced. Nothing above touches them. What is inverted is only the sentence-level drafting that comes after the gate.
+
+One consequence worth naming: the `>` lines stop being the thing the story was written in and become a translation of it. That is why § The English has to stand alone now sits in § The revision pass rather than up here — checking derived English is a check, and checking the English a story was planned in was mostly a restatement of the plan.
 
 ## Format
 
@@ -127,14 +162,16 @@ Leech words come from `vocab.weak_forms()` — kanji words tagged leech in Anki 
 ```
 
 - **One Japanese sentence per line, each immediately followed by its translation on a `>` line.** The 1:1 coupling is load-bearing and nothing checks it at build time. Split a Japanese sentence and you must write the second translation.
+- **But a line may hold more than one sentence, and the toolchain accepts it.** This was claimed to be rigid, and it was rigid only because this document said so. `build.py:84` attaches an `en` to whichever line was appended last, and `build.py:88` appends every line with `en: ""`, so a second sentence on a line is simply a line, and a line with no `>` after it is simply unglossed. `stats.py`'s `prose_sentences()` already splits lines into sentences of its own accord, so no rhythm measure depends on the coupling. `reader.js:825` renders an unglossed line as a plain `s` rather than `s has-en`, which is the intended no-translation path and not a fallback. Nothing breaks. The coupling stays the default because a reader tapping a sentence wants that sentence's English, not a paragraph of it — but when two short sentences belong to one breath, put them on one line and translate the pair.
 - **One quoted turn per line, however many sentences it holds.** 「」 brackets a turn — everything one speaker says before anybody else speaks or the narration resumes — not a sentence. Sentences inside a turn are divided by 。 as usual, and the last one drops its 。 before the 」. This is the only place the one-sentence-per-line rule yields, and it has to: the alternative is a closing 」 in the middle of somebody still talking.
+- **Relaxing the coupling does not relax the brackets.** The two rules look alike and are not: a line holding two narration sentences is a formatting choice with nothing riding on it, while a 「」 boundary is the story's only speaker attribution. § 「」 is the speaker attribution stands unchanged, and the permission above is not a licence to merge or split a turn. One turn, one line, still — and 21 turns already shipped wrongly split under a rule that was only about narration in the first place.
 - Blank line separates pages. Aim for four to five sentences a page.
 - **This format once became a style rule by accident.** The 1:1 coupling made long multi-clause sentences awkward to keep aligned, so the first five stories were written almost entirely in short declaratives: mean 17 characters, standard deviation 4.6, and three of the five contained no sentence over 30 characters at all. Vary length deliberately. The stdev floor exists to catch exactly this.
 - **The coupling is not a reason to write short.** Write the long sentence and translate it as one long sentence. What the coupling really discourages is **subordination** — 連用形 chaining, relative clauses, ので / のに / ながら — and those are the level ladder's own constructions, so writing around it works against the ladder. `stats.py` reports `subordinate_share` for this; it is measured and not yet gated.
 
 ### 「」 is the speaker attribution
 
-Most quoted lines carry no dialogue tag, so a reader has nothing but the brackets to go on: a new 「 means the speaker changed, or the same speaker stopped and started again. Splitting a continuous turn across several 「」 therefore *says* something false, and there is no other cue to contradict it.
+Most quoted lines carry no dialogue tag, so a reader has nothing but the brackets to go on: a new 「 means the speaker changed, or the same speaker stopped and started again. Splitting a continuous turn across several 「」 therefore _says_ something false, and there is no other cue to contradict it.
 
 ```
 ✗ 「あの鐘は、私が四十の時に作った」        ✓ 「あの鐘は、私が四十の時に作った。当時の王の命令だ。戦争のための鐘だった」
@@ -154,7 +191,6 @@ python3 stats.py ../stories/<slug>.txt --turns   # every run of adjacent quoted 
 ```
 
 Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest alternate unless a beat says otherwise. Two neighbours you would give to the same speaker, with no silence between them, are one turn wrongly split. Nothing gates this — neither speaker identity nor a pause is recoverable from the text, so the script prints and you judge.
-
 
 ## Furigana
 
@@ -176,21 +212,38 @@ An annotation on a verb stem covers its inflection, so `｜行《い》った` c
 
 ## The revision pass
 
-Five failure modes, each found the expensive way. Run this against every draft.
+Six failure modes, each found the expensive way. Run this against every draft.
 
-| Failure                          | Evidence                                                      | Check                                                      |
-| -------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------- |
-| Closing thesis sentence          | 4 of 5 stories, near-identical shape                          | Does the last page state what it means? Cut it.            |
-| Flat short declaratives          | mean 17 chars, stdev 4.6; 3 of 5 had nothing over 30          | Is every sentence one clause?                              |
-| Variance bought long-only        | ｜猫《ねこ》 +24%, ｜城《しろ》の｜鐘《かね》 +14% over brief | Are the long sentences long from structure, or more nouns? |
-| Circumlocution to dodge unknowns | 一緒に暮らしている人 for ｜飼《か》い｜主《ぬし》             | Is a phrase working around a word rather than using one?   |
-| One turn split across several 「」 | 21 turns, six of seven stories, Sept 2026                 | `stats.py --turns`; does a 」 close mid-breath, with no beat? |
+| Failure                            | Evidence                                                                                                                                                                                         | Check                                                                       |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Closing thesis sentence            | 4 of 5 stories, near-identical shape                                                                                                                                                             | Does the last page state what it means? Cut it.                             |
+| Flat short declaratives            | mean 17 chars, stdev 4.6; 3 of 5 had nothing over 30                                                                                                                                             | Is every sentence one clause?                                               |
+| Variance bought long-only          | ｜猫《ねこ》 +24%, ｜城《しろ》の｜鐘《かね》 +14% over brief                                                                                                                                    | Are the long sentences long from structure, or more nouns?                  |
+| Circumlocution to dodge unknowns   | 一緒に暮らしている人 for ｜飼《か》い｜主《ぬし》                                                                                                                                                | Is a phrase working around a word rather than using one?                    |
+| One turn split across several 「」 | 21 turns, six of seven stories, Sept 2026                                                                                                                                                        | `stats.py --turns`; does a 」 close mid-breath, with no beat?               |
+| Predicate monotony                 | Top-three ending share 25.0–54.5% against an authentic plain-form 18.6–28.6%; ending 3-gram entropy 3.97–5.34 against an authentic 5.10–5.85, seven of eight stories below the authentic minimum | What is the longest unbroken same-tense run? `scripts/voice.py` reports it. |
+
+### On the sixth row
+
+Of the six, this is the one most easily bought rather than fixed, so two things are ruled out in advance.
+
+**It is not a length problem, and it must not be attached to one.** `CALIBRATION.md`'s headline finding is the 1.34x sentence-length gap, and the temptation is to treat flat endings as another face of short sentences. Measured inside these eight stories, mean sentence length correlates with ending entropy at **−0.475** — weakly _negative_. The story with the longest sentences is the second flattest. They are independent axes, and bundling them is exactly how "variance bought long-only" comes back: a draft lengthened in the name of ending variety fixes neither. Fix the endings by changing what the predicates are, at whatever length the sentence already is.
+
+**Do not reach for 体言止め, ようだ, かもしれない or だろうか.** An earlier draft of the September 2026 audit listed all four as missing from the corpus and recommended more of them. The claim did not survive a register-controlled re-measurement: it had been taken against a reference band that is 87% ですます調 while every story here is 100% plain form, and once register is held constant all four already run at or above authentic rates. 私 density is the same story, and worse for the claim — ours 18.7–34.7 per 100 narration sentences against ｜花《はな》をうめる at 45.1. We are not at the authentic rate, we are below it. Sprinkling any of them raises the entropy figure and changes nothing a reader would feel.
+
+`voice.py` prints and gates nothing, like `--turns`. The number to look at is the longest same-tense run, because it is the one figure on the sheet you can also find by eye: read the narration and watch for the stretch where every sentence lands on the same ending. That stretch is the defect. The entropy figure only tells you it is there.
+
+### The English has to stand alone
+
+Read only the `>` lines, top to bottom, ignoring the Japanese. **It must be a short story worth reading.** Not a gloss track, not a sequence of captions. This is half of what actually gets read, and it is the cheapest strong check available.
+
+This check used to sit up with the craft rules, before drafting, where it was very nearly circular: the English being read back was the English the story had been planned in, so it confirmed the plan and little else. Under § Drafting the English is derived from finished Japanese, which makes this a real check on a translation — and the first place a gloss track shows up, because English that reads as captions is usually reporting Japanese that was never prose.
 
 ## Metrics are floors, not targets
 
 **Every threshold catches a specific failure this corpus actually produced. None is a target to optimise.** A story can meet all of them and still be inert; a story can miss one and still be the right story, in which case say so and ship it.
 
-This clause is load-bearing rather than decorative: two of the five failures above were _caused_ by optimising a metric. Sentence variance was bought by writing long, and driving the unknown-word count to zero is what produced the circumlocutions.
+This clause is load-bearing rather than decorative: two of the six failures above were _caused_ by optimising a metric. Sentence variance was bought by writing long, and driving the unknown-word count to zero is what produced the circumlocutions.
 
 ### The reference band is not a floor either
 
@@ -202,7 +255,13 @@ Every floor in `corpus.json` is calibrated from this project's own output, and a
 
 **It gates nothing, and it must not become a gate.** "Real authors score 21.2" is a far more persuasive argument for chasing a number than "our lowest story scored 6.7" ever was, and writing to the band would buy the same variance the same dishonest way. `reference.py` writes no threshold, never touches `corpus.json`, and exits zero regardless.
 
-The one finding to carry while drafting: **this corpus writes short.** 8.9 Ichiran tokens per sentence against an authentic 12.0, a 1.34x gap, every story below its own bin on `pct_over_30`. Close it with a genuine second clause, never with more nouns — "variance bought long-only" is failure mode three in the revision pass above. The revision pass is the check, not a number.
+**Two findings to carry while drafting, and they are independent of each other.**
+
+The first: **this corpus writes short.** 8.9 Ichiran tokens per sentence against an authentic 12.0, a 1.34x gap, every story below its own bin on `pct_over_30`. Close it with a genuine second clause, never with more nouns — "variance bought long-only" is failure mode three in the revision pass above.
+
+The second: **its predicates repeat.** That is failure mode six, added September 2026 off the native-evaluator reading. It is the newer of the two only because nobody had measured it: until then the length gap was the only structural finding on record, which is why this section said "the one finding" for as long as it did.
+
+They do not share a cause and they do not share a fix. Within these eight stories, mean sentence length correlates with ending entropy at **−0.475**, weakly _negative_: writing longer has, if anything, gone with flatter endings here, and the longest-sentence story is the second flattest. Treat them as one problem and the draft gets lengthened in the name of variety, which buys neither. The revision pass is the check on both, and neither is a number.
 
 `CALIBRATION.md` has the rest: the full band, the four ways to misread it, why `subordinate_share` is measured and not gated, and five recorded corrections.
 
@@ -247,7 +306,7 @@ That second one is the assertion that matters, because the failure mode here is 
 
 - **new** — the default, all four steps above.
 - **revise `<slug>`** — edit the `.txt` in place. The brief already exists; re-run `stats.py --strict` against it.
-- **version `<slug>`** — archive the current text to `stories/versions/<slug>.vN.txt`, add `vN` to that entry's `versions[]`, then write the new current. `rebuild.py` builds archived versions too, so A/B comparison stays available via `stats.py --diff`.
+- **version `<slug>`** — archive the current text to `stories/versions/<slug>.vN.txt`, add `vN` to that entry's `versions[]`, then write the new current. **`rebuild.py` does not build the archive**, and this document said for a while that it did. `rebuild.py:200-202` skips every archived target unless `--versions` is passed, on purpose: an archive re-rendered with today's engine "preserves the story and not the reading it shipped with" (`rebuild.py:172-174`). Nothing is lost by that, because A/B comparison never needed a built archive — `stats.py --diff <old>.txt <new>.txt` reads the two source files and prints both columns.
 
 ## Committing
 
