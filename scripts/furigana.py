@@ -20,6 +20,36 @@ def pair(m):
     return (m.group(1) or m.group(3), m.group(2) or m.group(4))
 
 
+def stray_markers(line):
+    """Character offsets of every ｜ in `line` that opens no annotation.
+
+    MARKUP's marker alternative is ｜([^《｜\\n]+)《…》, whose run may not contain a
+    second ｜ and may not cross a newline. A ｜ standing in front of a kana-only
+    run therefore matches nothing at all — ｜どこにも has no 《》 to close it, and
+    ｜そのままにしておいた。 runs to the end of the line — and because neither
+    strip() nor parse() has an else branch, an unmatched ｜ is not a warning and
+    not a counter. It is copied through as ordinary text, reaches ichiran.align()
+    and is emitted as a token, so a literal ｜ ships into the published reader.
+    Two lines in the corpus do exactly that today.
+
+    The predicate is "every ｜ is the start of a MARKUP match", which is exact
+    rather than approximate: ｜ cannot occur anywhere else inside a match, since
+    group 1 excludes it, group 3 is kanji and both readings are kana. So a ｜ at
+    any other offset opens nothing.
+
+    It must not fire on the legitimate marker form, which is the whole reason the
+    marker exists — ｜この家《このいえ》 and ｜そこに立《そこにた》 annotate a run
+    that starts with kana, and the bare-kanji alternative could not reach them.
+    Those match, so their ｜ is a match start and is not reported.
+
+    This lives here because furigana.py is the only module that owns the markup
+    grammar: build.py, check.py and stats.py all reach markup through strip() and
+    parse(), so one predicate beside MARKUP covers every consumer.
+    """
+    opens = {m.start() for m in MARKUP.finditer(line) if m.group(1) is not None}
+    return [i for i, c in enumerate(line) if c == "｜" and i not in opens]
+
+
 def strip(text):
     """Markup removed, leaving the bare text a parser should see."""
     return MARKUP.sub(lambda m: pair(m)[0], text)
@@ -153,8 +183,28 @@ TRUNCATE_SELFTEST = [
 ]
 
 
+# (line, the offsets stray_markers should report). The first two are the corpus's
+# two real faults, trimmed; the next two are the legitimate marker-form
+# annotations they must not be confused with, both of which span a kana prefix
+# and are exactly why the marker form exists.
+MARKER_SELFTEST = [
+    ("｜道《みち》が｜どこにも｜見《み》えなくなっていた。", [7]),
+    ("｜向《む》きも、｜そのままにしておいた。", [8]),
+    ("｜この家《このいえ》は｜私《わたし》のものになった。", []),
+    ("｜そこに立《そこにた》っていた。", []),
+    # A marker with no 《》 anywhere after it, and a doubled marker: the first is
+    # what an unfinished annotation looks like, the second what a stray keystroke
+    # looks like. Neither can match, and both used to be silent.
+    ("｜どこにも", [0]),
+    ("｜｜見《み》る", [0]),
+    # The bare-kanji alternative carries no marker and must not be asked for one.
+    ("見《み》える。", []),
+    ("そのままにしておいた。", []),
+]
+
+
 def selftest():
-    """align() on the demo set, then truncate()'s cuts and its refusals."""
+    """align() on the demo set, truncate()'s cuts and refusals, then stray ｜."""
     for s, r in [
         ("引き出し", "ひきだし"),
         ("暮らして", "くらして"),
@@ -172,6 +222,13 @@ def selftest():
         good = got == want
         ok &= good
         print(f"  {'ok  ' if good else 'FAIL'} truncate {surface}/{reading} to {text!r} -> {got}")
+        if not good:
+            print(f"       want {want}")
+    for line, want in MARKER_SELFTEST:
+        got = stray_markers(line)
+        good = got == want
+        ok &= good
+        print(f"  {'ok  ' if good else 'FAIL'} stray ｜ in {line} -> {got}")
         if not good:
             print(f"       want {want}")
     return ok

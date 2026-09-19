@@ -424,6 +424,28 @@ def check_brief(a, story):
     return fails
 
 
+def check_ruby(path):
+    """Ruby markup in the source that will not survive a build.
+
+    Every other check here runs on furigana.strip()ed text, which is exactly
+    where a broken annotation stops being visible: an unclosed ｜ strips to
+    itself, so the line reads as prose and measures as prose. The only place it
+    surfaces is the built reader, as a literal ｜ in the middle of a sentence.
+
+    Reads the raw file rather than sentences(), because the markup is stripped
+    before that returns and because a translation line carries annotations too.
+    The predicate is furigana.stray_markers — one module owns the grammar.
+    """
+    fails = []
+    for n, line in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), 1):
+        for col in furigana.stray_markers(line):
+            fails.append(
+                f"line {n}: ｜ at character {col} opens no annotation "
+                f"and will ship as text — …{line[max(0, col - 4):col + 12]}…"
+            )
+    return fails
+
+
 def check_targets(a, level):
     """Unmet requirements for this story's declared level.
 
@@ -570,19 +592,24 @@ def main():
 
     print()
     failed = False
-    for a in analyses:
+    for path, a in zip(paths, analyses):
         story = entries.get(a["slug"])
-        if story is None:
+        # Markup is checked on every path, corpus member or not: it is a property
+        # of the file rather than of a declared level, and a draft not yet in
+        # corpus.json is exactly when a broken annotation gets written.
+        fails = check_ruby(path)
+        if story is not None:
+            fails += check_targets(a, story["level"]) + check_brief(a, story)
+        elif not fails:
             continue
-        level = story["level"]
-        fails = check_targets(a, level) + check_brief(a, story)
+        label = f"{a['slug']}" + (f" (level {story['level']})" if story else "")
         if fails:
             failed = True
-            print(f"{a['slug']} (level {level}):")
+            print(f"{label}:")
             for f in fails:
                 print(f"  MISS  {f}")
         else:
-            print(f"{a['slug']} (level {level}): targets met")
+            print(f"{label}: targets met")
     if failed and args.strict:
         raise SystemExit(1)
 
