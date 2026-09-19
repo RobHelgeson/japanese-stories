@@ -89,20 +89,33 @@ def _reading(value):
     'たよろう とする'. 熱すぎて/あつすぎて has no space, which is why a single
     example reads as a general rule and this went unnoticed.
 
-    Handing that to furigana alignment fails two ways and neither is loud. Where
-    the alignment still resolves, the space lands inside the ruby — 廃業《はいぎょう 》.
-    Where it does not, alignment cannot anchor on a kana run holding a space, bails
-    to one unsplit pair, and the token ships with no reading at all: 通して, 開けて,
-    導いて, 行ったり来たり and the rest of the てくれる/とする family.
+    Handing that to furigana alignment fails three ways, and only the first two
+    announce themselves:
+
+    1. The space lands inside the ruby — 廃業《はいぎょう 》. Visible, and wrong.
+    2. Alignment cannot anchor on a kana run holding a space, bails to one unsplit
+       pair, the cut is refused, and the token ships with no reading at all:
+       通して, 開けて, 導いて and the rest of the てくれる/とする family.
+    3. The space lands at the HEAD of a later kanji run's ruby, so 行ったり来たり
+       over 'いったり きたり' gives 来《 き》. Nothing refuses this one. It returns
+       successfully with a corrupted reading, and it is the class that ships
+       looking correct.
 
     Joined here rather than in `furigana.align`, which also reads the readings
     authors hand-write into the stories. A space there is a real authoring defect
     and `stats.py --strict` reports it; teaching `align` to tolerate spaces would
     blind that check to fix a machine-generated problem.
 
+    Both cleanups are needed and they have no order: `.split()` discards whitespace
+    runs, `_text`'s translate removes zero-width, over disjoint characters, so they
+    commute. What fails is doing only one — `replace(" ", "")` leaves 所へ's
+    'ところ ‌へ' as 'ところ‌へ', with the non-joiner still welded on.
+
     Measured over the 384 recorded responses: 2,376 of 11,051 compound parses carry
     a space, and 0 of 275,650 non-compound parses do. So this is a compound
-    separator specifically, not general whitespace hygiene.
+    separator specifically, not general whitespace hygiene. Restricted to the 212
+    kanji-bearing components where a space is present, the field as sent disagrees
+    with a correct reading 212 times and blanks 102 tokens; joined, it disagrees 0.
     """
     return "".join(_text(value).split())
 
