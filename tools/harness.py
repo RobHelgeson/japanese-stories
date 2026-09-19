@@ -2541,9 +2541,16 @@ def suite_table(br, rep, base):
     # 32 until the quote-turn merge (4654b56) put four split turns back onto one
     # line each; the sentence blocks that went with them were enough for one
     # authored page to stop needing a second screen.
-    expect = {"shuden": 28, "neko-o-sagasu-tantei": 31, "maigo-no-tegami": 18,
-              "tokei-no-oto": 25, "shiro-no-kane": 41, "entotsu-no-kemuri": 27,
-              "ikanakatta-hito-no-chizu": 55, "rouka-no-kagami": 25}
+    #
+    # Re-measured 2026-09-19 after the eight-story revision. Five moved: 終電
+    # 28->27, 猫を探す探偵 31->30, 城の鐘 41->42, 煙突の煙 27->28, and
+    # 行かなかった人の地図 55->49, which is the big one — it lost four authored
+    # pages (48->44) and two more screens' worth of over-explanation on top.
+    # 迷子の手紙, 時計の音 and 廊下の鏡 re-measured to their recorded values
+    # unchanged, which is the evidence that the measurement itself is stable.
+    expect = {"shuden": 27, "neko-o-sagasu-tantei": 30, "maigo-no-tegami": 18,
+              "tokei-no-oto": 25, "shiro-no-kane": 42, "entotsu-no-kemuri": 28,
+              "ikanakatta-hito-no-chizu": 49, "rouka-no-kagami": 25}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
