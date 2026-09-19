@@ -243,6 +243,50 @@ def spreading():
     return good
 
 
+# (surface, kana as Ichiran sends it, the reading it has to become). A compound's
+# kana is its parts' readings with separators between them, and 熱すぎて having none
+# is why one example read as a general rule. Measured over the 384 recorded
+# responses: 2,376 of 11,051 compound parses carry a space, 0 of 275,650
+# non-compound parses do.
+READINGS = [
+    # Separator at a component boundary that is also a kanji/okurigana boundary.
+    ("廃業する", "はいぎょう する", "はいぎょうする"),
+    # No kana anchor before the separator: alignment cannot recover from this one,
+    # it bails to a single unsplit pair and the token ships with no reading.
+    ("頼ろうとする", "たよろう とする", "たよろうとする"),
+    # Separator interior to the surface, so the space lands at the HEAD of a later
+    # kanji run's ruby — 来《 き》 — which truncate() accepts rather than refuses.
+    # The only class of the three that ships looking correct.
+    ("行ったり来たり", "いったり きたり", "いったりきたり"),
+    # Zero-width glue sitting against the separator: 358 recorded kana hold both,
+    # and 18,274 hold zero-width with no space at all. The case is here because a
+    # reading needs BOTH cleanups, not because they have an order — `.split()`
+    # discards whitespace runs and `translate` removes zero-width, over disjoint
+    # characters, so the two commute and either order is correct.
+    # What fails is doing only one of them: `raw.replace(" ", "")` takes the space
+    # and leaves the non-joiner welded to ところ, shipping 所《ところ‌》. That is
+    # the reimplementation this case exists to catch.
+    ("所へ", "ところ ‌へ", "ところへ"),
+    # Controls: nothing to join, and the value must survive untouched.
+    ("熱すぎて", "あつすぎて", "あつすぎて"),
+    ("青い", "あおい", "あおい"),
+]
+
+
+def readings():
+    """A compound's kana arrives separated, and has to be joined to be a reading."""
+    ok = True
+    for surface, sent, want in READINGS:
+        got = Word.read({"text": surface, "kana": sent}).preferred.kana
+        good = got == want
+        ok &= good
+        note = "" if sent == want else "  (separated)"
+        print(f"  {'ok  ' if good else 'FAIL'} {surface} reads {want}{note}")
+        if not good:
+            print(f"       sent {sent!r} -> got {got!r}, want {want!r}")
+    return ok
+
+
 def response_shape():
     """The chunk nesting, including the shapes a bad response can arrive in."""
     ok = True
@@ -273,6 +317,7 @@ def main():
         ("compound split", shares),
         ("placement", placement),
         ("placement then split", spreading),
+        ("compound readings", readings),
         ("response shape", response_shape),
     ]
     ok = True

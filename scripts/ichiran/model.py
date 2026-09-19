@@ -81,6 +81,32 @@ def _text(value):
     return value.translate(ZERO_WIDTH) if isinstance(value, str) else ""
 
 
+def _reading(value):
+    """A kana field, with the separator Ichiran puts between component readings gone.
+
+    A compound's `kana` is not a reading, it is its parts' readings with spaces
+    between them: 廃業する arrives as 'はいぎょう する' and 頼ろうとする as
+    'たよろう とする'. 熱すぎて/あつすぎて has no space, which is why a single
+    example reads as a general rule and this went unnoticed.
+
+    Handing that to furigana alignment fails two ways and neither is loud. Where
+    the alignment still resolves, the space lands inside the ruby — 廃業《はいぎょう 》.
+    Where it does not, alignment cannot anchor on a kana run holding a space, bails
+    to one unsplit pair, and the token ships with no reading at all: 通して, 開けて,
+    導いて, 行ったり来たり and the rest of the てくれる/とする family.
+
+    Joined here rather than in `furigana.align`, which also reads the readings
+    authors hand-write into the stories. A space there is a real authoring defect
+    and `stats.py --strict` reports it; teaching `align` to tolerate spaces would
+    blind that check to fix a machine-generated problem.
+
+    Measured over the 384 recorded responses: 2,376 of 11,051 compound parses carry
+    a space, and 0 of 275,650 non-compound parses do. So this is a compound
+    separator specifically, not general whitespace hygiene.
+    """
+    return "".join(_text(value).split())
+
+
 def _number(value):
     return value if isinstance(value, (int, float)) and value is not True else None
 
@@ -206,7 +232,7 @@ class Parse:
         counter = node.get("counter")
         return cls(
             surface=_text(node.get("text")),
-            kana=_text(node.get("kana")),
+            kana=_reading(node.get("kana")),
             reading=_text(node.get("reading")),
             score=_number(node.get("score")) or 0,
             seq=_number(node.get("seq")),
