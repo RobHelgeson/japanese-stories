@@ -93,8 +93,37 @@ def strip(text):
     return MARKUP.sub(lambda m: pair(m)[0], text)
 
 
+class StrayMarker(ValueError):
+    """A ｜ that opens no annotation, raised where it would otherwise be published."""
+
+
 def parse(line):
-    """(plain line, {offset in plain line: (surface, reading)})."""
+    """(plain line, {offset in plain line: (surface, reading)}).
+
+    Raises StrayMarker on a ｜ that opens no annotation, because this is the last
+    place that can tell. MARKUP has no else branch: a ｜ that matches nothing is
+    copied through as ordinary text, reaches ichiran.align() and is emitted as a
+    token, and a literal ｜ ships into the reader. A ｜ that matches too much is
+    worse, setting one reading over five characters and looking fine.
+
+    The predicate existed before this call did — `stray_markers` — but its only
+    caller was `stats.py --strict`, an optional report that nothing in the build
+    runs. So rebuild.py published the defect silently while the check that would
+    have caught it sat one command away. Guarding here rather than in
+    build.parse_story covers indexmd's blurbs and afterwords on the same footing
+    as story lines, which is what the docstring beside MARKUP already argued for.
+
+    Raising rather than warning: a warning in a build that prints a screenful of
+    reading overrides per story is a warning nobody sees. Every source in the
+    corpus is clean as of 2026-09-19 — 5,682 lines, zero stray markers — so this
+    fails only on a defect being introduced.
+    """
+    stray = stray_markers(line)
+    if stray:
+        raise StrayMarker(
+            f"｜ at offset{'s' if len(stray) > 1 else ''} "
+            f"{', '.join(str(s) for s in stray)} opens no 《》 annotation: {line!r}"
+        )
     plain, authored, pos, last = [], {}, 0, 0
     for m in MARKUP.finditer(line):
         plain.append(line[last : m.start()])
