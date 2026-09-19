@@ -156,8 +156,15 @@ def check_contracts():
     # so the walker is now the thing that decides whether a story re-segments.
     # A module it misses is a story that reports "up to date" against a stale
     # data file, which is the failure the walk was added to prevent.
-    walked = {p.stem for p in rebuild.build_modules()}
-    expected = {"build", "cache", "check", "furigana", "ichiran",
+    # The walker returns files, because editing any file of a package changes
+    # what the build produces. This assertion is about modules, so a package's
+    # files collapse back to its name: ichiran is six files to the walker and
+    # one import to build.py, and it is the import that this contract is about.
+    def module_of(path):
+        return path.parent.name if (path.parent / "__init__.py").exists() else path.stem
+
+    walked = {module_of(p) for p in rebuild.build_modules()}
+    expected = {"build", "check", "furigana", "ichiran",
                 "indexmd", "inflect", "pitch", "pos", "vocab"}
     if walked != expected:
         raise SystemExit(
