@@ -156,18 +156,20 @@ So editing the reader's styling or behaviour now rewrites two files in about a s
 
 | Command                                  | What it does                                                          |
 | ---------------------------------------- | --------------------------------------------------------------------- |
-| `python3 stats.py --strict`              | level ladder, brief compliance, sentence rhythm, word recycling       |
+| `python3 stats.py --strict`              | level ladder, brief compliance, sentence rhythm, word recycling, stray ruby markup |
 | `python3 check.py ../stories/<slug>.txt` | every content token is known or decomposes into known pieces (slow)   |
 | `python3 have.py 単語1 単語2`            | quick known / unknown / leech lookup                                  |
 | `python3 brief.py`                       | resolve and print a story brief before drafting                       |
 | `python3 reviews.py`                     | star ratings and notes, joined to level, register and length          |
 | `python3 progress.py`                    | snapshot the progress gist; `--restore` puts one back                 |
 | `python3 reference.py --compare`         | our structural numbers beside authentic 児童文学 — a band, not a gate |
+| `python3 voice.py --compare`             | sentence-final form, タ/ル alternation and overt pronouns beside authentic 常体 prose — a band, not a gate |
 | `python3 readings.py ../docs/*.html`     | ambiguous readings across the built set; `grep MULTIPLE` for the ones to annotate |
 | `python3 pitch.py --build`               | rebuild the pitch table after adding or editing a story (needs fugashi) |
 | `python3 pitch.py --selftest`            | the accent rules against the gold set, without writing anything        |
 | `python3 ichiran.py --selftest`          | the token-to-offset matching rule, on hand-built token lists           |
-| `python3 furigana.py --selftest`         | reading alignment, and the cuts and refusals behind a carried token    |
+| `python3 furigana.py --selftest`         | reading alignment, the cuts and refusals behind a carried token, stray ｜ detection |
+| `python3 voice.py --selftest`            | the sentence-final classifiers and the narration rule, on a fixture table |
 | `python3 rebuild.py --all`               | force a full rebuild — use after cards mature in Anki                 |
 | `python3 rebuild.py --versions`          | also rebuild the frozen archives in `docs/versions/`                  |
 
