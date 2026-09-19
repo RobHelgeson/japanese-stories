@@ -905,8 +905,10 @@
         // The afterword is one HTML string with no sentence structure exposed, so
         // it splits at word granularity instead. <template> parses it inert; the
         // markup is build-time output of indexmd.ruby_html and carries only
-        // <ruby>/<rt>, everything else escaped. This is the reader's only
-        // innerHTML site; en and gloss strings never go near it.
+        // <ruby>/<rt>, everything else escaped. That escaper is what licenses
+        // innerHTML, so the two strings it produces — this and a sentence's en —
+        // are the only ones in the reader that may use it. A gloss is not one of
+        // them: it comes from Ichiran, not from the author, and stays textContent.
         function atoms() {
           if (atomList) return atomList;
           atomList = [];
@@ -1419,12 +1421,20 @@
         // 私わたし — which is what every gloss in every shipped story has said.
         function surfaceOf(w) {
           if (w.dataset.t) return w.dataset.t;
-          let out = "";
-          for (const n of w.childNodes) {
-            if (n.nodeType === 3) out += n.data;
-            else if (n.nodeName === "RUBY" && n.firstChild) out += n.firstChild.textContent;
-          }
-          return out;
+          return withoutRuby(w);
+        }
+
+        // Node text with every reading dropped — the <rt> is an annotation on the
+        // surface, not part of it, so this is 私 where textContent is 私わたし.
+        // Used for the headword above and for what the panel says out loud.
+        // The readings taken back out: 梓, not 梓あずさ. Same form the copy
+        // handler uses, and depth-independent on purpose — walking direct
+        // children only would truncate the moment ruby_html emits an <rp> or
+        // anything wraps a name, and it would do it silently.
+        function withoutRuby(node) {
+          const frag = node.cloneNode(true);
+          for (const r of frag.querySelectorAll("rt, rp")) r.remove();
+          return frag.textContent;
         }
 
         function chip(cls, text) {
@@ -1460,8 +1470,15 @@
           } else {
             pitchBox.hidden = true;
             body.hidden = false;
-            body.textContent = subject.en;
-            spoken = subject.en;
+            // A translation names Japanese people and places and annotates them
+            // with ふりがな, so it arrives as build-time output of
+            // indexmd.ruby_html — <ruby>/<rt> and nothing else, every other
+            // character escaped — and is rendered rather than shown as markup.
+            // Same contract and same escaper as DATA.afterword.
+            body.innerHTML = subject.en;
+            // Read back off the DOM, so the tags never reach the speech string
+            // and 梓《あずさ》 is announced as 梓 rather than as 梓あずさ.
+            spoken = withoutRuby(body);
           }
           Chrome.announce(spoken);
         }
@@ -1696,8 +1713,11 @@
         if (!sel || sel.isCollapsed || !e.clipboardData) return;
         const frag = document.createDocumentFragment();
         for (let i = 0; i < sel.rangeCount; i++) frag.append(sel.getRangeAt(i).cloneContents());
-        // Nothing annotated in range — a gloss, a translation, the stats — so the
-        // engine's own serialisation is already right, block structure and all.
+        // Nothing annotated in range — a gloss, the stats — so the engine's own
+        // serialisation is already right, block structure and all. A translation
+        // used to be on that list and no longer is: one that names someone
+        // carries ruby now, so it takes the strip below and loses its text/html
+        // flavour. The plain text is correct; the richer flavour is the cost.
         if (!frag.querySelector("rt")) return;
         for (const rt of frag.querySelectorAll("rt, rp")) rt.remove();
         // textContent alone would run two paragraphs together.
