@@ -7,9 +7,26 @@ tokens, sentence-length spread, construction inventory, repeated-word share,
 subordination and quote turns; check.py measures vocabulary; reference.py
 measures four structural axes against 児童文学. Not one of them looks at what a
 sentence *ends in*, and sentence-final form is where a Japanese narrator's voice
-mostly lives. A story can pass every gate in this repo and still run thirty-three
-narration sentences without changing tense once, which 行かなかった人の地図 does,
-or spend 55% of its narration on three endings, which 煙突の煙 does.
+mostly lives. A story can pass every gate in this repo and still run a dozen or
+more narration sentences without changing tense once, and spend a quarter of its
+narration on three endings. Those two are `run_max` and `final3_top3_pct` in the
+table below, per story.
+
+NO FIGURE FROM A RUN IS WRITTEN DOWN HERE
+-----------------------------------------
+Every number --compare computes it also prints, so a copy in this docstring is a
+second version of the same state with nothing keeping the two in step. That is
+not hypothetical: the first draft of this file quoted a run of 33 and a top-3
+share of 55%, and one revision pass over the stories took them to 14 and 27%
+without a line of this module changing. Those two are kept above as the record of
+what went stale; every other figure is gone. The prose below names the shapes and
+the arguments and sends you to the run for the values.
+
+Two kinds of number do stay. The five measures deliberately NOT made, under FIVE
+THINGS below, which --compare cannot recompute because it does not compute them
+at all — each carries the date it was measured. And the correlations quoted from
+CALIBRATION.md § Corrections, which are the record of a decision already taken
+elsewhere and are not this corpus's to move.
 
 WHAT THIS IS
 ------------
@@ -63,9 +80,9 @@ measure of how much dialogue a story has.
 
 THE BAND IS PLAIN-FORM ONLY, AND THIS IS THE LOAD-BEARING DECISION
 ------------------------------------------------------------------
-22 of reference.py's 25 texts narrate in ですます調, and 68% of every narration
-sentence in that sample is polite. The top polite endings across it are ました
-868, でした 114, のです 103. This corpus is 100% 常体.
+Most of reference.py's texts narrate in ですます調, and most of the narration
+sentences in that sample are polite; --compare prints both counts. This corpus
+is 100% 常体.
 
 Ending concentration measured across that split measures politeness, not voice:
 ました is one ending doing the work of た, ていた, かった and だった at once, so a
@@ -74,25 +91,31 @@ scores as varied no matter how flat it is. The sign of the finding is not even
 stable under the confound.
 
 So the sample is re-split by narration register and only the 常体 texts are used.
-register() finds three: 花をうめる and 久助君の話 (新美南吉) and 泉ある家 (宮沢賢治).
-The split is not marginal — those three run 0.0%, 1.8% and 2.7% polite and the
-next text up is 55.2% — but **n=3 is the weak point of this entire report** and
-the n is printed beside every authentic figure for that reason, the way
-reference.py prints n= under each reference column.
+register() does the splitting and POLITE_MAX is the cut; --compare prints which
+texts survived it, the worst kept figure, the best rejected one, and the empty
+space between. The split is not a judgement call and that print is how you check
+rather than take it on trust. But **the surviving n is the weak point of this
+entire report** — it is a handful of texts, not a sample — and the n is printed
+beside every authentic figure for that reason, the way reference.py prints n=
+under each reference column.
 
-n=3 is worse than it looks for the referential layer: only 花をうめる is narrated
-in the first person, so every first-person comparison here rests on one text.
-Treat a single authentic figure as a direction, not a bound.
+It is worse than it looks for the referential layer: --compare also prints how
+many of the survivors narrate in the first person, and the answer has been one.
+Every first-person comparison here rests on that text. Treat a single authentic
+figure as a direction, not a bound.
 
 FIVE THINGS DELIBERATELY NOT MEASURED
 -------------------------------------
 体言止め, ようだ, かもしれない, だろうか, and 私 density. An earlier pass called
-all five missing from this corpus. They are not. Measured at design time against
-the plain-form subset, 体言止め runs 0.00-2.31% here against 0.00-1.10% there,
-and first-person density 18.7-34.7 per 100 narration sentences against 花をうめる's
-45.1 — above every story we have. The earlier reading was the ですます confound
-above: a polite text ends in でした, not in a bare noun, so 体言止め looked rare in
-the reference set because the reference set was polite.
+all five missing from this corpus. They are not. Nothing recomputes what follows,
+because nothing computes it, so it is stated with the date it was taken and must
+be re-taken by hand to be trusted: measured 2026-09-19 against the plain-form
+subset, 体言止め runs 0.00-2.31% here against 0.00-1.10% there, and first-person
+density 19.2-29.1 per 100 narration sentences across the stories that have a
+first-person narrator, against 花をうめる's 45.1 — above every story we have. The
+earlier reading was the ですます confound above: a polite text ends in でした, not
+in a bare noun, so 体言止め looked rare in the reference set because the reference
+set was polite.
 
 Every one of the five is already at or above authentic rate, so a metric on them
 would invent a target real prose does not hit. That is the exact failure this
@@ -114,15 +137,16 @@ The one place the trap could still bite is the final 3-gram, whose key is three
 raw characters and so carries stem orthography — 見えた against みえた. --compare
 therefore recomputes the correlation on every run rather than assuming it away,
 and it does not come out clean: within this corpus, where orthography policy is
-constant, kanji ratio and ending entropy correlate at r=+0.479. A kanji stem
-makes the 3-gram key more distinctive, so a kanji-heavy text scores as more
-varied.
+constant, kanji ratio and ending entropy correlate positively. A kanji stem makes
+the 3-gram key more distinctive, so a kanji-heavy text scores as more varied.
 
 That is the confound, and it runs the wrong way to explain the finding. The
-authentic texts are the kana-heavy side — 21% kanji in narration against our 32%
-— so the mechanism predicts they should score LOWER than us. They score higher,
-5.10-5.85 against our 3.97-5.34. The gap survives the confound and is understated
-by it, which is the opposite of what happened to TE_CHAIN.
+authentic texts are the kana-heavy side, so the mechanism predicts they should
+score LOWER than us. They score higher. The gap survives the confound and is
+understated by it, which is the opposite of what happened to TE_CHAIN. --compare
+prints the two kanji ratios, both correlations and both entropy bands together,
+under "confound checks", so the whole argument can be re-read off a run — which
+is the point, because a story edit moves every figure in it.
 
 The one lexical exception to "no kanji in a pattern" is 彼/彼女, matched in kanji
 only: かれ in kana collides with every passive in the language (置かれた,
@@ -132,11 +156,13 @@ NOT A RESTATEMENT OF mean_len
 -----------------------------
 The standing bar from the same correction — correction (b) died partly because
 subordination events per sentence correlated with mean_len at r=0.805, restating
-a measure stats.py already reports. Ending entropy does not: across these eight
-stories it correlates with stats.py's own mean_len at r=-0.475, moderate and
-negative, where a restatement would be strong and positive. --compare recomputes
-and prints it, along with the correlation against narration length, since entropy
-rises with sample size and the stories differ 66 to 173 sentences.
+a measure stats.py already reports. That 0.805 is the one figure quoted here from
+outside: it is CALIBRATION.md's record of a decision already taken, not a number
+this module can recompute. Ending entropy clears the bar — it correlates with
+stats.py's own mean_len moderately and negatively, where a restatement would be
+strong and positive. --compare recomputes and prints that r, along with the
+correlation against narration length, since entropy rises with sample size and
+the stories are of very different lengths.
 
 Usage:
     python3 voice.py --compare     # our narration beside authentic 常体 prose
@@ -150,12 +176,9 @@ import re
 import statistics as st
 import sys
 from collections import Counter
-from pathlib import Path
 
 import reference
 import stats
-
-HERE = Path(__file__).resolve().parent
 
 # Quote handling for rule 2. Balanced spans first; then an unclosed opener and a
 # dangling closer, which appear once reference.SPLIT has divided a multi-sentence
@@ -165,7 +188,12 @@ QUOTE_OPEN = re.compile(r"「[^」]*$|『[^』]*$")
 QUOTE_CLOSE = re.compile(r"^[^「]*」|^[^『]*』")
 TURN_OPEN = ("「", "『")
 
-SENT_END = re.compile(r"[。！？]+")
+# Borrowed, not restated. The module docstring's argument for importing
+# reference.to_sentences — two corpora measured in different units would make the
+# drift look like a finding — applies with more force to a splitter that is used
+# on both of them here. This was a character-for-character copy of stats.SENT_END
+# and there was nothing to stop the two drifting apart.
+SENT_END = stats.SENT_END
 TRIM = "。！？…―—・、，,」』）］〉》　 "
 
 # のだ系, in its の form only. Checked before anything else, because のだ ends in
@@ -224,8 +252,15 @@ PRONOUN_ANY = re.compile(PRONOUN_3P)
 # this report deliberately does not make, for the reason the docstring gives.
 # The particle lookahead is what makes it usable in kana: bare おれ matches
 # しおれず and bare わたし matches 渡した, and 花をうめる contains the first.
+#
+# MULTILINE is what makes the `|$` branch mean what it says. measure() runs this
+# over the narration joined with newlines, so without it `$` is the end of the
+# whole text and only the last sentence could ever take that branch — a
+# first-person 体言止め sentence (…残っているのは私) anywhere else matched
+# nothing. There is no `^` in the pattern for the flag to affect.
 FIRST_PERSON = re.compile(
-    r"(?:私|わたくし|わたし|僕|ぼく|俺|おれ)(?:たち|ども|ら)?(?=[はがのをにもとでへかや、。]|$)"
+    r"(?:私|わたくし|わたし|僕|ぼく|俺|おれ)(?:たち|ども|ら)?(?=[はがのをにもとでへかや、。]|$)",
+    re.MULTILINE,
 )
 # Per 100 narration sentences. The cut is wide: across the 常体 reference texts
 # 花をうめる runs 45.1, 久助君の話 2.6 — a framing narrator who is not the
@@ -233,12 +268,12 @@ FIRST_PERSON = re.compile(
 FIRST_PERSON_MIN = 5.0
 
 # A text is 常体 below this share of polite narration endings. The threshold is
-# nowhere near anything: across reference.json's 25 texts the plain three run
-# 0.0-2.4% and the next one up is 55.6%, so any cut in that gap picks the same
-# three. Printed by --compare so the gap can be re-checked rather than trusted.
+# nowhere near anything: across reference.json's 25 texts the plain handful sit
+# near zero and the next one up is past halfway, so any cut in that gap picks the
+# same texts. --compare prints both edges of the gap and the width between them,
+# so it can be re-checked rather than trusted, and that print is authoritative
+# over any figure written down here.
 POLITE_MAX = 20.0
-
-KANJI = re.compile(r"[一-鿿々]")
 
 
 def denarrate(unit):
@@ -280,8 +315,37 @@ def tail(sentence):
     return sentence.rstrip(TRIM)
 
 
+def predicate(t):
+    """A tail with its interrogative か removed, so its ending can be read.
+
+    Every pattern below is $-anchored, SENT_END splits on ？ rather than keeping
+    it, and か is not in TRIM — so a question arrived at the classifiers with か
+    still attached and missed all of them at once. 〜ですか was neither polite nor
+    non-past; 〜ましたか was neither polite nor past; 〜のだろうか was neither のだ系
+    nor 推量. All four are live: 泉ある家, a KEPT reference text, narrates
+    （田畑の地味のお調べですか, and 時計の音 has a のだろうか.
+
+    か is stripped here rather than added to TRIM because TRIM also feeds the
+    final-3 ending key, and ですか really is a different ending from です. Folding
+    the two would move every entropy and top-3 figure in the report, and would
+    additionally count だろうか into the 推量 rate that the module docstring lists
+    among the five measures this report does not make.
+    """
+    return t[:-1] if t.endswith("か") else t
+
+
 def is_polite(t):
-    return bool(POLITE_PAST.search(t) or POLITE_NONPAST.search(t))
+    p = predicate(t)
+    return bool(POLITE_PAST.search(p) or POLITE_NONPAST.search(p))
+
+
+def is_noda(t):
+    p = predicate(t)
+    return bool(NODA_PAST.search(p) or NODA_NONPAST.search(p))
+
+
+def is_suiryou(t):
+    return bool(SUIRYOU.search(predicate(t)))
 
 
 def is_past(t):
@@ -292,6 +356,7 @@ def is_past(t):
     plain past; then the polite pair, so a ですます sentence is classified rather
     than falling through to `endswith("た")` by accident; then た; then ん+だ.
     """
+    t = predicate(t)
     if NODA_PAST.search(t):
         return True
     if NODA_NONPAST.search(t):
@@ -305,9 +370,17 @@ def is_past(t):
     return bool(ONBIN_DA.search(t))
 
 
-def final3(sentence):
-    """The last three characters of the trimmed sentence."""
-    return tail(sentence)[-3:]
+def final3(t):
+    """The ending key this report counts: the last three characters of a tail.
+
+    Takes tail()'s output rather than a raw sentence, so measure() can count
+    endings off the tails it already holds and the key has exactly one
+    definition. It was inlined there before, which left FINAL3_SELFTEST pinning a
+    function nothing called — the key could be changed in measure() and the
+    selftest would stay green. The fixtures run tail() first, so they still pin
+    TRIM, which is where the real decision lives.
+    """
+    return t[-3:]
 
 
 def entropy(counts):
@@ -317,7 +390,14 @@ def entropy(counts):
 
 
 def tense_runs(flags):
-    """Lengths of every maximal same-tense run, in order."""
+    """Lengths of every maximal same-tense run, in order.
+
+    No flags is no runs. `cur` starts at 1 and used to be appended
+    unconditionally, so an empty text reported [1] — a phantom run of one, which
+    reads as maximum alternation and is the one direction that looks good here.
+    """
+    if not flags:
+        return []
     out, cur = [], 1
     for a, b in zip(flags, flags[1:]):
         if a == b:
@@ -330,20 +410,42 @@ def tense_runs(flags):
 
 
 def register(jp):
-    """Share of narration sentences ending in ですます. The 常体 test."""
+    """Share of narration sentences ending in ですます. The 常体 test.
+
+    A text with no narration has no polite narration, so the share is 0.0 rather
+    than a ZeroDivisionError. Nothing reaches that path through measure(), which
+    refuses an empty text outright — POLITE_MAX would otherwise read 0.0% as
+    exemplary 常体 and keep it.
+    """
+    if not jp:
+        return 0.0
     return 100 * sum(1 for s in jp if is_polite(tail(s))) / len(jp)
 
 
 def measure(jp):
-    """Every figure this report prints, from narration sentences alone."""
+    """Every figure this report prints, from narration sentences alone.
+
+    None when there is no narration to measure, which callers skip and report.
+    A short text, an all-dialogue text, or a draft whose every line opens with 「
+    reaches here empty, and every figure below divides by n.
+    """
+    if not jp:
+        return None
     tails = [tail(s) for s in jp]
     n = len(jp)
     flags = [is_past(t) for t in tails]
     runs = tense_runs(flags)
-    finals = Counter(t[-3:] for t in tails)
+    finals = Counter(final3(t) for t in tails)
     top3 = finals.most_common(3)
-    body = "".join(jp)
-    kanji = sum(1 for c in body if KANJI.match(c))
+    # Newline-joined, matching stats.measure, and for the same reason: with the
+    # sentences butted together a character-level pattern matches straight across
+    # a sentence boundary. 鏡に映ったのは彼 + 女の声が聞こえた produced a 彼女 that
+    # is in neither sentence, which inflated the pronoun rows the report is built
+    # on. Kanji is still counted over the sentences themselves, so the separator
+    # cannot dilute the ratio the confound check reads.
+    body = "\n".join(jp)
+    chars = sum(len(s) for s in jp)
+    kanji = sum(len(r) for r in stats.KANJI_RUN.findall(body))
 
     a = {
         "n": n,
@@ -352,13 +454,11 @@ def measure(jp):
         "run_mean": st.mean(runs),
         "final3_entropy": entropy(finals),
         "final3_top3_pct": 100 * sum(v for _, v in top3) / n,
-        "noda_pct": 100 * sum(
-            1 for t in tails if NODA_PAST.search(t) or NODA_NONPAST.search(t)
-        ) / n,
-        "suiryou_pct": 100 * sum(1 for t in tails if SUIRYOU.search(t)) / n,
+        "noda_pct": 100 * sum(1 for t in tails if is_noda(t)) / n,
+        "suiryou_pct": 100 * sum(1 for t in tails if is_suiryou(t)) / n,
         "polite_pct": register(jp),
         "top3": top3,
-        "kanji_ratio": 100 * kanji / len(body) if body else 0.0,
+        "kanji_ratio": 100 * kanji / chars if chars else 0.0,
     }
     for name, _ in PARTICLE_GROUPS:
         a[f"pron_{name}"] = 100 * len(PRONOUN_RE[name].findall(body)) / n
@@ -386,18 +486,26 @@ def pearson(xs, ys):
 def plain_reference():
     """The 常体 subset of reference.json, measured. Never the whole sample.
 
-    Returns (kept, rejected) so --compare can print the register split it is
-    resting on instead of asserting it. Everything is already in
-    scripts/.refcache/, so this costs no network.
+    Returns (kept, rejected, skipped) so --compare can print the register split
+    it is resting on instead of asserting it, and can say which texts it could
+    not measure at all. Everything is already in scripts/.refcache/, so this
+    costs no network.
+
+    A text with no narration is skipped by name rather than aborting the report.
+    Every text in the manifest today has narration, but the manifest is editable
+    and `reference.py --refresh` is the moment a short or all-dialogue text
+    arrives — one of those used to take the whole run down with a traceback.
     """
     man = json.loads(reference.MANIFEST.read_text(encoding="utf-8"))
-    kept, rejected = [], []
+    kept, rejected, skipped = [], [], []
     for w in man["texts"]:
-        jp = ref_narration(w)
-        a = measure(jp)
+        a = measure(ref_narration(w))
+        if a is None:
+            skipped.append(f"{w['author']} {w['title']}")
+            continue
         a["author"], a["title"] = w["author"], w["title"]
         (kept if a["polite_pct"] < POLITE_MAX else rejected).append(a)
-    return kept, rejected
+    return kept, rejected, skipped
 
 
 # Keys are ASCII on purpose. A CJK row label is double-width in a terminal and a
@@ -458,17 +566,22 @@ def stats_mean_len(path):
 
 def compare():
     reference.test_no_vocab_import()
-    kept, rejected = plain_reference()
+    kept, rejected, skipped = plain_reference()
     if not kept:
         raise SystemExit("no 常体 text in reference.json; the band cannot be built")
 
-    ours = []
+    ours, ours_skipped = [], []
     for s in stats.CORPUS["stories"]:
         path = stats.STORIES / f"{s['slug']}.txt"
         a = measure(story_narration(path))
+        if a is None:
+            ours_skipped.append(s["slug"])
+            continue
         a["slug"], a["level"] = s["slug"], s["level"]
         a["mean_len"] = stats_mean_len(path)
         ours.append(a)
+    if not ours:
+        raise SystemExit("no story has narration; there is nothing to compare")
 
     w1, wc, wb = 18, 8, 12
     width = w1 + wc * len(ours) + 3 + wb * 2
@@ -493,6 +606,13 @@ def compare():
         print(f"{key:<{w1}}" + "".join(fmt.format(a[key]).rjust(wc) for a in ours)
               + f"{'│':>3}" + f"{med:>{wb}}{rng:>{wb}}")
     print("=" * width)
+
+    # Named, not counted away. A text with no narration is invisible in every
+    # figure above, so the one place it can be reported is here.
+    if ours_skipped:
+        print(f"\nSKIPPED, no narration to measure: {', '.join(ours_skipped)}")
+    if skipped:
+        print(f"\nSKIPPED from reference.json, no narration: {', '.join(skipped)}")
 
     print("\ncolumns, in corpus.json order:")
     for a in ours:
@@ -609,6 +729,21 @@ SELFTEST = [
     # 体言止め and a な-ending, both non-past and neither measured elsewhere.
     ("静かな廊下。", False, False, False, False),
     ("鏡を磨く。", False, False, False, False),
+    # Questions. SENT_END eats ？ and TRIM does not carry か, so every one of
+    # these used to reach the classifiers with か attached and answer False four
+    # times over. The first two are live: 泉ある家 narrates お調べですか and
+    # 時計の音 has a のだろうか.
+    ("田畑の地味のお調べですか。", False, False, False, True),
+    ("直せない状態のまま残したのだろうか。", False, True, True, False),
+    ("どうしてこの町へきましたか。", True, False, False, True),
+    ("どんなに幸福でしたか。", True, False, False, True),
+    ("どなたか知っているかたはありませんか。", False, False, False, True),
+    ("おそうじしたのはいつだったか。", True, False, False, False),
+    ("やはり兵太郎君じゃないか。", False, False, False, False),
+    # か that is not interrogative: the stripped character must not turn a
+    # non-past ending into something it is not. そう and しよう match nothing
+    # either way, which is the point — か leaves no residue of its own.
+    ("食ってやるとしようか。", False, False, False, False),
 ]
 
 # (units in, narration sentences out). The narration rule, including the two
@@ -622,11 +757,16 @@ NARRATION_SELFTEST = [
     (["「ただいま」"], []),
 ]
 
+# (sentence, its ending key). Run through tail() first, the way measure() does,
+# so these pin TRIM as much as the slice.
 FINAL3_SELFTEST = [
     ("雨が降っていた。", "ていた"),
     ("空は青かった。", "かった"),
     ("彼は先生だった。", "だった"),
     ("鏡を磨く。", "を磨く"),
+    # か is trimmed by neither tail() nor the key, only by predicate(), so a
+    # question is its own ending and not a second copy of です.
+    ("お調べですか。", "ですか"),
 ]
 
 
@@ -634,12 +774,7 @@ def selftest():
     ok = True
     for sentence, past, noda, suiryou, polite in SELFTEST:
         t = tail(sentence)
-        got = (
-            is_past(t),
-            bool(NODA_PAST.search(t) or NODA_NONPAST.search(t)),
-            bool(SUIRYOU.search(t)),
-            is_polite(t),
-        )
+        got = (is_past(t), is_noda(t), is_suiryou(t), is_polite(t))
         want = (past, noda, suiryou, polite)
         good = got == want
         ok &= good
@@ -657,23 +792,59 @@ def selftest():
             print(f"       want {want}")
 
     for sentence, want in FINAL3_SELFTEST:
-        got = final3(sentence)
+        got = final3(tail(sentence))
         good = got == want
         ok &= good
         print(f"  {'ok  ' if good else 'FAIL'} final3 {sentence} -> {got}")
+        if not good:
+            print(f"       want {want}")
 
     # tense_runs is the headline measure's other half, and an off-by-one in it
-    # would move run_max on every story at once.
+    # would move run_max on every story at once. [] is the case that was wrong:
+    # it reported [1], a run that is not there, and a phantom run of one reads as
+    # perfect alternation.
     for flags, want in [
         ([True] * 5, [5]),
         ([True, False, True], [1, 1, 1]),
         ([True, True, False, False, False, True], [2, 3, 1]),
         ([False], [1]),
+        ([], []),
     ]:
         got = tense_runs(flags)
         good = got == want
         ok &= good
         print(f"  {'ok  ' if good else 'FAIL'} tense_runs {flags} -> {got}")
+
+    # An empty text is skipped, not divided by. Every figure in measure() has n
+    # in its denominator, so one unmeasurable text used to end the whole report
+    # in a traceback rather than a line naming it.
+    for label, got in (("measure([])", measure([])), ("register([])", register([]))):
+        want = None if "measure" in label else 0.0
+        good = got == want
+        ok &= good
+        print(f"  {'ok  ' if good else 'FAIL'} {label} -> {got!r} (want {want!r})")
+
+    # The sentences are joined with a separator, so a character pattern cannot
+    # run across a boundary. Neither pair below contains 彼女; butted together
+    # they each produce one, in the row that is the actual tell. The 彼 in the
+    # first sentence is real and still counts, under `other`.
+    for units, key in (
+        (["鏡に映ったのは彼", "女の声が聞こえた"], "pron_genitive"),
+        (["鏡に映ったのは彼", "女は声をあげた"], "pron_topic"),
+    ):
+        a = measure(units)
+        good = a[key] == 0.0 and a["pron_other"] == 50.0
+        ok &= good
+        print(f"  {'ok  ' if good else 'FAIL'} 彼女 across a sentence boundary -> "
+              f"{key} {a[key]:.1f}, other {a['pron_other']:.1f} (want 0.0, 50.0)")
+
+    # 体言止め in the first person, which the `|$` branch of FIRST_PERSON's
+    # lookahead is there for and could not reach without MULTILINE: before, only
+    # the last sentence of a text could take it.
+    fp = measure(["残っているのは私", "鏡を磨く"] + ["外は暗い"] * 18)
+    ok &= fp["first_person"]
+    print(f"  {'ok  ' if fp['first_person'] else 'FAIL'} first person at a "
+          f"sentence end, not the text end -> {fp['first_person']} (want True)")
 
     h = entropy(Counter({"a": 1, "b": 1, "c": 1, "d": 1}))
     good = abs(h - 2.0) < 1e-9
