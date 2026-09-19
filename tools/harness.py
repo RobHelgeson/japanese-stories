@@ -1995,6 +1995,12 @@ def suite_manage(br, rep, base):
         br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
 
         cell = f"document.querySelector('.cell[data-slug=\"{slug}\"]')"
+        # Read off the row rather than written down here. contents.js clamps
+        # every stepper move against `data-pages`, which index.py emits from the
+        # built story, so a revision that repaginates a story moves the expected
+        # values with it. Three cases below carried 25's last-page-minus-one as
+        # a literal 24 and went stale the moment 時計の音 lost a page.
+        pages = int(br.eval(f"{cell}.dataset.pages"))
         rep.add("manage", "controls-start-hidden", br.eval(f"{cell}.querySelector('.manage').hidden"),
                 None)
         br.eval("document.getElementById('edit').click()")
@@ -2008,7 +2014,7 @@ def suite_manage(br, rep, base):
         rep.add("manage", "marking-read-writes-done-and-a-doneAt",
                 got[slug]["done"] is True and got[slug].get("doneAt", 0) > 0, got)
         rep.add("manage", "marking-read-sends-the-position-to-the-end",
-                got[slug]["page"] == int(br.eval(f"{cell}.dataset.pages")), got)
+                got[slug]["page"] == pages, got)
         rep.add("manage", "the-row-repaints-as-read",
                 br.eval(f"{cell}.classList.contains('done')"), None)
 
@@ -2018,7 +2024,9 @@ def suite_manage(br, rep, base):
 
         br.eval(f"{cell}.querySelector('[data-act=\"dec\"]').click()")
         got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
-        rep.add("manage", "the-stepper-moves-the-page", got[slug]["page"] == 24, got)
+        # One tap back from 読了's end position, which the case above pinned at
+        # `pages`.
+        rep.add("manage", "the-stepper-moves-the-page", got[slug]["page"] == pages - 1, got)
         rep.add("manage", "the-stepper-resets-the-screen-index", got[slug]["sub"] == 0, got)
 
         # Import is a merge, not a replace: pasting yesterday's export must not
@@ -2031,7 +2039,8 @@ def suite_manage(br, rep, base):
         br.eval("document.getElementById('box').value = " + json.dumps(json.dumps(stale)))
         br.eval("document.getElementById('imp').click()")
         got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
-        rep.add("manage", "import-merges-rather-than-replaces", got[slug]["page"] == 24, got)
+        # Unmoved from the stepper's result: the stale record loses the merge.
+        rep.add("manage", "import-merges-rather-than-replaces", got[slug]["page"] == pages - 1, got)
 
         br.eval(f"{cell}.querySelector('[data-act=\"clear\"]').click()")
         got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
@@ -2075,8 +2084,11 @@ def suite_manage(br, rep, base):
             br.eval(f"{cell}.querySelector('[data-act=\"dec\"]').click()")
             br.eval("new Promise(r => setTimeout(r, 500))", await_promise=True)
             got = br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
+            # From the clear's page-less tombstone, the first tap lands on
+            # `pages` and the second one back. `pages - 1` is what distinguishes
+            # two taps from one; a lost second tap leaves `pages`.
             rep.add("manage", "two-taps-in-one-millisecond-both-count",
-                    got[slug]["page"] == 24, got)
+                    got[slug]["page"] == pages - 1, got)
         finally:
             br.eval("Date.now = window.__now")
     finally:
