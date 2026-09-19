@@ -723,6 +723,12 @@
          sheet/a-translation-sits-centred; the gap is a few pixels and shows up
          only against the word panel, which this must NOT match. */
       #sheet-head[hidden] + #sheet-pitch[hidden] + #sheet-body { margin-top: 0; }
+      /* A translation's ふりがな is not gated on the ふ switch, for the same reason
+         the afterword's is not: the page is the thing being read, and the panel is
+         the answer to a question already asked. Bigger than the 0.44em on the page
+         because the line around it is English at body size, and fully opaque
+         because nothing here is waiting to be revealed. */
+      #sheet-body rt { font-size: 0.5em; opacity: 1; }
 
       /* ---- pitch ---------------------------------------------------------- */
 

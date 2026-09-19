@@ -9,26 +9,33 @@ import html
 import re
 from pathlib import Path
 
-# ｜kanji《かな》 — the furigana markup used in the story sources (see AUTHORING.md).
-RUBY = re.compile(r"｜([^《｜]+)《([^》]+)》")
+import furigana
+
 BULLET = re.compile(r"^- \*\*(.+?)\*\*\s*[—-]\s*(.+)$")
 
 
 def strip_ruby(text):
-    return RUBY.sub(r"\1", text)
+    return furigana.strip(text)
 
 
 def ruby_html(text):
     """｜漢字《かな》 rendered as <ruby>, everything else HTML-escaped.
 
-    Afterwords quote Japanese inside English prose, and the reader is for someone
-    who wants the reading available. Escaping happens per-segment so the markup
-    survives while the surrounding prose cannot inject tags.
+    English prose quotes Japanese in two places — the afterwords here, and the
+    `> ` translation lines of the stories — and the reader is for someone who
+    wants the reading available in both. Escaping happens per-segment so the
+    markup survives while the surrounding prose cannot inject tags; this is the
+    only string in the build that the reader hands to innerHTML.
+
+    The grammar is furigana.MARKUP, the same one the Japanese lines are parsed
+    with, so an annotation cannot mean one thing in a story line and another in
+    the English beside it.
     """
     out, last = [], 0
-    for m in RUBY.finditer(text):
+    for m in furigana.MARKUP.finditer(text):
+        surface, reading = furigana.pair(m)
         out.append(html.escape(text[last : m.start()]))
-        out.append(f"<ruby>{html.escape(m.group(1))}<rt>{html.escape(m.group(2))}</rt></ruby>")
+        out.append(f"<ruby>{html.escape(surface)}<rt>{html.escape(reading)}</rt></ruby>")
         last = m.end()
     out.append(html.escape(text[last:]))
     return "".join(out)
@@ -47,7 +54,8 @@ def section(index_md, heading):
         m = BULLET.match(line.strip())
         if m:
             marked, text = m.group(1), m.group(2)
-            out[strip_ruby(marked)] = ("".join(r for _, r in RUBY.findall(marked)), text)
+            plain, authored = furigana.parse(marked)
+            out[plain] = ("".join(authored[at][1] for at in sorted(authored)), text)
     return out
 
 

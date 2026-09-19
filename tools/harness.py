@@ -993,6 +993,14 @@ window.H = (() => {
     return null;
   }
   const isLit = (node) => !!node && node.classList.contains("lit");
+  // An HTML string parsed inert, so a test can ask what it means rather than
+  // what it says. <template> and not innerHTML on a live node: nothing here
+  // should be able to run a script or load an image by being asserted about.
+  function parsed(htmlText) {
+    const t = document.createElement("template");
+    t.innerHTML = htmlText || "";
+    return t.content;
+  }
 
   // DOUBLE_MS in reader.js. A tap lands 20ms after its pointerdown, so two bare
   // tapAt calls would be ~80ms apart and EVERY consecutive pair would read as a
@@ -1141,8 +1149,11 @@ window.H = (() => {
     if (!hit) return out.concat([{ name: "sheet/sentence-fixture", ok: false, detail: { at: "double-tap" } }]);
     s = hit.s;
     await doubleTapAt(hit.pt);
+    // data-en is an HTML string, so the two sides are compared as rendered text
+    // rather than as source: a translation carrying an apostrophe ships &#x27;
+    // and a name ships <ruby>, and neither is what the panel is asked to show.
     add("sheet/double-tap-opens-a-translation",
-        Sheet.isOpen() && isLit(s) && body.textContent === s.dataset.en,
+        Sheet.isOpen() && isLit(s) && body.textContent === parsed(s.dataset.en).textContent,
         { open: Sheet.isOpen(), lit: isLit(s), body: body.textContent.slice(0, 60) });
 
     // With the headword and the pitch row both away, the translation is the only
@@ -1251,6 +1262,65 @@ window.H = (() => {
     add("chrome/a-tap-in-the-reserve-summons-the-bars",
         wasHidden && Chrome.isShown(),
         { hiddenFirst: wasHidden, shown: Chrome.isShown() });
+    return out;
+  }
+
+  // ---- ふりがな in a translation -------------------------------------------
+  // A translation that names someone annotates the name the way the story does,
+  // ｜梓《あずさ》, and the panel used to print that markup at the reader because
+  // it set textContent. Driven from its own suite because it needs a story whose
+  // translations carry furigana, and sheet() above runs on one that does not.
+  async function enRuby() {
+    const out = [];
+    const add = (name, ok, detail) => out.push({ name, ok: !!ok, detail });
+    const body = document.getElementById("sheet-body");
+    const raw = /[｜《》]/;
+
+    // The build converts the markup, so none of it may reach the browser at all.
+    // Whole-story, not just the sentence tapped below: an escaper that missed a
+    // shape would ship it silently everywhere else.
+    const sents = DATA.pages.flat();
+    const leaked = sents.filter((s) => raw.test(s.en || ""));
+    add("en-ruby/no-translation-ships-raw-markup", leaked.length === 0,
+        { leaked: leaked.length, first: (leaked[0] || {}).en });
+    const annotated = sents.filter((s) => (s.en || "").includes("<ruby"));
+    add("en-ruby/the-story-still-has-annotated-translations", annotated.length > 0,
+        { count: annotated.length });
+
+    // Same forward walk as sheet(), narrowed to a sentence whose translation
+    // carries a reading and which has a bare spot to tap.
+    let a = Paginator.first(), hit = null;
+    for (let i = 0; i < 80 && a && !hit; i++) {
+      Track.goTo(a, false);
+      await sleep(10);
+      for (const cand of document.querySelectorAll("#track .cell.is-current .s[data-en]")) {
+        if (!cand.dataset.en.includes("<ruby")) continue;
+        const pt = bareSpot(cand);
+        if (pt) { hit = { s: cand, pt }; break; }
+      }
+      a = Paginator.next(a);
+    }
+    if (!hit) return out.concat([{ name: "en-ruby/fixture", ok: false, detail: { at: "walk" } }]);
+
+    await doubleTapAt(hit.pt);
+    const rt = body.querySelector("rt");
+    // The reading is a real <rt> the browser lays out over the name, and none of
+    // the markup that produced it is left anywhere on screen.
+    add("en-ruby/the-sheet-renders-a-reading-rather-than-its-markup",
+        Sheet.isOpen() && !!rt && !raw.test(body.textContent),
+        { open: Sheet.isOpen(), rt: rt && rt.textContent,
+          body: body.textContent.slice(0, 60) });
+
+    // What the panel says out loud is the sentence with the readings taken back
+    // out: 梓, never ｜梓《あずさ》 and never 梓あずさ. Read off #live, the live
+    // region Chrome.announce writes, so this is the string a screen reader gets
+    // and not a restatement of how it was built.
+    const want = parsed(hit.s.dataset.en);
+    for (const n of want.querySelectorAll("rt, rp")) n.remove();
+    const said = document.getElementById("live").textContent;
+    add("en-ruby/the-panel-speaks-the-name-without-its-reading",
+        said === want.textContent && !raw.test(said) && !said.includes(rt.textContent),
+        { said: said.slice(0, 60), want: want.textContent.slice(0, 60) });
     return out;
   }
 
@@ -1711,7 +1781,7 @@ window.H = (() => {
     return out;
   }
 
-  return { walk, atoms, paintcache, gestures, sheet, pitch, highlight, selection, marks, snap, binding, invariants, sleep,
+  return { walk, atoms, paintcache, gestures, sheet, enRuby, pitch, highlight, selection, marks, snap, binding, invariants, sleep,
            setPrefs: (p) => { Prefs.setAll(p); }, flush: () => Store.flush() };
 })();
 1
@@ -3106,6 +3176,22 @@ def suite_marks(br, rep, base):
                  "position": m.get("emPos")})
 
 
+def suite_en_ruby(br, rep, base):
+    """The one story whose translations annotate the names they use.
+
+    Its 70 ｜漢字《かな》 English lines are the whole reason the panel renders HTML
+    at all, and no other story reaches that path — so this runs where the fixture
+    is rather than folding into suite_behaviour, which reads 時計の音.
+    """
+    slug = "ikanakatta-hito-no-chizu"
+    br.emulate(*PHONE[1:])
+    br.goto(f"{base}/{slug}.html")
+    br.eval(LIB)
+    apply_prefs(br, "vertical", False, 28)
+    for row in br.eval("H.enRuby()", await_promise=True):
+        rep.add("en-ruby", row["name"].split("/", 1)[1], row["ok"], row["detail"])
+
+
 def suite_persistence(br, rep, base):
     br.emulate(*PHONE[1:])
     a, b = "tokei-no-oto", "maigo-no-tegami"
@@ -3241,6 +3327,8 @@ def main():
             suite_pitch_reader(br, rep, base)
             print("\n===== 傍点 vs ruby =====")
             suite_marks(br, rep, base)
+            print("\n===== ふりがな in a translation =====")
+            suite_en_ruby(br, rep, base)
             print("\n===== persistence =====")
             suite_persistence(br, rep, base)
             print("\n===== degradation =====")

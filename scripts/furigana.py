@@ -15,14 +15,14 @@ MARKUP = re.compile(
 )
 
 
-def _pair(m):
+def pair(m):
     """(surface, reading) from either alternative of MARKUP."""
     return (m.group(1) or m.group(3), m.group(2) or m.group(4))
 
 
 def strip(text):
     """Markup removed, leaving the bare text a parser should see."""
-    return MARKUP.sub(lambda m: _pair(m)[0], text)
+    return MARKUP.sub(lambda m: pair(m)[0], text)
 
 
 def parse(line):
@@ -31,7 +31,7 @@ def parse(line):
     for m in MARKUP.finditer(line):
         plain.append(line[last : m.start()])
         pos += m.start() - last
-        surface, reading = _pair(m)
+        surface, reading = pair(m)
         authored[pos] = (surface, reading)
         plain.append(surface)
         pos += len(surface)

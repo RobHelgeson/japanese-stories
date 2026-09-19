@@ -81,7 +81,12 @@ def parse_story(path):
         line = line.strip()
         if line.startswith(">"):
             if current:
-                current[-1]["en"] = line.lstrip("> ").strip()
+                # A translation names Japanese people and places, and it annotates
+                # them with the same ｜漢字《かな》 the story uses — Rob reads kana,
+                # not romaji. So it ships as HTML, exactly as the afterword does,
+                # and by the same escaper: the reader renders it and never sees
+                # the markup. The plain form for speech is recovered at the panel.
+                current[-1]["en"] = indexmd.ruby_html(line.lstrip("> ").strip())
             continue
         if line:
             ja, authored = strip_ruby(line)
