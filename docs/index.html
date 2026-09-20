@@ -607,7 +607,7 @@ main { counter-reset: story; }
     <header>
       <h1>物語</h1>
       <span class="spacer"></span>
-      <span id="totals">8 編 · 229 ページ · 1107 文 · 既知語彙 6547<span id="readtot"></span></span>
+      <span id="totals">9 編 · 252 ページ · 1204 文 · 既知語彙 6547<span id="readtot"></span></span>
       <button class="btn" id="guide-open" type="button" aria-haspopup="dialog">案内</button>
       <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
     </header>
@@ -764,6 +764,44 @@ main { counter-reset: story; }
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
         <div class="vers"><span>版</span><a class="ver" href="versions/entotsu-no-kemuri.v1.html">v1</a><span class="cur">現行</span></div>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
+    </div>
+    <div class="cell" data-slug="endai-no-shougi" data-pages="23" data-title="縁台の将棋" data-level="3">
+      <a class="card" href="endai-no-shougi.html">
+        <div class="rt">えんだいのしょうぎ</div>
+        <h2>縁台の将棋<span class="lv">Lv3</span></h2>
+        <p class="sum">Two women play shogi on a park bench every Sunday, and the one who keeps losing is not the one who is losing.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false" aria-label="詳細"><span class="dlabel">詳細</span><span class="fin">了</span></button>
+      <div class="meta">
+        <span>23 ページ</span>
+        <span>97 文</span>
+        <span>375 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 過ぎる</span><span class="chip new">新出 対局、将棋、投了、持ち駒、指す、指先、盤、縁台、詰み、頬、駒</span></div>
+      <div class="rate">
+        <span class="stars" role="group" aria-label="評価">
+          <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
+          <button type="button" data-act="star" data-n="2" aria-pressed="false" aria-label="星2つ">★</button>
+          <button type="button" data-act="star" data-n="3" aria-pressed="false" aria-label="星3つ">★</button>
+          <button type="button" data-act="star" data-n="4" aria-pressed="false" aria-label="星4つ">★</button>
+          <button type="button" data-act="star" data-n="5" aria-pressed="false" aria-label="星5つ">★</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" class="notebtn" data-act="note" aria-expanded="false">感想</button>
+      </div>
+      <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
+                placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">

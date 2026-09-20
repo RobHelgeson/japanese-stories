@@ -123,6 +123,35 @@
       }
     },
     {
+      "slug": "endai-no-shougi",
+      "title": "縁台の将棋",
+      "level": 3,
+      "versions": [],
+      "_note": "The first story briefed with a deliberately widened new-word budget, at 2.4x the derived rate, and the first with no death in it. Both came out of the 2026-09-19 second blind read: six evaluators named circumlocution-around-the-obligatory-noun as the corpus's clearest tell, and the reader's own ★2 on 煙突の煙 said 'another story about a dead person, derivative of the watch story'. The extra budget is spent entirely on the board, because the people could already be written — 座る, 隣, 向かい, 膝, 髪, 耳, 息, 手袋 are all known, so nothing in the relationship needed a new word.",
+      "_premise": "Two women meet every Sunday over a shogi board on a park bench. The younger, the narrator, wins almost every week, because Hiroko resigns around the fortieth move. Hiroko is in fact much the stronger player and has been resigning from winning positions for a year: a game she wins is a game that ends, and the narrator would go home. the narrator, meanwhile, has been studying alone every night for the same reason, to make the games last. Her studying is what exposes it. Beats, each joined by だから or しかし: (1) the Sunday ritual, the bench, the pieces going down / (2) PLANT: Hiroko resigns on move forty and the narrator does not understand how she won / (3) the narrator buys a book so the next game will last longer / (4) weeks pass, the games run to seventy moves, the resignation still arrives / (5) the narrator starts watching Hiroko's fingertips instead of the board, and the pause does not look like losing / (6) a cold Sunday, gloves off, red cheeks, the closest they come to saying anything / (7) the narrator gives check for the first time and Hiroko resigns early / (8) TURN: the narrator rebuilds the abandoned position from Hiroko's side and finds mate in two / (9) a year of Sundays reorganises itself; both of them had been playing to keep the other there / (10) the next Sunday Hiroko moves first, plays it out, wins, and asks for a second game for the first time.",
+      "brief": {
+        "pages": 25,
+        "register": "quiet-realism",
+        "new_words": 12,
+        "leech_seeds": 8
+      },
+      "_new_words": "Twelve, against a derived five. Held at twelve rather than higher because every declared word must reach min_occurrences, and 駒台 and 盤面 would have had to be reached for — the documented failure. Each of these is either the subject matter or load-bearing for the turn.",
+      "new_words": {
+        "将棋": "shogi — the subject; framed p1 by being played rather than described, 日曜日の午後、私はそこで将棋を指す",
+        "駒": "piece — framed p2 by being set out and making a sound, never explained. The story's highest-frequency new word",
+        "盤": "board — framed p2 by Hiroko sitting across it. Carries the last beat, where half of it falls into shadow",
+        "指す": "to play a move — the verb the domain takes rather than する or やる, framed p1 in the opening sentence of the ritual",
+        "対局": "a game, as a unit — framed p2 as the thing that begins once the pieces are out. Needed because the story counts games across a year",
+        "縁台": "the wooden bench — framed p1 by being the place, and it is where every scene happens. Title word",
+        "持ち駒": "pieces in hand — framed p11 by being counted during the reconstruction, which is the mechanism of the turn, and again p18 as they dwindle",
+        "王手": "check — framed p10 by the narrator giving it for the first time, which is what triggers the early resignation. Returns at p20 against her",
+        "詰み": "mate — framed p5 as the thing the book is teaching her, どうやって作られるのか, and it is what she finds on the abandoned board",
+        "投了": "resignation — framed p3 by Hiroko doing it, and it is the story's plant. Recurs as the weekly ritual and stops recurring at the end, which is the payoff",
+        "指先": "fingertips — framed p7 by the narrator watching them instead of the board. The crush made physical, and the tell that the pause is a choice",
+        "頬": "cheek — framed p8 by being red in December. Returns at the end still red, when it is not the cold"
+      }
+    },
+    {
       "slug": "neko-o-sagasu-tantei",
       "title": "猫を探す探偵",
       "level": 4,
