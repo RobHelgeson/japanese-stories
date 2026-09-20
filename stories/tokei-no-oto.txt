@@ -51,8 +51,8 @@
 
 机の引き出しの奥に、他とは違う箱があった。
 > At the back of the desk drawer was a box unlike the others.
-部品ではなく、蓋がしてある。
-> Not parts. It had a lid.
+部品の箱と違って、蓋がしてあった。
+> Unlike the boxes of parts, this one had a lid.
 開けてみると、｜中《なか》には時計が一つだけ入っていた。
 > When I opened it, inside was a single watch.
 部品に分けられていない、完成した時計だ。
@@ -113,8 +113,8 @@
 > By morning the watch had stopped again.
 針はやはり三時十分だ。
 > The hands stood at ten past three, as before.
-夜の間に何時間も動いたのに、針は一つも進んでいない。
-> It had run for hours in the night, and not one hand had advanced.
+夜の間に何時間も動いたのに、針は少しも進んでいない。
+> It had run for hours in the night, and the hands had not advanced at all.
 時計としては、おかしい。
 > For a watch, that makes no sense.
 
@@ -158,7 +158,7 @@
 > Back home, I went through the box again.
 底に薄い紙が敷いてある。
 > A thin sheet of paper was laid across the bottom.
-｜下《した》から、折られた手紙が出てきた。
+｜下《した》から、折った手紙が出てきた。
 > From underneath came a folded letter.
 祖父の字だった。
 > It was my grandfather's handwriting.
