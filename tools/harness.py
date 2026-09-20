@@ -2709,9 +2709,18 @@ def suite_table(br, rep, base):
     # pages (48->44) and two more screens' worth of over-explanation on top.
     # 迷子の手紙, 時計の音 and 廊下の鏡 re-measured to their recorded values
     # unchanged, which is the evidence that the measurement itself is stable.
+    #
+    # 縁台の将棋 (23) and 三番の乾燥機 (37) recorded 2026-09-19, both first
+    # measurements. 縁台の将棋 shipped in 1dbc8b7 without a row, so the
+    # corpus-coverage assertion below was already failing before 三番の乾燥機
+    # was written; the two were recorded together off one harness run.
+    # 三番の乾燥機 is 34 authored pages against 37 text screens, so three pages
+    # take two screens each at 28px — tight=0 and worst-overflow=0px, meaning
+    # nothing overflows, they simply fill.
     expect = {"shuden": 27, "neko-o-sagasu-tantei": 30, "maigo-no-tegami": 18,
               "tokei-no-oto": 25, "shiro-no-kane": 42, "entotsu-no-kemuri": 28,
-              "ikanakatta-hito-no-chizu": 49, "rouka-no-kagami": 25}
+              "ikanakatta-hito-no-chizu": 49, "rouka-no-kagami": 25,
+              "endai-no-shougi": 23, "sanban-no-kansouki": 37}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")

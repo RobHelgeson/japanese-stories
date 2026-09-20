@@ -607,7 +607,7 @@ main { counter-reset: story; }
     <header>
       <h1>物語</h1>
       <span class="spacer"></span>
-      <span id="totals">9 編 · 252 ページ · 1204 文 · 既知語彙 6547<span id="readtot"></span></span>
+      <span id="totals">10 編 · 286 ページ · 1366 文 · 既知語彙 6547<span id="readtot"></span></span>
       <button class="btn" id="guide-open" type="button" aria-haspopup="dialog">案内</button>
       <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
     </header>
@@ -789,6 +789,44 @@ main { counter-reset: story; }
         <span>375 漢字語</span>
       </div>
       <div class="chips"><span class="chip weak">苦手 過ぎる</span><span class="chip new">新出 対局、将棋、投了、持ち駒、指す、指先、盤、縁台、詰み、頬、駒</span></div>
+      <div class="rate">
+        <span class="stars" role="group" aria-label="評価">
+          <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
+          <button type="button" data-act="star" data-n="2" aria-pressed="false" aria-label="星2つ">★</button>
+          <button type="button" data-act="star" data-n="3" aria-pressed="false" aria-label="星3つ">★</button>
+          <button type="button" data-act="star" data-n="4" aria-pressed="false" aria-label="星4つ">★</button>
+          <button type="button" data-act="star" data-n="5" aria-pressed="false" aria-label="星5つ">★</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" class="notebtn" data-act="note" aria-expanded="false">感想</button>
+      </div>
+      <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
+                placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
+    </div>
+    <div class="cell" data-slug="sanban-no-kansouki" data-pages="34" data-title="三番の乾燥機" data-level="3">
+      <a class="card" href="sanban-no-kansouki.html">
+        <div class="rt">さんばんのかんそうき</div>
+        <h2>三番の乾燥機<span class="lv">Lv3</span></h2>
+        <p class="sum">A man tells the owner of the all-night coin laundry that one of the dryers is broken, and the following week the woman who always sits under the heater is finished and gone in thirty minutes.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false" aria-label="詳細"><span class="dlabel">詳細</span><span class="fin">了</span></button>
+      <div class="meta">
+        <span>34 ページ</span>
+        <span>162 文</span>
+        <span>630 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 中身、修理、後、普段、状態、用意、経つ、職場、足りる、返事、通勤、連絡、遅れる、過ぎる、遠慮</span><span class="chip new">新出 乾燥機、商店街、小銭、明かり、洗濯物、温まる、無人、生乾き、貼り紙</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
