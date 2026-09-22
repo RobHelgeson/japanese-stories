@@ -4,7 +4,7 @@ Write a story the reader can read without a dictionary, at a declared difficulty
 
 Everything below is enforced or measured by the scripts in `scripts/`. Run them; do not eyeball.
 
-**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written. Only then draft — and the draft runs the other way round, in Japanese, a page at a time, with the English written last. See § Drafting.
+**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written — and it is built backward, from the climax. Only then draft — and the draft runs the other way round, in Japanese, a page at a time, with the English written last. See § Drafting.
 
 ## Before writing
 
@@ -60,24 +60,72 @@ With no topic given, propose two or three domains the corpus has not used. The s
 Before any Japanese exists, write and stop on:
 
 ```
-PREMISE   two or three sentences
+CLIMAX    one scene. Specific, unexpected, and emotionally messy
 AFTERWORD full spoiler, in English — what the story is actually doing
-BEATS     6-10, each joined to the next by だから or しかし
+PREMISE   two or three sentences
+WANT      the external goal — tangible, visible, sayable in one clause
+NEED      the internal one — the wound or the flaw the want is hiding
+SHAPE     three-act (default), two-act, or five-act
+BEATS     6-10, built backward from the climax, act boundaries marked,
+          each resolving as a yes-but or a no-and
 ```
 
-**Write the afterword first.** It used to be written last, as a patch for the removed theme statement. Inverted, it is the design document: if you cannot write the afterword before drafting, you do not have a story yet, you have a situation. It already has a canonical home — the `## Afterwords` section of `stories/stories-index.md` — so writing it first means writing it where it will live.
+**The order of that list is itself the rule.** Every line above is produced against the lines above it, and the sheet is worth nothing produced in any other order — a climax chosen after the beats is the climax the beats were already heading for.
 
-Record the premise and beats as `_premise` on the `corpus.json` entry, alongside the existing `_feature` and `_note` prose keys.
+**Write the climax first, and do not write the obvious one.** A story composed front to back arrives at the ending it was always going to arrive at, because each beat is chosen to follow the one before it and the last one has nowhere else to go. So write the final scene before anything else exists: a specific scene rather than a representative one, with something in it nobody would have predicted from the premise, and a cost the character actually pays. Then build every earlier beat backward from it, planting what that particular climax needs in order to land as earned rather than arranged.
+
+The September 2026 audit is the evidence. Six of eight stories ended by stating their own meaning, and in every case the evaluator named an earlier line as the real ending, unprompted — 網棚は、最後まで空いたままだった, 私は止めなかった, 部品の箱の隣ではなく、机の上に置いた。 Those endings were not chosen. They were arrived at, found thin, and then explained, which is what the closing thesis sentence in § Writing rules always is.
+
+**The afterword is still written before drafting; it is now written second.** It used to be written last, as a patch for the removed theme statement, and inverting it made it the design document. The climax takes that job now, which changes what the afterword is rather than when it happens: it is a reading of a scene that already exists rather than a statement of intent, and that is a better test, because an afterword you cannot write off your own climax means the climax is not carrying anything. Everything else stands. If you cannot write it before drafting you have a situation and not a story, and it has a canonical home — the `## Afterwords` section of `stories/stories-index.md` — so writing it early means writing it where it will live.
+
+**Want and need are two tracks, and the second is what makes the first cost something.** The want is the external goal: win the tournament, find the cat, finish the bell. It is visible, the character can say it out loud, and on its own it produces the straight line — wants X, does Y, gets X. The need is the internal one: the wound, the flaw, or the thing about themselves they have not admitted. Write both before the beats, and bind them with the rule that makes them a story rather than two lists: **the character cannot have the want until they face the need**, and most often they give up the want in order to get it.
+
+This is the machinery behind § Craft's "one turn, and the reader can point at it". The turn is the sentence where the need is faced, and the want is what it costs. The old rule said a change happens somewhere; it never said the change was internal, and it never said anything was surrendered for it.
+
+**Declare the shape.** Three are documented below. Three-act is the default and the others are chosen deliberately, per story, at this gate — not derived from the topic, the level, or the page count, and not a parameter of Gate 1. Name the shape on the sheet and mark the act boundaries on the beats, because an undeclared shape is indistinguishable from no shape.
+
+**Every beat resolves as a yes-but or a no-and.** See § Craft, first rule. The beats are where that rule is enforced, and a sheet where it holds nowhere is the thing to send back.
+
+### The three shapes
+
+Beat counts are given as fractions of the sheet, not as numbers, because the sheet runs 6-10 and a fixed allocation would only be right at one length.
+
+**Three-act — the default.** Setup, confrontation, resolution, with the twist in the third and its seeds in the first.
+
+- **Act I, the first quarter.** The want is established and visible; the need is present and unnamed. The veiled setup goes here. A veiled plant reads at the time as something else — a habit, a piece of scenery, an offhand line — and only becomes a plant in retrospect. This is the shape to work hardest at, because a plant the reader files as a plant has already given the twist away.
+- **Act II, the middle half.** The want is pursued and the pursuit costs. Each beat turns against the character. The need surfaces here, in what the pursuit keeps breaking, and is still not stated.
+- **Act III, the last quarter.** The climax, which is where the Act I plants pay off and where the need is faced. The want is surrendered, transformed, or won in a form the character no longer wanted.
+
+**Two-act.** Setup and rising action, then climax and resolution.
+
+- **Act I, the first half.** Want established, need buried, pressure applied. There is no separate exposition beat; the want and the world arrive together in the first beat.
+- **Act II, the second half.** The climax and everything after it. Because the break lands mid-sheet, the second half carries the whole descent as well as the turn, which makes this the shape with the most room after the climax — useful when the story is about the consequence rather than the reversal.
+- Plant and pay off still applies and has less distance to work with. Plants go in the first two beats or they are not veiled, they are recent.
+
+**Five-act.** Exposition, rising action, climax, falling action, catastrophe or resolution.
+
+- **Acts I-II, the first two fifths.** Exposition, then rising action. The one shape that gives exposition a beat of its own.
+- **Act III, the middle fifth.** The climax, structurally centred rather than at the end. Everything after it is consequence.
+- **Acts IV-V, the last two fifths.** Falling action, then the resolution or the catastrophe. This is what five acts buy and it is the reason to choose the shape: two full acts in which the climax's damage plays out.
+- **It needs the top of the beat range.** At six beats, five acts is roughly one beat each and the falling action gets a single line, which is the half of the shape worth having. Take this one at nine or ten beats or take a different one.
+
+Whichever shape is declared, it is a shape to build toward and not a form to fill. A beat that exists because the act diagram has a slot there is worse than an act boundary in a slightly wrong place.
+
+Record the whole sheet — climax, afterword reference, premise, want, need, shape, and beats — as `_premise` on the `corpus.json` entry, alongside the existing `_feature` and `_note` prose keys. It is a prose key and nothing parses it; write it as the sheet, not as a schema.
+
+**The gate is bigger than it was, and that is deliberate.** The old sheet was three lines and could be approved at a glance. This one has a climax, two tracks, a declared shape, and a filter applied to every beat, and it takes a real reading. That is the cost of the enforcement mechanism: no script checks any of this, none should try (§ Metrics are floors, not targets), and the entire weight of six craft techniques rests on someone reading the sheet and sending it back. A skimmed Gate 2 enforces nothing.
 
 ## Craft
 
 The rules below are what to do. The prohibitions further down are what not to do. Both matter; only one of them used to be written here.
 
-- **Causality, not sequence.** Between consecutive beats you must be able to put だから or しかし. If the only honest connective is そして or それから, it is a list of events and not yet a story. That is what the beat sheet is testing.
-- **One turn, and the reader can point at it.** Something is different at the end than at the beginning, and there is a specific sentence where it changed. ｜城《しろ》の｜鐘《かね》 states its distinction exactly once, in dialogue, on page 11.
-- **Plant and pay off.** ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》 plants the boxes clue on page 7 and does not recall it until page 20.
+- **Friction, not sequence.** Every beat resolves as a **yes, but** or a **no, and** — the character gets what the beat was for and it creates a new problem, or they fail and the situation worsens with it. A beat that simply succeeds is not a beat. The connective is how you check it: write the honest join to the next beat, and そして or それから means you have a list of events rather than a story, while だから or しかし means you have causality. **Causality is the floor, not the test.** An all-だから sheet joins perfectly and is still a character getting what they want in the order they wanted it, which is the straight line this rule exists to break. This is what the beat sheet is testing, and the old wording tested only the floor.
+- **One turn, and the reader can point at it.** Something is different at the end than at the beginning, and there is a specific sentence where it changed. ｜城《しろ》の｜鐘《かね》 states its distinction exactly once, in dialogue, on page 11. The turn is where the need is faced and the want is paid — see § Gate 2, want and need. A turn in the external situation alone is an event, not a turn.
+- **Plant and pay off, and veil the plant.** ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》 plants the boxes clue on page 7 and does not recall it until page 20. What that example does not yet do is hide it: a plant the reader files as a plant has spent the twist in advance. Plant it as a habit, a piece of scenery, or a line said for some other reason, so that it is doing visible work of its own at the time and a second job at the climax. This is structural under the three-act default, where the plants live in Act I and pay off in Act III.
 - **Concrete before abstract.** An abstract noun has to be earned by a physical detail that came first. This serves the vocabulary constraint too: concrete nouns are what the known set is richest in.
 - **Withhold, never confuse.** The reader sees one sentence at a time and the inference chains run thirty-plus sentences. Information must stay retrievable — plant it concretely, and never ask the reader to hold an ambiguity across pages.
+- **Write from inside the culture, not from English with Japanese words.** The story has to be one a Japanese reader recognises as theirs, not an American story rendered into Japanese. This is the corpus's named defect and the audit found it at three depths. **Speech:** an eighty-year-old craftsman, a schoolboy, a knight captain and a middle-aged detective all spoke identical neutral textbook Japanese — no ｜役割語《やくわりご》 anywhere, 私 where a novel gives the dying master わし, no 〜ぞ / 〜な / 〜さ on any male character. Also あなた as a second-person address where Japanese uses the surname or nothing, and おばあさん used inside a family where it is おばあちゃん. **Fact:** a 定期券 carrying a company name, which is the 社員証; one 桶 left inverted as the anomaly, when inverted is how they are stored; 閉店 for a 銭湯 closing, which is 廃業; a conductor checking tickets on a 通勤 train; ten-day domestic mail, which is four at the outside; 部屋 and 表札 and a neighbour's garden in one dwelling. **Absence:** a story about a grandson clearing his grandfather's house containing no 遺品整理, no 形見, no ｜四十九日《しじゅうくにち》 — 形見 is the word for the watch. And season used only as a section marker, never as a subject, in a tradition that organises prose of this length by it. The corpus proves it can do this, so it is a process defect and not a capability one: ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 gives four speakers four voices — 祖父 わし, 甚平 〜ん / 〜とな, 千代 わたし, 蓮 です・ます — and its 山は紙に入らん was named the single most Japanese line in the corpus. Check the era of every name against every other, and check any institution, object or procedure the story leans on before it becomes the story's centre. Nothing in the validation stack sees any of this.
+- **Nobody says what they mean.** On-the-nose dialogue — a character stating what they feel, or answering the emotional question they were asked — is the default and has to be written against. Three constraints, applied per scene: **a secret**, one piece of information each character in the scene is actively keeping from the others; **misdirection**, no direct answer to a direct emotional question, so they change the subject, deflect into a physical action, or say something beside the point; and **conflicting agendas**, a different micro-goal per character, so one wants an answer and the other wants to leave the room. The vocabulary constraint bites unevenly here and picks the technique for you. Deflection into action and changing the subject cost nothing — a hand moved, a cup set down, a question about the weather are all inside the known set. Sarcasm and irony need range that set may not hold; check with `have.py` before building a scene on one. The corpus already has the good version: 「静かにしろ。音が聞こえない」 is a command with a reason and no softening, and 「この鏡は動かさないでください」 is a woman asking her own family with ください, which is neither an order nor a plea and says the whole power gradient without naming it.
 
 ### Register
 
@@ -144,7 +192,7 @@ The mechanism is tense. Past-tense share across the corpus runs 62–90% against
 
 Three of the eight — ｜時計《とけい》の｜音《おと》, ｜迷子《まいご》の｜手紙《てがみ》, ｜終電《しゅうでん》 — sit inside the authentic band on both figures. This is drift, not a floor the language imposes, which is why the fix is an order of operations and not a number.
 
-**Gate 2 does not move.** The beat sheet stays in English. What it tests is whether a story exists at all, English tests that perfectly well, and the beat sheets are the best artifact this repo has produced. Nothing above touches them. What is inverted is only the sentence-level drafting that comes after the gate.
+**Gate 2 does not move.** The beat sheet stays in English. What it tests is whether a story exists at all, English tests that perfectly well, and the beat sheets are the best artifact this repo has produced. Nothing above touches them — the September 2026 craft revision enlarged what Gate 2 produces, and it left the language it is produced in exactly where it was. What is inverted is only the sentence-level drafting that comes after the gate.
 
 One consequence worth naming: the `>` lines stop being the thing the story was written in and become a translation of it. That is why § The English has to stand alone now sits in § The revision pass rather than up here — checking derived English is a check, and checking the English a story was planned in was mostly a restatement of the plan.
 
@@ -287,7 +335,7 @@ To work on the reader UI rather than a story, `python3 build.py <story> --split 
 Four places. Miss one and the corpus is inconsistent in a way only some of them report:
 
 1. `stories/<slug>.txt` — the story
-2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise`, `new_words`, in reading order
+2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `new_words`, in reading order
 3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
 
