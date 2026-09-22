@@ -2720,7 +2720,8 @@ def suite_table(br, rep, base):
     expect = {"shuden": 27, "neko-o-sagasu-tantei": 30, "maigo-no-tegami": 18,
               "tokei-no-oto": 25, "shiro-no-kane": 42, "entotsu-no-kemuri": 28,
               "ikanakatta-hito-no-chizu": 49, "rouka-no-kagami": 25,
-              "endai-no-shougi": 23, "sanban-no-kansouki": 37}
+              "endai-no-shougi": 23, "sanban-no-kansouki": 37,
+              "juugonichi-no-shichifuda": 30}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
