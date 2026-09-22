@@ -49,6 +49,7 @@ def resolve(args):
     level = take("level", args.level, D["level"])
     pages = take("pages", args.pages, D["pages"])
     register = take("register", args.register, D["register"])
+    page_slack = take("page_slack", args.page_slack, None)
     tokens = pages * D["tokens_per_page"]
 
     def rate(name, given, per100):
@@ -75,6 +76,7 @@ def resolve(args):
     return {
         "level": level,
         "pages": pages,
+        "page_slack": page_slack,
         "tokens": tokens,
         "register": register,
         "new_words": new_words,
@@ -92,6 +94,8 @@ def validate(b):
     bad = []
     if str(b["level"]) not in LEVELS:
         bad.append(f"level {b['level']} is not a rung ({LEVELS[0]}-{LEVELS[-1]})")
+    if b["page_slack"] is not None and b["page_slack"] < 0:
+        bad.append(f"page slack {b['page_slack']} is negative; it is a ± width in pages")
     if b["register"] not in REGISTERS:
         bad.append(f"register '{b['register']}' unknown; have {', '.join(REGISTERS)}")
     unknown = [c for c in b["grammar_focus"] if c not in stats.GRAMMAR_PATTERNS]
@@ -111,14 +115,13 @@ def leech_pool():
 
 
 def show(b, src):
-    tol = D["page_tolerance"]
-    lo, hi = round(b["pages"] * (1 - tol)), round(b["pages"] * (1 + tol))
+    lo, hi, tol_label = stats.page_bounds(b["pages"], b["page_slack"])
     pool = leech_pool()
     spec = CORPUS["levels"][str(b["level"])]
 
     rows = [
         ("level", b["level"], src["level"], spec["name"]),
-        ("pages", f"{b['pages']} ±{tol:.0%}", src["pages"], f"{lo}-{hi} pages"),
+        ("pages", f"{b['pages']} ±{tol_label}", src["pages"], f"{lo}-{hi} pages"),
         ("tokens", f"~{b['tokens']}", "derived", f"{b['pages']} × {D['tokens_per_page']}"),
         ("register", b["register"], src["register"],
          CORPUS["registers"][b["register"]].split(":")[0]),
@@ -151,6 +154,8 @@ def block(b):
     """The `brief` object for the story's corpus.json entry."""
     out = {"pages": b["pages"], "register": b["register"], "new_words": b["new_words"],
            "leech_seeds": b["leech_seeds"]}
+    if b["page_slack"] is not None:
+        out["page_slack"] = b["page_slack"]
     if b["grammar_focus"]:
         out["grammar_focus"] = b["grammar_focus"]
     if b["dialogue"]:
@@ -163,6 +168,8 @@ def main():
     ap.add_argument("--level", type=int)
     ap.add_argument("--pages", type=int)
     ap.add_argument("--register")
+    ap.add_argument("--page-slack", type=int, dest="page_slack",
+                    help="allow ±N pages instead of the default ±page_tolerance")
     ap.add_argument("--new-words", type=int, dest="new_words")
     ap.add_argument("--leech-seeds", type=int, dest="leech_seeds")
     ap.add_argument("--repeats", type=float, help="repeated-word share floor, 0-1")

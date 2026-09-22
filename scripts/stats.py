@@ -385,6 +385,19 @@ def budgets(tokens):
     }
 
 
+def page_bounds(pages, slack=None):
+    """The briefed page range, and the label the tables print for it.
+
+    `slack` is absolute pages and wins when a brief carries one. Without it the
+    range is the global `page_tolerance` fraction, which is what every brief
+    written before this existed was checked against.
+    """
+    if slack is not None:
+        return max(1, pages - slack), pages + slack, f"{slack} pages"
+    tol = CORPUS["defaults"]["page_tolerance"]
+    return round(pages * (1 - tol)), round(pages * (1 + tol)), f"{tol:.0%}"
+
+
 def check_brief(a, story):
     """Unmet parts of what this story was briefed to be.
 
@@ -398,8 +411,7 @@ def check_brief(a, story):
 
     if brief.get("pages"):
         want = brief["pages"]
-        tol = CORPUS["defaults"]["page_tolerance"]
-        lo, hi = round(want * (1 - tol)), round(want * (1 + tol))
+        lo, hi, _ = page_bounds(want, brief.get("page_slack"))
         if not lo <= a["pages"] <= hi:
             off = 100 * (a["pages"] - want) / want
             fails.append(f"{a['pages']} pages, briefed {want} ({lo}-{hi}), {off:+.0f}%")

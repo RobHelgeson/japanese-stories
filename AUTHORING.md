@@ -27,9 +27,9 @@ Anki must be running (AnkiConnect on `:8765`) and Ichiran must be reachable at `
 ## Gate 1 — the brief
 
 ```bash
-python3 brief.py [--level N] [--pages N] [--register R] [--new-words N]
-                 [--leech-seeds N] [--repeats F] [--grammar-focus a,b]
-                 [--dialogue PCT[,untagged]] [--topic "..."]
+python3 brief.py [--level N] [--pages N] [--page-slack N] [--register R]
+                 [--new-words N] [--leech-seeds N] [--repeats F]
+                 [--grammar-focus a,b] [--dialogue PCT[,untagged]] [--topic "..."]
 ```
 
 Print the table, **then stop and ask.** Do not draft until the brief is confirmed.
@@ -38,6 +38,7 @@ Print the table, **then stop and ask.** Do not draft until the brief is confirme
 | --------------- | ------------------------ | ------------------------------------------------- |
 | `level`         | 3 — N3 voice             | `stats.py` level ladder                           |
 | `pages`         | 25, ±10%                 | `stats.py` brief check                            |
+| `page_slack`    | none — `page_tolerance`  | `stats.py` brief check — ±N pages, absolute       |
 | `topic`         | none — propose 2-3       | Gate 2                                            |
 | `register`      | `quiet-realism`          | Gate 2                                            |
 | `new_words`     | 1.0 per 100 tokens       | `stats.py` brief check                            |
@@ -46,6 +47,8 @@ Print the table, **then stop and ask.** Do not draft until the brief is confirme
 | `grammar_focus` | none                     | `stats.py` brief check — all must be present      |
 | `dialogue`      | unconstrained            | `stats.py` brief check — ±10, untagged means ≥90% |
 | `mode`          | `new`                    | see Modes                                         |
+
+**`page_slack` widens the page check for one story, in pages rather than as a percentage.** Without it the range is `page_tolerance`, the global 10%. It is there because some shapes cannot be briefed to a length honestly — a story built backward from a climax does not know how many pages the descent needs until the beats exist. Set it at Gate 1, where it is on the record, and say why. Note what it costs: `--page-slack 10` on a 25-page brief accepts 15 to 35, which is ±40%, and both of the overruns that made the brief worth persisting at all — ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》 at 24% and ｜城《しろ》の｜鐘《かね》 at 14% — would have passed it. A slack wide enough to swallow the failure the check exists to catch is not a check. Use the default unless the brief has a reason.
 
 Every parameter has a default, so a bare invocation is a complete brief. Defaults live in `corpus.json`'s `defaults` block, not here — a default nothing reads is a suggestion. `grammar_focus` names must be keys of `GRAMMAR_PATTERNS` in `stats.py`; `brief.py` rejects the rest.
 
