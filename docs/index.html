@@ -182,6 +182,9 @@ main { counter-reset: story; }
 }
 .chip.weak { color: var(--weak); border-color: color-mix(in srgb, var(--weak) 40%, transparent); }
 .chip.new { color: var(--new); border-color: color-mix(in srgb, var(--new) 40%, transparent); }
+/* Neutral on purpose: a peek is not a mark the reader draws, so it
+   borrows neither mark's hue. */
+.chip.peek { color: var(--muted); }
 
 /* The level was the one column of the deleted Reading Order table that
    nothing else showed. */
@@ -1140,9 +1143,15 @@ main { counter-reset: story; }
 
   var read = function () { return S ? S.local() : slot("progress"); };
   var readR = function () { return S ? S.reviews() : slot("reviews"); };
+  var readP = function () { return S ? S.peeks() : slot("peeks"); };
 
   var put = function (key, map) {
-    if (S) { if (key === "progress") S.saveLocal(map); else S.saveReviews(map); return; }
+    if (S) {
+      if (key === "progress") S.saveLocal(map);
+      else if (key === "peeks") S.savePeeks(map);
+      else S.saveReviews(map);
+      return;
+    }
     try { localStorage.setItem("japanese-stories:" + key, JSON.stringify(map)); } catch (e) {}
   };
 
@@ -1153,7 +1162,7 @@ main { counter-reset: story; }
   var pushNow = function () {
     if (flush) { clearTimeout(flush); flush = null; }
     if (!S) return;
-    S.push().then(function (r) { paint(r.map); paintR(r.reviews); });
+    S.push().then(function (r) { paint(r.map); paintR(r.reviews); paintP(readP()); });
   };
   var pushSoon = function () {
     if (!S) return;
@@ -1307,6 +1316,52 @@ main { counter-reset: story; }
       if (btn) btn.classList.toggle("has", !!note);
     }
     autoOpen(null, all);
+  }
+
+  // The words whose reading was asked for in each story, summed across
+  // devices, most-asked first. Behind 詳細 with the 苦手 and 新出 chips,
+  // because it is the same kind of fact: which words in this story are
+  // not yet yours. Eight is what fits on a phone row without wrapping
+  // twice; peeks.py has the rest.
+  var PEEK_SHOWN = 8;
+
+  function tally(story) {
+    var sum = {};
+    if (!story || typeof story !== "object") return sum;
+    for (var dev in story) {
+      if (!Object.prototype.hasOwnProperty.call(story, dev)) continue;
+      var w = story[dev] && story[dev].w;
+      if (!w || typeof w !== "object") continue;
+      for (var k in w) {
+        if (!Object.prototype.hasOwnProperty.call(w, k) || !w[k]) continue;
+        var n = (Number(w[k].r) || 0) + (Number(w[k].m) || 0);
+        if (n > 0) sum[k] = (sum[k] || 0) + n;
+      }
+    }
+    return sum;
+  }
+
+  function paintP(all) {
+    if (!all || typeof all !== "object") all = {};
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      var box = cell.querySelector(".chips");
+      if (!box) continue;
+      var sum = tally(all[cell.dataset.slug]);
+      var keys = Object.keys(sum).sort(function (a, b) { return sum[b] - sum[a] || (a < b ? -1 : 1); });
+      var chip = box.querySelector(".chip.peek");
+      if (!keys.length) { if (chip) chip.remove(); continue; }
+      if (!chip) {
+        chip = document.createElement("span");
+        chip.className = "chip peek";
+        box.appendChild(chip);
+      }
+      var shown = keys.slice(0, PEEK_SHOWN).map(function (k) {
+        return sum[k] > 1 ? k + "×" + sum[k] : k;
+      });
+      chip.textContent = "見た " + shown.join("、") +
+        (keys.length > PEEK_SHOWN ? " ほか" + (keys.length - PEEK_SHOWN) : "");
+    }
   }
 
   // A hand-set review carries `at` for the same reason a hand-set record
@@ -1492,6 +1547,7 @@ main { counter-reset: story; }
 
   paint(read());
   paintR(readR());
+  paintP(readP());
 
   // ------------------------------------------------------------ sync --
   if (!S) return;
@@ -1531,6 +1587,7 @@ main { counter-reset: story; }
       $("tok").value = "";
       paint((r && r.map) || read());
       paintR((r && r.reviews) || readR());
+      paintP(readP());
     }, function () { $("tok").value = ""; });
   });
 
@@ -1541,7 +1598,8 @@ main { counter-reset: story; }
     // The envelope the gist holds, so an export and the store read the
     // same. A bare progress map still imports, for anything exported
     // before reviews existed.
-    box.value = JSON.stringify({ v: 1, progress: read(), reviews: readR() }, null, 2);
+    box.value = JSON.stringify(
+      { v: 1, progress: read(), reviews: readR(), peeks: readP() }, null, 2);
     box.focus();
     box.select();
     if (navigator.clipboard) navigator.clipboard.writeText(box.value).catch(function () {});
@@ -1568,15 +1626,19 @@ main { counter-reset: story; }
       ? (S.plain(incoming.progress) ? incoming.progress : {})
       : incoming;
     var revs = enveloped && S.plain(incoming.reviews) ? incoming.reviews : {};
+    var pks = enveloped && S.plain(incoming.peeks) ? incoming.peeks : {};
     // Written together and pushed once: two saves would each pull, merge
     // and PATCH, and the first PATCH would be a revision saying half of
     // what the paste meant.
     var mergedP = S.merge(read(), prog);
     var mergedR = S.mergeReviews(readR(), revs);
+    var mergedK = S.mergePeeks(readP(), pks);
     put("progress", mergedP);
     put("reviews", mergedR);
+    put("peeks", mergedK);
     paint(mergedP);
     paintR(mergedR);
+    paintP(mergedK);
     pushNow();
     box.hidden = true;
   });
@@ -1611,10 +1673,23 @@ main { counter-reset: story; }
         outR[j] = { stars: 0, note: "", at: now() };
       }
     }
+    // Every device's record, not just this one's: each is replaced whole by
+    // a newer copy of itself, so a dated empty record per device is the
+    // tombstone here too.
+    var allP = readP(), outP = {};
+    for (var sl in allP) {
+      if (!Object.prototype.hasOwnProperty.call(allP, sl) || !S.plain(allP[sl])) continue;
+      outP[sl] = {};
+      for (var dv in allP[sl]) {
+        if (Object.prototype.hasOwnProperty.call(allP[sl], dv)) outP[sl][dv] = { at: now(), w: {} };
+      }
+    }
     put("progress", out);
     put("reviews", outR);
+    put("peeks", outP);
     paint(out);
     paintR(outR);
+    paintP(outP);
     pushNow();
   });
 
@@ -1623,7 +1698,7 @@ main { counter-reset: story; }
     navigator.storage.persist().catch(function () {});
   }
 
-  S.push().then(function (r) { paint(r.map); paintR(r.reviews); });
+  S.push().then(function (r) { paint(r.map); paintR(r.reviews); paintP(readP()); });
 })();
     </script>
   </body>
