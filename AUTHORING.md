@@ -338,7 +338,7 @@ To work on the reader UI rather than a story, `python3 build.py <story> --split 
 Four places. Miss one and the corpus is inconsistent in a way only some of them report:
 
 1. `stories/<slug>.txt` — the story
-2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `new_words`, in reading order
+2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `new_words`, inserted after the last story of its level rather than appended. `stories[]` order is the contents page's order, and the contents page reads in level order.
 3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
 

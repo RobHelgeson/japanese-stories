@@ -184,6 +184,30 @@
       "_mimetics": "Ten, planned into the draft rather than added to it: ぐるぐる on the drum at p7, p30 and the last line, がたがた on the old machine at p8, きょろきょろ on his first night at p4, ぽかぽか and いい匂い on a load out of a dryer that works at p26, はっと at p28, そっと at p26, ばったり at p22. Measured 2026-09-19 the corpus ran 0.34 per 100 narration sentences against an authentic 4.35-33.12; the figure says where to look, not what to hit, and where to look was narration that reports motion where it could depict it. No 三点リーダー: measured Dead, the authentic median is 0.00 and this corpus's zero already is that median."
     },
     {
+      "slug": "juugonichi-no-shichifuda",
+      "title": "十五日の質札",
+      "level": 3,
+      "_feature": "First story in the ghost-story register, and the first written against the September 2026 Gate 2 — climax first, want and need on separate tracks, a declared three-act shape, every beat a yes-but or a no-and. The veiled plant is bookkeeping: the narrator spoils a ticket in the first week and voids it by number, which reads as him being tired and pays off as the only proof the story offers.",
+      "_note": "THE GHOST IS NOT A MOURNED RELATIVE. That guard is written into the register itself because 時計の音 and 煙突の煙 are the same bereavement story twice and were rated two stars both times, the second explicitly as derivative. The woman is a stranger and the weight sits on the narrator's choice, not on her condition. THE TWIST IS NOT THAT SHE IS DEAD — a reader will suspect that by the neighbour scene, and it is meant to be suspected. The turn is the ticket number, and under it the fact that he confessed to someone who was never going to catch him. THE FATHER IS A SOURCE OF A RULE AND NOTHING ELSE: he is named three times, never mourned, and the story does not visit him. YEAR-END IS THE SUBJECT, NOT A MARKER: the 大掃除 is why the storehouse is being cleared and New Year money is why the shop is busy, which is the audit's fifth divergence answered in the premise rather than in the prose. 店を畳む rather than 廃業 or 閉店 — the audit found 閉店 used for a 銭湯 going out of business, and this is the same error class avoided with a word already in the known set.",
+      "_premise": "CLIMAX: he voids her ticket and the number is the one he spoiled and voided himself in the first week, and that voided ticket is still in his drawer, whole. Both exist. He looks up and she is gone. Nobody explains it, including him. AFTERWORD: see stories-index.md. PREMISE: year-end at a small pawnshop; the owner is clearing the storehouse to close the business by New Year, and one customer comes every month to redeem a comb and pawn it again. WANT: empty the storehouse and close the shop by 大晦日. NEED: to admit the shop was never a business in objects — he keeps perfect records of items and none of people, and that is what lets him take the earlier date. He gets the want; it costs him the thing that would have made having it bearable. SHAPE: three-act, I 1-2, II 3-6, III 7-9. BEATS: 1 counts the stock and voids a torn ticket, number 214 (yes-but, veiled plant). 2 she redeems and re-pawns; he tells her the shop closes (no-and). 3 the record runs back past this book in a third hand (yes-but). 4 next door has been shut on the third for twenty years (no-and). 5 the record says the 15th and her ticket the 16th; he takes the 15th (yes-but, the ugly choice). 6 the dealer pays less than she paid monthly (yes-but, the cost). 7 she comes on the 16th and is not angry; she asks to see the shelf (no-and). 8 her ticket is 214 and the voided one is still in the drawer (yes-but, climax). 9 he closes on schedule; the pale patch stays and he greets an empty doorway (no-and).",
+      "brief": {
+        "pages": 25,
+        "page_slack": 10,
+        "register": "ghost-story",
+        "new_words": 5,
+        "leech_seeds": 8,
+        "grammar_focus": ["はず", "まま", "ようだ/ような"],
+        "dialogue": { "pct": 40, "untagged": true }
+      },
+      "new_words": {
+        "質屋": "pawnshop — the setting and the narrator's trade. First occurrence has it doing something rather than being defined: 年末になると、うちのような質屋は忙しくなる. Recurs at the forty-year line and at the closing",
+        "質札": "pawn ticket — the object the whole turn runs on. Framed p2 by the act of tearing one and voiding it by number, before the reader has any reason to care. Recurs through every counter scene and at the payoff",
+        "櫛": "comb — what is pawned, redeemed and pawned again. Framed p5 by being taken out of a box and set on paper, with its three missing teeth as the only description. Recurs monthly, at the sale, and as the empty shelf",
+        "質流れ": "forfeiture of a pawned item once its deadline passes — the mechanism the plot turns on. Framed p15 inside the narrator's own calculation, 十五日で質流れにすれば蔵は予定通り空になる, so it arrives as a consequence he is choosing rather than a term being explained. Recurs at the sale, the confession and the rule",
+        "蔵": "storehouse — what the want is about emptying. Framed p1 by the cleaning itself, 蔵を空にするための大掃除. Recurs as where the comb lives, where the old books are, and as the empty room she asks to stand in"
+      }
+    },
+    {
       "slug": "neko-o-sagasu-tantei",
       "title": "猫を探す探偵",
       "level": 4,
@@ -251,30 +275,6 @@
         "釘": "nail — what fixes the position across three generations. Framed p2 by the act itself, 壁に釘を一本打って、そこに掛けた. Recurs as the same hole at the repair, as 三代、同じ釘, and at the lifting off",
         "向き": "the way a thing faces, orientation — distinct from 斜め, which is that the orientation is oblique. Framed p7 in the same sentence that introduces 斜め, 壁と同じ向きに, and fixed by the already-known 向く in the next line, 鏡は玄関の窓のほうを向いている. Recurs wherever the mirror is set or restored",
         "埃": "dust — why the polishing was frequent rather than fussy, and it is held back as an explanation until the payoff. Framed p9 by its own absence, 埃がついていなくても、晴れた日には必ず磨く, which makes the polishing strange before it makes it sensible"
-      }
-    },
-    {
-      "slug": "juugonichi-no-shichifuda",
-      "title": "十五日の質札",
-      "level": 3,
-      "_feature": "First story in the ghost-story register, and the first written against the September 2026 Gate 2 — climax first, want and need on separate tracks, a declared three-act shape, every beat a yes-but or a no-and. The veiled plant is bookkeeping: the narrator spoils a ticket in the first week and voids it by number, which reads as him being tired and pays off as the only proof the story offers.",
-      "_note": "THE GHOST IS NOT A MOURNED RELATIVE. That guard is written into the register itself because 時計の音 and 煙突の煙 are the same bereavement story twice and were rated two stars both times, the second explicitly as derivative. The woman is a stranger and the weight sits on the narrator's choice, not on her condition. THE TWIST IS NOT THAT SHE IS DEAD — a reader will suspect that by the neighbour scene, and it is meant to be suspected. The turn is the ticket number, and under it the fact that he confessed to someone who was never going to catch him. THE FATHER IS A SOURCE OF A RULE AND NOTHING ELSE: he is named three times, never mourned, and the story does not visit him. YEAR-END IS THE SUBJECT, NOT A MARKER: the 大掃除 is why the storehouse is being cleared and New Year money is why the shop is busy, which is the audit's fifth divergence answered in the premise rather than in the prose. 店を畳む rather than 廃業 or 閉店 — the audit found 閉店 used for a 銭湯 going out of business, and this is the same error class avoided with a word already in the known set.",
-      "_premise": "CLIMAX: he voids her ticket and the number is the one he spoiled and voided himself in the first week, and that voided ticket is still in his drawer, whole. Both exist. He looks up and she is gone. Nobody explains it, including him. AFTERWORD: see stories-index.md. PREMISE: year-end at a small pawnshop; the owner is clearing the storehouse to close the business by New Year, and one customer comes every month to redeem a comb and pawn it again. WANT: empty the storehouse and close the shop by 大晦日. NEED: to admit the shop was never a business in objects — he keeps perfect records of items and none of people, and that is what lets him take the earlier date. He gets the want; it costs him the thing that would have made having it bearable. SHAPE: three-act, I 1-2, II 3-6, III 7-9. BEATS: 1 counts the stock and voids a torn ticket, number 214 (yes-but, veiled plant). 2 she redeems and re-pawns; he tells her the shop closes (no-and). 3 the record runs back past this book in a third hand (yes-but). 4 next door has been shut on the third for twenty years (no-and). 5 the record says the 15th and her ticket the 16th; he takes the 15th (yes-but, the ugly choice). 6 the dealer pays less than she paid monthly (yes-but, the cost). 7 she comes on the 16th and is not angry; she asks to see the shelf (no-and). 8 her ticket is 214 and the voided one is still in the drawer (yes-but, climax). 9 he closes on schedule; the pale patch stays and he greets an empty doorway (no-and).",
-      "brief": {
-        "pages": 25,
-        "page_slack": 10,
-        "register": "ghost-story",
-        "new_words": 5,
-        "leech_seeds": 8,
-        "grammar_focus": ["はず", "まま", "ようだ/ような"],
-        "dialogue": { "pct": 40, "untagged": true }
-      },
-      "new_words": {
-        "質屋": "pawnshop — the setting and the narrator's trade. First occurrence has it doing something rather than being defined: 年末になると、うちのような質屋は忙しくなる. Recurs at the forty-year line and at the closing",
-        "質札": "pawn ticket — the object the whole turn runs on. Framed p2 by the act of tearing one and voiding it by number, before the reader has any reason to care. Recurs through every counter scene and at the payoff",
-        "櫛": "comb — what is pawned, redeemed and pawned again. Framed p5 by being taken out of a box and set on paper, with its three missing teeth as the only description. Recurs monthly, at the sale, and as the empty shelf",
-        "質流れ": "forfeiture of a pawned item once its deadline passes — the mechanism the plot turns on. Framed p15 inside the narrator's own calculation, 十五日で質流れにすれば蔵は予定通り空になる, so it arrives as a consequence he is choosing rather than a term being explained. Recurs at the sale, the confession and the rule",
-        "蔵": "storehouse — what the want is about emptying. Framed p1 by the cleaning itself, 蔵を空にするための大掃除. Recurs as where the comb lives, where the old books are, and as the empty room she asks to stand in"
       }
     }
   ]
