@@ -14,6 +14,7 @@ export ICHIRAN_URL=http://localhost:3005   # or wherever your Ichiran runs; comm
 python3 have.py 単語1 単語2 ...      # ✓ known / ✗ not / ✓ (weak) leech. Batch 30-50.
 python3 stats.py                      # every story against its declared level
 python3 reviews.py                    # what the reader thought of the ones so far
+python3 peeks.py                      # the words the reader had to tap for, ranked
 ```
 
 Read `stories/tokei-no-oto.txt` first. It is the worked example and the only story written against this spec from the start.
@@ -55,6 +56,8 @@ Every parameter has a default, so a bare invocation is a complete brief. Default
 With no topic given, propose two or three domains the corpus has not used. The six so far are watches, letters, trains, a bathhouse, a missing cat, and a cast bell.
 
 **Run `reviews.py` before proposing anything.** It prints the star ratings and notes from the contents page against the level, register and length each was a verdict on. Read the notes rather than the averages: a note naming what dragged or what had to be re-read is a constraint on the next brief, while a mean over three ratings is a number looking for a pattern. Say which review you are responding to when a parameter departs from the default because of one — an unattributed change to `dialogue` or `register` is indistinguishable from a whim, and the brief is the only record either way. Nothing here is automatic: no parameter is derived from a rating, and a low-rated register is not retired on the strength of one story.
+
+**Then run `peeks.py`.** It ranks the words whose reading or meaning had to be asked for in the reader, summed across devices, broadest first: a word peeked at in three stories outranks one peeked at five times on one page, because the second is one bad sentence. Those are words the known set counts as known and reading does not, so the draft should reuse a handful of the top ones on purpose — in a sentence that frames them, the way a 新出 word is framed, rather than dropped in bare. Name the ones you chose in the brief. A word marked 苦手 is already getting extra exposure from its 傍点; the unmarked ones are where this list says something Anki does not.
 
 **Persist the brief.** Once it is confirmed, `python3 brief.py --json` emits the block for the story's `corpus.json` entry. Add it **by hand** — that file is hand-maintained and carries comment keys and one-line arrays that `json.dump` would reformat. Persisting it is the whole point: nothing recorded what a story was supposed to be, which is how ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》 ran 24% long and ｜城《しろ》の｜鐘《かね》 14% without either being noticed.
 

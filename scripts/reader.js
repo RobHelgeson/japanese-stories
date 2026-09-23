@@ -492,6 +492,73 @@
         };
       })();
 
+      // -------------------------------------------------------------- peeks --
+      // A tap that lights a word is the reader admitting its reading was not
+      // there, and a double tap that opens the sheet admits the meaning was not
+      // either. Both are counted per dictionary form, so 焦って and 焦った are
+      // one word that was asked about twice, and the counts travel in the gist
+      // for peeks.py to rank. Nothing on the page shows them: a reader that
+      // kept score in front of you would make every tap cost something.
+      //
+      // What is not counted is as deliberate as what is. Hover on a mouse fires
+      // on every sweep across the page. A sentence tap is how a finished page gets
+      // checked against its readings and its English, which is confirmation
+      // rather than a gap, and it names no one word anyway. A 新出 word shows
+      // its reading from the start, so lighting it asked for nothing, and with
+      // ふりがな on every reading is already showing.
+      const Peek = (() => {
+        let pending = {};
+        const marked = new Set();
+
+        const flush = Store.defer(() => {
+          const add = pending;
+          pending = {};
+          if (!window.Sync || !DATA.slug) return;
+          // Re-read for the reason Progress does: another tab may have written
+          // this device's record for another story since.
+          const all = Sync.peeks();
+          const dev = Sync.device();
+          const story = Object.assign({}, Sync.plain(all[DATA.slug]) ? all[DATA.slug] : {});
+          const mine = Sync.plain(story[dev]) ? story[dev] : {};
+          const words = Object.assign({}, Sync.plain(mine.w) ? mine.w : {});
+          for (const key of Object.keys(add)) {
+            const c = Object.assign({}, Sync.plain(words[key]) ? words[key] : {});
+            for (const f of ["r", "m"]) {
+              if (add[key][f]) c[f] = (Number(c[f]) || 0) + add[key][f];
+            }
+            words[key] = c;
+          }
+          story[dev] = { at: Date.now(), w: words };
+          all[DATA.slug] = story;
+          Sync.savePeeks(all);
+        }, 400);
+
+        const note = (w, kind) => {
+          if (!window.Sync || !DATA.slug || !w || !w.dataset) return;
+          if (kind === "r" && (w.classList.contains("new") || Prefs.get().furigana)) return;
+          const key = w.dataset.d || w.dataset.t;
+          if (!key) return;
+          const c = pending[key] || (pending[key] = {});
+          c[kind] = (c[kind] || 0) + 1;
+          flush();
+          for (const fn of marked) {
+            try {
+              fn();
+            } catch (e) {
+              /* the same guard Progress.mark gives its subscribers */
+            }
+          }
+        };
+
+        return {
+          note,
+          onPeek: (fn) => {
+            marked.add(fn);
+            return () => marked.delete(fn);
+          },
+        };
+      })();
+
       // ------------------------------------------------------------ pagebox --
       // The page box is constant in CELLS, not in pixels: a measure (characters
       // per column in 縦書き, per line in 横書き) floored by what the viewport
@@ -846,6 +913,7 @@
             w.dataset.t = tok.t;
             w.dataset.kana = tok.k || "";
             w.dataset.gloss = tok.g || "";
+            if (tok.d) w.dataset.d = tok.d;
             if (tok.p !== undefined) w.dataset.pitch = tok.p;
             w.tabIndex = 0;
             for (const pair of tok.r) {
@@ -1531,6 +1599,7 @@
         }
 
         function showWord(w) {
+          Peek.note(w, "m");
           subject = {
             kind: "word", el: w,
             t: surfaceOf(w),
@@ -1617,6 +1686,7 @@
           }
           lastNode = node;
           lastAt = now;
+          if (node !== lit && node.classList.contains("w")) Peek.note(node, "r");
           // The slow repeat tap is the toggle, and light() takes any open panel
           // with it.
           light(node === lit ? null : node);
@@ -2600,4 +2670,5 @@
         // is already in localStorage, and the next open pushes it.
         const soon = Store.defer(() => { Sync.push(); }, 4000);
         Progress.onMark(soon);
+        Peek.onPeek(soon);
       })();

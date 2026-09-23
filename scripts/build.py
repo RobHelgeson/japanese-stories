@@ -16,6 +16,7 @@ that drifted out of vocabulary range fails loudly instead of shipping.
 """
 
 import argparse
+import functools
 import json
 import re
 import sys
@@ -120,6 +121,11 @@ def authored_reading(authored, surface):
     return None
 
 
+@functools.lru_cache(maxsize=None)
+def known_lemmas():
+    return frozenset(vocab.known_forms()[0])
+
+
 def to_token(tok, known, weak, approved, authored=None, accents=None):
     if isinstance(tok, ichiran.Raw):
         return {"t": tok.text}
@@ -172,6 +178,15 @@ def to_token(tok, known, weak, approved, authored=None, accents=None):
         "k": kana,
         "g": word.gloss(),
     }
+    # The dictionary form, so the reader counts a peek at 焦って against 焦る.
+    # Only where it differs: most kanji words are printed in dictionary form,
+    # and the reader falls back to `t`. A surface that is itself a lemma in the
+    # collection stays one, because Ichiran reduces further than Anki does —
+    # 生まれる to the passive of 生む, 年寄り to the stem of 年寄る — and a peek
+    # filed under 生む would match no card.
+    lemma_form = word.dictionary_form
+    if lemma_form and lemma_form != surface and surface not in known_lemmas():
+        entry["d"] = lemma_form
     hit = next((f for f in (surface, *word.dictionary_forms) if f in weak), None)
     if hit:
         entry["w"] = hit  # the dictionary form, so the index lists 焦る not 焦って

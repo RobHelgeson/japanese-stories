@@ -168,6 +168,9 @@ main { counter-reset: story; }
 }
 .chip.weak { color: var(--weak); border-color: color-mix(in srgb, var(--weak) 40%, transparent); }
 .chip.new { color: var(--new); border-color: color-mix(in srgb, var(--new) 40%, transparent); }
+/* Neutral on purpose: a peek is not a mark the reader draws, so it
+   borrows neither mark's hue. */
+.chip.peek { color: var(--muted); }
 
 /* The level was the one column of the deleted Reading Order table that
    nothing else showed. */

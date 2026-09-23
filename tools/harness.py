@@ -1849,7 +1849,7 @@ GIST_STUB = r"""
   };
   // `doc` is the progress half and `revs` the reviews half, kept as two fields
   // so every existing test that drives `doc` still means what it meant.
-  const G = load() || { id: "g1", doc: null, revs: null, calls: [], status: 0, delay: 0, rev: 1 };
+  const G = load() || { id: "g1", doc: null, revs: null, peeks: null, calls: [], status: 0, delay: 0, rev: 1 };
   const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify(G)); } catch (e) {} };
   // Which document made a call. The outgoing document gets a pagehide flush on
   // every reload, and that flush pushes — so a log cleared before a reload still
@@ -1873,12 +1873,12 @@ GIST_STUB = r"""
     return G.delay ? new Promise((r) => setTimeout(() => r(res), G.delay)) : Promise.resolve(res);
   };
 
-  const wrap = (map, revs) => ({
+  const wrap = (map, revs, pk) => ({
     id: G.id,
     files: {
       [FILE]: {
         content: JSON.stringify(
-          { v: 1, progress: map || {}, reviews: revs || {} }, null, 2),
+          { v: 1, progress: map || {}, reviews: revs || {}, peeks: pk || {} }, null, 2),
       },
     },
   });
@@ -1899,15 +1899,16 @@ GIST_STUB = r"""
     if (m === "GET") {
       save();
       if (h["If-None-Match"] && h["If-None-Match"] === etag) return reply(304, null, etag);
-      return reply(200, wrap(G.doc, G.revs), etag);
+      return reply(200, wrap(G.doc, G.revs, G.peeks), etag);
     }
     if (m === "POST" || m === "PATCH") {
       const doc = JSON.parse(sent.files[FILE].content);
       G.doc = doc.progress;
       G.revs = doc.reviews;
+      G.peeks = doc.peeks;
       G.rev++;
       save();
-      return reply(m === "POST" ? 201 : 200, wrap(G.doc, G.revs), 'W/"' + G.rev + '"');
+      return reply(m === "POST" ? 201 : 200, wrap(G.doc, G.revs, G.peeks), 'W/"' + G.rev + '"');
     }
     save();
     return reply(404, {}, null);
@@ -1928,9 +1929,9 @@ def gist(br, **fields):
     br.eval("window.GISTsave()")
 
 
-def connect(br, doc=None, revs=None):
+def connect(br, doc=None, revs=None, peeks=None):
     """Put the device in the connected state without going through the UI."""
-    gist(br, doc=doc, revs=revs, calls=[], rev=1)
+    gist(br, doc=doc, revs=revs, peeks=peeks, calls=[], rev=1)
     br.eval(
         "localStorage.setItem('japanese-stories:sync',"
         " JSON.stringify({token: 't', gist: 'g1', etag: ''}))"
@@ -2440,6 +2441,147 @@ def suite_index(br, rep, base):
         br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
         rep.add("index", "and-re-opening-by-hand-clears-the-flag",
                 br.eval(f"{c}.classList.contains('open')"), None)
+    finally:
+        br.drop_init_script(ident)
+
+
+def suite_peek(br, rep, base):
+    ident = br.init_script(sync_stub())
+    try:
+        br.emulate(*PHONE[1:])
+        slug = SYNC_SLUG
+        br.goto_plain(f"{base}/blank.html")
+        br.eval("localStorage.clear()")
+        connect(br)
+        br.goto(f"{base}/{slug}.html")
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+
+        # ---- the merge rule, as a pure function -----------------------------
+        M = "Sync.mergePeeks(%s, %s)"
+        a = {slug: {"A": {"at": 1000, "w": {"時計": {"r": 2}}}}}
+        b = {slug: {"B": {"at": 500, "w": {"時計": {"r": 1}}}}}
+        got = br.eval(M % (json.dumps(a), json.dumps(b)))
+        rep.add("peek", "merge-keeps-every-device", set(got[slug]) == {"A", "B"}, got)
+        newer = {slug: {"A": {"at": 2000, "w": {"時計": {"r": 5}}}}}
+        got = br.eval(M % (json.dumps(a), json.dumps(newer)))
+        rep.add("peek", "merge-takes-a-devices-later-record",
+                got[slug]["A"]["w"]["時計"]["r"] == 5, got)
+        got = br.eval(M % (json.dumps(newer), json.dumps(a)))
+        rep.add("peek", "merge-is-order-independent", got[slug]["A"]["w"]["時計"]["r"] == 5, got)
+        got = br.eval(M % (json.dumps(a), json.dumps({"v": 1})))
+        rep.add("peek", "merge-drops-a-non-record-key", "v" not in got, got)
+
+        # ---- counting, off real taps ------------------------------------------
+        # A plain word, not 新出, with and without a dictionary form: the key
+        # has to be `d` where one was emitted, since that is the whole reason
+        # build.py emits it.
+        pick = """(() => {
+          const ws = [...document.querySelectorAll('#track .cell.is-current .w')]
+            .filter(w => !w.classList.contains('new'));
+          const inf = ws.find(w => w.dataset.d);
+          const bare = ws.find(w => !w.dataset.d && w.dataset.t !== (inf && inf.dataset.t));
+          return { inf: inf ? [inf.dataset.t, inf.dataset.d] : null,
+                   bare: bare ? bare.dataset.t : null };
+        })()"""
+        found = br.eval(pick)
+        if not found["inf"]:
+            br.eval("Track.goTo({page: 2, sub: 0}, false)")
+            br.eval("new Promise(r => setTimeout(r, 200))", await_promise=True)
+            found = br.eval(pick)
+        rep.add("peek", "fixture-has-an-inflected-and-a-bare-word",
+                bool(found["inf"]) and bool(found["bare"]), found)
+        mine = """(() => {
+          const s = (Sync.peeks()[%s] || {})[Sync.device()];
+          return s ? s.w : {};
+        })()""" % json.dumps(slug)
+        el = "[...document.querySelectorAll('#track .cell.is-current .w')].find(w => w.dataset.t === %s)"
+        wait = lambda ms: br.eval(f"new Promise(r => setTimeout(r, {ms}))", await_promise=True)
+
+        if found["inf"]:
+            t, d = found["inf"]
+            br.eval("Sheet.dismiss()")
+            br.eval(f"Sheet.tap({el % json.dumps(t)})")
+            wait(500)
+            got = br.eval(mine)
+            rep.add("peek", "a-tap-counts-a-reading-under-the-dictionary-form",
+                    (got.get(d) or {}).get("r") == 1 and t not in got, got)
+            # Second slow tap puts the reading away, and asked for nothing.
+            wait(350)
+            br.eval(f"Sheet.tap({el % json.dumps(t)})")
+            wait(500)
+            got = br.eval(mine)
+            rep.add("peek", "the-tap-that-puts-it-away-is-not-counted",
+                    (got.get(d) or {}).get("r") == 1, got)
+
+        if found["bare"]:
+            t = found["bare"]
+            br.eval("Sheet.dismiss()")
+            br.eval(f"(() => {{ const w = {el % json.dumps(t)}; Sheet.tap(w); Sheet.tap(w); }})()")
+            wait(500)
+            got = br.eval(mine)
+            rep.add("peek", "a-double-tap-counts-reading-and-meaning",
+                    got.get(t) == {"r": 1, "m": 1}, got)
+
+            br.eval("Sheet.dismiss(); Prefs.set('furigana', true)")
+            wait(350)
+            br.eval(f"Sheet.tap({el % json.dumps(t)})")
+            wait(500)
+            got = br.eval(mine)
+            rep.add("peek", "with-furigana-on-a-tap-asks-for-nothing",
+                    got.get(t, {}).get("r") == 1, got)
+            br.eval("Sheet.dismiss(); Prefs.set('furigana', false)")
+
+        # Rob taps the sentence at the end of a page to confirm he understood
+        # it, not because a word was missing, so neither the reading nor the
+        # English it opens may count against any word in it.
+        before = br.eval(mine)
+        br.eval("""(() => {
+          Sheet.dismiss();
+          const s = document.querySelector('#track .cell.is-current .s[data-en]');
+          Sheet.tap(s); Sheet.tap(s);
+        })()""")
+        wait(500)
+        after = br.eval(mine)
+        rep.add("peek", "a-sentence-tap-or-double-tap-counts-nothing",
+                before == after and br.eval("!!document.querySelector('.s.lit')"),
+                {"before": before, "after": after})
+        br.eval("Sheet.dismiss()")
+
+        # Jump to the first page carrying a 新出 word, off the data rather than
+        # the DOM, so the case cannot quietly skip on a page without one.
+        at = br.eval("DATA.pages.findIndex(pg => pg.some(s => s.toks.some(t => t.n)))")
+        rep.add("peek", "fixture-has-a-new-word", at >= 0, at)
+        br.eval(f"Sheet.dismiss(); Track.goTo({{page: {at}, sub: 0}}, false)")
+        wait(250)
+        new = br.eval("(() => { const w = document.querySelector('#track .cell.is-current .w.new');"
+                      " return w ? (w.dataset.d || w.dataset.t) : null; })()")
+        if at >= 0:
+            rep.add("peek", "the-new-word-is-on-screen", bool(new), new)
+        if new:
+            br.eval("Sheet.dismiss(); Sheet.tap(document.querySelector('#track .cell.is-current .w.new'))")
+            wait(500)
+            got = br.eval(mine)
+            rep.add("peek", "a-new-words-reading-was-never-hidden",
+                    "r" not in (got.get(new) or {}), got)
+
+        # ---- it travels ---------------------------------------------------------
+        br.eval("Store.flush()")
+        br.eval("Sync.push()", await_promise=True)
+        remote = br.eval("window.GIST.peeks")
+        dev = br.eval("Sync.device()")
+        rep.add("peek", "the-push-carries-this-devices-record",
+                bool(remote) and dev in (remote.get(slug) or {}), remote)
+
+        # ---- and the contents page shows it ------------------------------------
+        other = {slug: {"other": {"at": 1, "w": {"猫": {"r": 3, "m": 1}}}}}
+        br.eval(f"GIST.peeks = Object.assign({{}}, GIST.peeks); "
+                f"GIST.peeks[{json.dumps(slug)}] = Object.assign({{}}, GIST.peeks[{json.dumps(slug)}], "
+                f"{json.dumps(other[slug])}); GISTsave()")
+        br.goto_plain(f"{base}/index.html")
+        wait(400)
+        chip = br.eval(f"(document.querySelector('.cell[data-slug=\"{slug}\"] .chip.peek') || {{}}).textContent || ''")
+        rep.add("peek", "the-contents-page-sums-devices-and-ranks",
+                chip.startswith("見た 猫×4"), chip)
     finally:
         br.drop_init_script(ident)
 
@@ -3491,6 +3633,8 @@ def main():
             suite_manage(br, rep, base)
             print("\n===== review =====")
             suite_review(br, rep, base)
+            print("\n===== peek =====")
+            suite_peek(br, rep, base)
         if "--matrix" in args:
             print("\n===== matrix: 4 mode x density, 3 viewports, 22/28/36/40px =====")
             suite_matrix(br, rep)

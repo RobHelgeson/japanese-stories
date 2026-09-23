@@ -40,7 +40,7 @@ DESC = "japanese-stories reading progress"
 BACKUPS = Path.home() / "Documents/Code/.japanese-stories-backups"
 
 
-def envelope(prog, revs):
+def envelope(prog, revs, peeks):
     r"""The file's bytes, exactly as sync.js writes them.
 
     ensure_ascii off because sync.js emits raw UTF-8 and a note is Japanese as
@@ -48,7 +48,7 @@ def envelope(prog, revs):
     which is half of why a gist was chosen, and would rewrite every record on
     the first restore. One encoder, so --dry-run prints what gets written.
     """
-    return json.dumps({"v": 1, "progress": prog, "reviews": revs},
+    return json.dumps({"v": 1, "progress": prog, "reviews": revs, "peeks": peeks},
                       ensure_ascii=False, indent=2) + "\n"
 
 
@@ -104,12 +104,16 @@ def maps(doc):
     return prog, revs
 
 
+def peeks_of(doc):
+    return doc["peeks"] if isinstance(doc, dict) and isinstance(doc.get("peeks"), dict) else {}
+
+
 def save(gid, dry):
     doc, rev = fetch(gid)
     prog, revs = maps(doc)
     stamp = datetime.now().strftime("%Y-%m-%dT%H%M")
     path = BACKUPS / f"progress-{stamp}.json"
-    body = envelope(prog or {}, revs or {})
+    body = envelope(prog or {}, revs or {}, peeks_of(doc))
     note = (f"gist {gid}\nrevision {rev['version']}\ncommitted {rev['committed_at']}\n"
             f"url https://gist.github.com/{gid}/{rev['version']}\n")
     if dry:
@@ -180,9 +184,13 @@ def restore(gid, path, dry):
         print(f"  tombstoned (in the gist, not in the snapshot): {', '.join(added)}")
     if cleared:
         print(f"  ratings cleared for: {', '.join(cleared)}")
+    # Peeks are a log of taps rather than a state to return to, so a restore
+    # never rolls them back. Leaving the key out would be worse than either:
+    # the gist would lose every device's count until each one next pushed.
+    print("  peeks: left as the gist has them")
     print(f"  every restored stamp set to {now}, so it outranks every device")
 
-    content = envelope(out_prog, out_revs)
+    content = envelope(out_prog, out_revs, peeks_of(live))
     if dry:
         print("\n--dry-run, nothing written. The gist would hold:\n")
         print(content)

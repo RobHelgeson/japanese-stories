@@ -105,7 +105,26 @@ python3 progress.py --restore <file>   # put that snapshot back
 python3 progress.py --restore <file> -n   # print what it would write, change nothing
 ```
 
-**A restore is not a paste,** and pasting the file into the gist editor restores nothing. Every record's `at` is bumped to the moment of the restore, because the later stamp takes the record and a device that read while the snapshot sat on disk holds newer stamps than the file does; without the bump the next device to sync merges its own records back over the restore. `doneAt` is bumped too, since it is the only thing that can take a 読了 away. And a slug the gist holds but the snapshot does not gets the same dated, page-less tombstone 消去 writes, because an absent key merges to whatever the other side still has.
+**A restore is not a paste,** and pasting the file into the gist editor restores nothing. Every record's `at` is bumped to the moment of the restore, because the later stamp takes the record and a device that read while the snapshot sat on disk holds newer stamps than the file does; without the bump the next device to sync merges its own records back over the restore. `doneAt` is bumped too, since it is the only thing that can take a 読了 away. And a slug the gist holds but the snapshot does not gets the same dated, page-less tombstone 消去 writes, because an absent key merges to whatever the other side still has. Peeks are the exception and are never restored: they are a log of taps rather than a state to go back to, so a restore carries the gist's current `peeks` through unchanged.
+
+## What you had to ask
+
+A tap that lights a word is a request for its reading, and a double tap that opens the sheet is a request for its meaning. The reader counts both per dictionary form — `build.py` emits it as `d` on any token printed in another form, so 焦って and 焦った are two peeks at 焦る — and keeps them in the same gist, in a third map beside `progress` and `reviews`. Nothing in the reader shows the count: a page that kept score in front of you would make every tap cost something.
+
+Some taps are not counted, on purpose. Hover on a mouse fires on every sweep across the page. A sentence tap, single or double, is how a finished page gets checked against its readings and its English — confirmation, not a gap — and it names no one word anyway. A 新出 word's reading is shown from the start, and with ふりがな on every reading is already there — lighting a word in either case asked for nothing. The tap that puts a reading away is not a second peek.
+
+`peeks` is keyed slug → device → record, and it is the one map where the later stamp cannot simply win. Two devices each tapping 時計 three times have seen it six times, and a shared record would report three. So each device writes only its own record, under a random id kept in `localStorage`; the merge replaces a device's record with its own newer copy, and the counts are added up when they are read. A Home Screen install starts with empty storage and so becomes a new device, which costs nothing — its counts join the others'. 全消去 writes a dated empty record for every device, the same way it tombstones everything else.
+
+詳細 on the contents page shows the eight most-asked words in a story beside its 苦手 and 新出 chips. The whole list is `peeks.py`:
+
+```bash
+python3 peeks.py                  # every story, via gh
+python3 peeks.py --story shuden   # one story
+python3 peeks.py --file exp.json  # a 書き出し export, no network
+python3 peeks.py --json           # for a tool
+```
+
+It ranks by how many stories a word was asked about in, then by count, drops anything asked about once (`--min` moves the floor), and marks what Anki already calls 苦手 or the corpus approved as 新出. A new story's brief is chosen against it — see AUTHORING.md.
 
 ## Layout
 
