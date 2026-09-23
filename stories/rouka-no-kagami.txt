@@ -22,8 +22,8 @@
 
 ｜午後《ごご》になって、ようやく｜廊下《ろうか》に｜戻《もど》ってきた。
 > It was afternoon before I finally came back to the hallway.
-｜天気《てんき》がよくて、｜玄関《げんかん》の｜窓《まど》から｜日《ひ》が｜入《はい》っている。
-> The weather is fine, and the sun comes in at the window by the front door.
+｜天気《てんき》がよくて、｜玄関《げんかん》の｜窓《まど》からぽかぽかと｜日《ひ》が｜入《はい》っている。
+> The weather is fine, and warm sun comes in at the window by the front door.
 ｜曲《ま》がり｜角《かど》には｜窓《まど》がないのに、｜手《て》もとがよく｜見《み》える。
 > There is no window at the turn, and yet I can see my hands well enough.
 ｜朝《あさ》からずっと、｜明《あ》かりをつけずに｜片付《かたづ》けていた。
@@ -37,8 +37,8 @@
 > To me the back of that hallway is not a dark place.
 ｜昼《ひる》の｜廊下《ろうか》は｜家《いえ》の｜中《なか》で｜一番《いちばん》｜静《しず》かで、｜居心地《いごこち》がよかった。
 > At midday it was the quietest and most comfortable place in the house.
-よくそこに｜座《すわ》って｜本《ほん》を｜読《よ》んだものだ。
-> I used to sit there and read.
+よくそこに｜座《すわ》って、のんびり｜本《ほん》を｜読《よ》んだものだ。
+> I used to sit there and read at my ease.
 
 ｜祖母《そぼ》のことを｜思《おも》い｜出《だ》したのは、そのときだった。
 > That was when my grandmother came back to me.
@@ -73,7 +73,7 @@
 > She went on saying it for thirty years.
 ｜理由《りゆう》は｜一度《いちど》も｜言《い》わなかった。
 > She never once gave a reason.
-｜聞《き》いても、ただ｜笑《わら》って｜首《くび》を｜振《ふ》るだけだった。
+｜聞《き》いても、ただにこにこして｜首《くび》を｜振《ふ》るだけだった。
 > If you asked, she only smiled and shook her head.
 
 ｜祖母《そぼ》は、よく｜鏡《かがみ》を｜磨《みが》いた。
@@ -82,8 +82,8 @@
 > Even with no dust on it, on a clear day she polished it without fail.
 ｜一方《いっぽう》で、｜鏡《かがみ》の｜前《まえ》で｜自分《じぶん》の｜姿《すがた》を｜確《たし》かめることは、｜一度《いちど》もなかった。
 > Not once, on the other hand, did she stand in front of it to check her own appearance.
-｜磨《みが》きながら、｜祖母《そぼ》はいつも｜廊下《ろうか》の｜奥《おく》のほうを｜見《み》ていた。
-> While she polished, she was always looking toward the back of the hallway.
+｜磨《みが》きながら、｜祖母《そぼ》はいつも｜廊下《ろうか》の｜奥《おく》のほうをじっと｜見《み》ていた。
+> While she polished, she was always gazing steadily toward the back of the hallway.
 
 ｜子供《こども》の｜私《わたし》は、それを｜祖母《そぼ》の｜癖《くせ》だと｜思《おも》っていた。
 > As a child I thought of it as a habit of hers.
@@ -159,14 +159,14 @@
 ｜木《き》の｜枠《わく》は｜隅《すみ》のところが｜割《わ》れていたが、｜誰《だれ》も｜直《なお》さない。
 > The wooden frame had split at one corner, and nobody repaired it.
 
-｜鏡《かがみ》そのものは、｜古《ふる》いものの、よく｜磨《みが》かれていた。
-> The glass itself was old, and for all that it was well polished.
+｜鏡《かがみ》そのものは、｜古《ふる》いものの、ぴかぴかに｜磨《みが》かれていた。
+> The glass itself was old, and for all that it was polished to a shine.
 ｜母《はは》は｜年《とし》を｜取《と》ってからも、｜晴《は》れた｜日《ひ》には｜必《かなら》ず｜磨《みが》いていたらしい。
 > Even after she grew old, my mother apparently polished it without fail on clear days.
 ｜曇《くも》った｜鏡《かがみ》も、｜埃《ほこり》のついた｜鏡《かがみ》も、｜私《わたし》は｜一度《いちど》も｜見《み》たことがない。
 > I have never once seen that mirror clouded, nor seen dust on it.
-｜八十《はちじゅう》｜歳《さい》を｜過《す》ぎた｜母《はは》が｜台《だい》に｜乗《の》って｜磨《みが》いているのを｜見《み》て、｜危《あぶ》ないからやめてほしいと｜言《い》ったこともある。
-> I once saw my mother, past eighty, up on a stool polishing it, and told her it was dangerous and I wished she would stop.
+｜八十《はちじゅう》｜歳《さい》を｜過《す》ぎた｜母《はは》が｜台《だい》に｜乗《の》って、ふらふらしながら｜磨《みが》いているのを｜見《み》て、｜危《あぶ》ないからやめてほしいと｜言《い》ったこともある。
+> I once saw my mother, past eighty, up on a stool and swaying as she polished it, and told her it was dangerous and I wished she would stop.
 
 ｜母《はは》が｜亡《な》くなって、｜この家《このいえ》は｜私《わたし》のものになった。
 > When my mother died the house came to me.
