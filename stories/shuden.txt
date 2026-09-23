@@ -80,6 +80,8 @@
 > "They look heavy."
 「重いです」
 > "They are."
+彼女は荷物の上に手を置いた。
+> She rested a hand on the bag.
 「｜割《わ》れる｜物《もの》が入っているので、｜下《した》に置いておきます」
 > "There are things in there that break, so I'll keep them down here."
 「それなら、その｜方《ほう》がいいですね」
@@ -99,6 +101,8 @@
 > "Moving?"
 「そうなんです」
 > "That's right."
+彼女は小さく頷いた。
+> She gave a small nod.
 「朝の｜新幹線《しんかんせん》に乗ります」
 > "I'm taking the morning bullet train."
 
@@ -110,20 +114,18 @@
 > "Is this your first time in Tokyo?"
 「初めてです」
 > "First time."
-「ずっとこの町にいました」
-> "I've been in this town the whole time."
-「｜二十年《にじゅうねん》、一度も出ていません」
-> "Twenty years, and I never once left."
-「そうですか」
-> "I see."
-「お母さんは、もう向こうですか」
-> "Is your mother over there already?"
+それから、窓の外を見たまま続けた。
+> Then, still looking out the window, she went on.
+「ずっとこの町にいました。｜二十年《にじゅうねん》、一度も出ていません」
+> "I've been in this town the whole time. Twenty years, and I never once left."
+「そうですか。お母さんは、もう向こうですか」
+> "I see. Is your mother over there already?"
 「母は去年亡くなりました」
 > "My mother died last year."
-「家も売りました」
-> "I sold the house too."
-「もう帰る家がないんです」
-> "I don't have a home to go back to anymore."
+膝の上の荷物に目を落として、彼女は続けた。
+> Her eyes dropped to the bag on her lap, and she went on.
+「家も売りました。もう帰る家がないんです」
+> "I sold the house too. I don't have a home to go back to anymore."
 「それは」
 > "That's..."
 
@@ -190,6 +192,8 @@
 > "Are you taking all of them?"
 「これだけです」
 > "Only these."
+｜包《つつ》みを一つ、そっと荷物に戻した。
+> She slipped one of the parcels quietly back into the bag.
 「｜他《ほか》は全部捨てました」
 > "I threw everything else away."
 「東京に着いたら、どうするんですか」

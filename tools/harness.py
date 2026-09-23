@@ -2717,7 +2717,11 @@ def suite_table(br, rep, base):
     # 三番の乾燥機 is 34 authored pages against 37 text screens, so three pages
     # take two screens each at 28px — tight=0 and worst-overflow=0px, meaning
     # nothing overflows, they simply fill.
-    expect = {"shuden": 27, "neko-o-sagasu-tantei": 30, "maigo-no-tegami": 18,
+    #
+    # 終電 27->29 on 2026-09-22: in-block attribution beats for the split
+    # turns both second-read reviewers flagged. Two authored pages now fill a
+    # second screen; nothing overflows.
+    expect = {"shuden": 29, "neko-o-sagasu-tantei": 30, "maigo-no-tegami": 18,
               "tokei-no-oto": 25, "shiro-no-kane": 42, "entotsu-no-kemuri": 28,
               "ikanakatta-hito-no-chizu": 49, "rouka-no-kagami": 25,
               "endai-no-shougi": 23, "sanban-no-kansouki": 37,
