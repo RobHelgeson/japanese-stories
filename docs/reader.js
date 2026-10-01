@@ -755,7 +755,14 @@
           // #measure is fixed at inset 0 and its .cell is absolute at inset 0, so
           // both resolve to exactly the box a live cell resolves to. Nothing is
           // pinned from JS; one set of CSS rules sizes both.
-          new ResizeObserver(schedule).observe(track);
+          // The cell too, not only the track: its content box is the track minus
+          // the safe-area padding, and an installed iOS app can resolve
+          // env(safe-area-inset-*) after first layout. That moves the cell and
+          // never the track, and left the あとがき split against a box 75px taller
+          // than the one on screen.
+          const ro = new ResizeObserver(schedule);
+          ro.observe(track);
+          ro.observe(cell);
           if (window.visualViewport) {
             window.visualViewport.addEventListener("resize", schedule);
           }
@@ -818,6 +825,7 @@
         let mpage = null;
         let dirty = true;
         let key = "";
+        let afterKey = "";
         let flowing = false;
 
         const cache = new Map(); // authored page index -> Screen[]
@@ -839,8 +847,21 @@
             g.measure, g.extent, g.vertical ? "v" : "h",
             Prefs.density(), g.fs,
           ].join("/");
-          if (k === key) return false;
+          // The あとがき box is the cell's own block size and min(34rem, cell)
+          // wide, not a whole number of cells, so a height change that leaves
+          // measure and extent alone — iPad 横書き, where extent is capped —
+          // still moves its breaks. Only the last page carries it.
+          const ak = Math.round(g.cellW) + "x" + Math.round(g.cellH);
+          if (k === key) {
+            if (ak === afterKey) return false;
+            afterKey = ak;
+            afterRuns = null;
+            afterSlack = null;
+            cache.delete(total - 1);
+            return true;
+          }
           key = k;
+          afterKey = ak;
           flowing = Prefs.density() === "flowing";
           cache.clear();
           afterRuns = null;
