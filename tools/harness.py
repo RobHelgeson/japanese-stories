@@ -2460,6 +2460,13 @@ def suite_index(br, rep, base):
         br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
         rep.add("index", "an-opened-fold-stays-open-across-a-reload",
                 br.eval(fold_open) is True, None)
+        # Re-rating a story already behind you is not a reason to lift it to
+        # the top of the page.
+        br.eval(f"{c}.querySelector('.disc').click()")
+        br.eval(f"{c}.querySelector('[data-act=\"star\"][data-n=\"5\"]').click()")
+        br.eval("new Promise(r => setTimeout(r, 200))", await_promise=True)
+        rep.add("index", "re-rating-a-read-story-leaves-it-under-read",
+                br.eval(shelf(first)) == "s-done", br.eval(shelf(first)))
 
         load({first: rec(7, 1000)})
         rep.add("index", "a-story-being-read-stays-in-the-unread-list",

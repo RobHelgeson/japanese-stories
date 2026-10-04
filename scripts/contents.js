@@ -168,6 +168,15 @@
   // anything about the reading, so it stays out of the gist.
   var fold = slot("fold");
 
+  // A note box opened on 感想待ち is drawn without opening the row. Off
+  // that shelf a collapsed row hides it, and left open it would reappear
+  // the next time 詳細 is, with its button still saying it is open.
+  function closeNote(cell) {
+    var ta = cell.querySelector("textarea.note"), btn = cell.querySelector(".notebtn");
+    if (ta) ta.hidden = true;
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
+
   function shelve(prog, revs) {
     prog = prog || read();
     revs = revs || readR();
@@ -179,19 +188,29 @@
       var rated = !!r && typeof r === "object" && Number(r.stars) >= 1;
       var to = !fin ? "unread" : !rated || held[slug] ? "review" : "done";
       // Re-parenting a row blurs whatever inside it has focus, which would
-      // take a half-typed note out from under the keyboard. A focused row
-      // waits for the next paint.
-      var here = cell.closest(".shelf");
-      if (here && cell.contains(document.activeElement)) to = here.dataset.shelf;
+      // take a half-typed note out from under the keyboard. A row with its
+      // note box focused waits for the next paint. Only the box: a 編集
+      // button keeps focus after a click on desktop, and pinning on that
+      // would leave the row it just moved on the wrong shelf.
+      var here = cell.closest(".shelf").dataset.shelf;
+      var ta = cell.querySelector("textarea.note");
+      if (ta && ta === document.activeElement) to = here;
       lists[to].push(cell);
+      cell.dataset.to = to;
     }
-    // In order, so each list ends with its own rows first; anything after
-    // them is bound for a later shelf and is pulled out when that one is
-    // filled.
+    // Two passes. Rows changing shelf move first, and none of them is the
+    // focused one. What stays is already in reading order, so the second
+    // pass only ever inserts the newcomers around it — a staying row is
+    // never itself moved, which is what would blur it.
+    for (var m = 0; m < cells.length; m++) {
+      var c = cells[m];
+      if (c.closest(".shelf").dataset.shelf !== c.dataset.to) {
+        shelves[c.dataset.to].querySelector(".list").appendChild(c);
+        if (c.dataset.to !== "review" && !c.classList.contains("open")) closeNote(c);
+      }
+    }
     for (var k in lists) {
-      var box = shelves[k];
-      if (!box) continue;
-      var list = box.querySelector(".list"), rows = lists[k];
+      var box = shelves[k], list = box.querySelector(".list"), rows = lists[k];
       for (var j = 0; j < rows.length; j++) {
         if (list.children[j] !== rows[j]) list.insertBefore(rows[j], list.children[j] || null);
       }
@@ -378,7 +397,9 @@
       return;
     }
     if (what === "star") {
-      held[cell.dataset.slug] = 1;
+      // Only a row already waiting is held: re-rating one under 読了 must
+      // not lift it to the top of the page.
+      if (cell.closest("#s-review")) held[cell.dataset.slug] = 1;
       star(cell, Number(btn.dataset.n));
       return;
     }
@@ -408,7 +429,7 @@
     if (!ta) return;
     var cell = ta.closest(".cell[data-slug]");
     if (!cell) return;
-    held[cell.dataset.slug] = 1;
+    if (cell.closest("#s-review")) held[cell.dataset.slug] = 1;
     review(cell.dataset.slug, function (r) { r.note = ta.value; return r; }, true);
   });
 
