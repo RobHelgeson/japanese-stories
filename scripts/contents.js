@@ -120,7 +120,7 @@
     }
     $("readtot").textContent = done ? " · 読了 " + done + "/" + cells.length : "";
     resume(open, openPage, next);
-    autoOpen(all, null);
+    shelve(all, null);
   }
 
   // 続き on the story already in hand, 次へ on the first one not yet
@@ -141,44 +141,90 @@
     el.hidden = false;
   }
 
-  // A story you have finished and not yet rated opens itself, so the
-  // stars are still in front of you on the way out — which is the whole
-  // reason they do not sit behind 編集. A row the reader has opened or
-  // closed by hand is left alone; a preference beats a default.
-  // Both callers already hold the map they painted from, and a push or a
-  // pull paints from the merged result rather than from the store — so
-  // going back to localStorage here can disagree with what is on screen.
-  // A write that silently failed on quota is enough to produce it.
-  function autoOpen(prog, revs) {
-    prog = prog || read();
-    revs = revs || readR();
-    for (var i = 0; i < cells.length; i++) {
-      var cell = cells[i];
-      if (shut[cell.dataset.slug] || cell.classList.contains("open")) continue;
-      var p = prog[cell.dataset.slug], r = revs[cell.dataset.slug];
-      var fin = p && typeof p === "object" && p.done === true;
-      var rated = r && typeof r === "object" && Number(r.stars) >= 1;
-      if (fin && !rated) disclose(cell, true);
-    }
-  }
-
   function disclose(cell, on) {
     cell.classList.toggle("open", on);
     var btn = cell.querySelector(".disc");
     if (btn) btn.setAttribute("aria-expanded", on ? "true" : "false");
   }
 
-  // Which rows have been shut by hand, so the auto-open does not undo the
-  // correction on the next load. A Home Screen install relaunches on
-  // every visit, so an in-memory flag would mean it never held at all.
-  // Device-local and out of the gist deliberately: this is where this
-  // screen is scrolled to, not anything about the reading.
-  var shut = slot("shut");
-  function remember(slug, on) {
-    if (on) delete shut[slug]; else shut[slug] = 1;
-    try {
-      localStorage.setItem("japanese-stories:shut", JSON.stringify(shut));
-    } catch (e) {}
+  // Three shelves: 感想待ち for a story finished and not yet rated, 未読
+  // for everything still to read, in reading order, and 読了 folded away
+  // at the foot. A finished story used to stay in its reading-order slot,
+  // so by the eighth one the list was mostly things behind you, and an
+  // unrated one opened itself in place wherever in the list that was. The
+  // rating is the one thing a finished story still asks for, so it goes to
+  // the top, next to 次へ, and everything else that is finished folds.
+  //
+  // Both callers already hold the map they painted from, and a push or a
+  // pull paints from the merged result rather than from the store — so
+  // going back to localStorage here can disagree with what is on screen.
+  var shelves = { review: $("s-review"), unread: $("s-unread"), done: $("s-done") };
+  // Rated on this page during this visit. Such a row stays on 感想待ち
+  // until the next load, so the stars and the 感想 box do not leave from
+  // under the thumb still using them; a rating that arrives from another
+  // device is not held, and files under 読了 as soon as it lands.
+  var held = {};
+  // The 読了 fold, per device: where this screen is opened to, not
+  // anything about the reading, so it stays out of the gist.
+  var fold = slot("fold");
+
+  // A note box opened on 感想待ち is drawn without opening the row. Off
+  // that shelf a collapsed row hides it, and left open it would reappear
+  // the next time 詳細 is, with its button still saying it is open.
+  function closeNote(cell) {
+    var ta = cell.querySelector("textarea.note"), btn = cell.querySelector(".notebtn");
+    if (ta) ta.hidden = true;
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
+
+  function shelve(prog, revs) {
+    prog = prog || read();
+    revs = revs || readR();
+    var lists = { review: [], unread: [], done: [] };
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i], slug = cell.dataset.slug;
+      var p = prog[slug], r = revs[slug];
+      var fin = !!p && typeof p === "object" && p.done === true;
+      var rated = !!r && typeof r === "object" && Number(r.stars) >= 1;
+      var to = !fin ? "unread" : !rated || held[slug] ? "review" : "done";
+      // Re-parenting a row blurs whatever inside it has focus, which would
+      // take a half-typed note out from under the keyboard. A row with its
+      // note box focused waits for the next paint. Only the box: a 編集
+      // button keeps focus after a click on desktop, and pinning on that
+      // would leave the row it just moved on the wrong shelf.
+      var here = cell.closest(".shelf").dataset.shelf;
+      var ta = cell.querySelector("textarea.note");
+      if (ta && ta === document.activeElement) to = here;
+      lists[to].push(cell);
+      cell.dataset.to = to;
+    }
+    // Two passes. Rows changing shelf move first, and none of them is the
+    // focused one. What stays is already in reading order, so the second
+    // pass only ever inserts the newcomers around it — a staying row is
+    // never itself moved, which is what would blur it.
+    for (var m = 0; m < cells.length; m++) {
+      var c = cells[m];
+      if (c.closest(".shelf").dataset.shelf !== c.dataset.to) {
+        shelves[c.dataset.to].querySelector(".list").appendChild(c);
+        if (c.dataset.to !== "review" && !c.classList.contains("open")) closeNote(c);
+      }
+    }
+    for (var k in lists) {
+      var box = shelves[k], list = box.querySelector(".list"), rows = lists[k];
+      for (var j = 0; j < rows.length; j++) {
+        if (list.children[j] !== rows[j]) list.insertBefore(rows[j], list.children[j] || null);
+      }
+      box.querySelector(".sn").textContent = rows.length;
+    }
+    var rv = lists.review.length, un = lists.unread.length, dn = lists.done.length;
+    shelves.review.hidden = !rv;
+    shelves.done.hidden = !dn;
+    shelves.unread.hidden = !un;
+    // A lone shelf needs no name; the plain list it was before is clearer.
+    shelves.unread.querySelector(".sh").hidden = !(rv || dn);
+    // Folded unless asked otherwise — except when there is nothing left
+    // to read, where a folded 読了 would leave the page all but empty.
+    shelves.done.open = typeof fold.open === "boolean" ? fold.open : !un;
   }
 
   function paintR(all) {
@@ -204,7 +250,7 @@
       var btn = cell.querySelector(".notebtn");
       if (btn) btn.classList.toggle("has", !!note);
     }
-    autoOpen(null, all);
+    shelve(null, all);
   }
 
   // The words whose reading was asked for in each story, summed across
@@ -347,12 +393,16 @@
     // Ahead of act(): an unrecognised action falls through to its
     // stepper branch, so a disclosure tap would turn a page.
     if (what === "more") {
-      var on = !cell.classList.contains("open");
-      disclose(cell, on);
-      remember(cell.dataset.slug, on);
+      disclose(cell, !cell.classList.contains("open"));
       return;
     }
-    if (what === "star") { star(cell, Number(btn.dataset.n)); return; }
+    if (what === "star") {
+      // Only a row already waiting is held: re-rating one under 読了 must
+      // not lift it to the top of the page.
+      if (cell.closest("#s-review")) held[cell.dataset.slug] = 1;
+      star(cell, Number(btn.dataset.n));
+      return;
+    }
     if (what === "note") {
       var ta = cell.querySelector("textarea.note");
       if (!ta) return;
@@ -360,8 +410,9 @@
       // A collapsed row puts the box in a display:none subtree, where it
       // cannot take focus and so is not skipped by paintR's focused-box
       // guard — the next pull would overwrite what was being typed.
-      // Revealing the box opens the row that holds it.
-      if (show) disclose(cell, true);
+      // Revealing the box opens the row that holds it — except on
+      // 感想待ち, where the box is drawn on the collapsed row already.
+      if (show && !cell.closest("#s-review")) disclose(cell, true);
       ta.hidden = !show;
       btn.setAttribute("aria-expanded", show ? "true" : "false");
       if (show) ta.focus();
@@ -377,7 +428,9 @@
     var ta = e.target.closest ? e.target.closest("textarea.note") : null;
     if (!ta) return;
     var cell = ta.closest(".cell[data-slug]");
-    if (cell) review(cell.dataset.slug, function (r) { r.note = ta.value; return r; }, true);
+    if (!cell) return;
+    if (cell.closest("#s-review")) held[cell.dataset.slug] = 1;
+    review(cell.dataset.slug, function (r) { r.note = ta.value; return r; }, true);
   });
 
   main.addEventListener("focusout", function (e) {
@@ -389,6 +442,13 @@
   // The tab away, the app switch and the Home Screen swipe all land here,
   // and only this one is reliable on iOS.
   window.addEventListener("pagehide", function () { if (flush) pushNow(); });
+
+  // Off the click rather than the toggle event, which also fires when
+  // shelve() sets the default and would record that as a choice.
+  shelves.done.querySelector("summary").addEventListener("click", function () {
+    fold.open = !shelves.done.open;
+    try { localStorage.setItem("japanese-stories:fold", JSON.stringify(fold)); } catch (e) {}
+  });
 
   $("edit").addEventListener("click", function () {
     var on = $("edit").getAttribute("aria-pressed") !== "true";

@@ -2234,7 +2234,7 @@ def suite_manage(br, rep, base):
 
 
 def suite_index(br, rep, base):
-    """The contents page's own shape: 続き, the 詳細 disclosure, and auto-open."""
+    """The contents page's own shape: 続き, the 詳細 disclosure, and the shelves."""
     ident = br.init_script(sync_stub())
     try:
         br.emulate(*PHONE[1:])
@@ -2371,6 +2371,9 @@ def suite_index(br, rep, base):
         tall = br.eval(f"{c}.getBoundingClientRect().height")
         load({first: rec(25, 1000, done=True, doneAt=1000)},
              {first: {"stars": 4, "at": 1000}})
+        # Inside the 読了 fold, which is shut by default; a row in a shut
+        # <details> measures zero and would pass the height case for free.
+        br.eval("document.querySelector('#s-done > summary').click()")
         short = br.eval(f"{c}.getBoundingClientRect().height")
         rep.add("index", "a-finished-row-drops-the-blurb-the-reading-and-the-bar",
                 br.eval(vis(".sum")) is False and br.eval(vis(".prog")) is False
@@ -2399,48 +2402,81 @@ def suite_index(br, rep, base):
                 br.eval(vis(".sum")) and br.eval(vis(".prog"))
                 and br.eval(vis(".disc .fin")) is False, None)
 
-        # ---- auto-open -------------------------------------------------------
-        # The stars do not sit behind 編集 because a rating is given on the way
-        # out of a story. A collapsed row would put them back behind a tap.
+        # ---- shelves ---------------------------------------------------------
+        shelf = lambda slug: f"{cell(slug)}.closest('.shelf').id"
+        shown = lambda sel: f"!document.querySelector('{sel}').hidden"
+        fold_open = "document.getElementById('s-done').open"
+        load()
+        rep.add("index", "an-unread-corpus-is-one-unnamed-list",
+                br.eval(shown("#s-unread")) and not br.eval(shown("#s-unread > .sh"))
+                and not br.eval(shown("#s-review")) and not br.eval(shown("#s-done")), None)
+
+        # The rating is the one thing a finished story still asks for, so it
+        # goes to the top rather than opening wherever the story sits.
         load({first: rec(25, 1000, done=True, doneAt=1000)})
-        rep.add("index", "a-finished-unrated-story-opens-itself",
-                br.eval(f"{c}.classList.contains('open')"), None)
+        rep.add("index", "a-finished-unrated-story-waits-on-the-review-shelf",
+                br.eval(shelf(first)) == "s-review", br.eval(shelf(first)))
+        rep.add("index", "which-comes-before-the-unread-list",
+                br.eval("!!(document.getElementById('s-review').compareDocumentPosition("
+                        "document.getElementById('s-unread')) & Node.DOCUMENT_POSITION_FOLLOWING)"),
+                None)
+        rep.add("index", "with-its-stars-drawn-without-opening-the-row",
+                br.eval(vis(".rate")) and br.eval(f"{c}.classList.contains('open')") is False,
+                None)
+        rep.add("index", "and-the-unread-list-is-named-beside-it",
+                br.eval(shown("#s-unread > .sh")), None)
+        br.eval(f"{c}.querySelector('.notebtn').click()")
+        rep.add("index", "its-note-box-opens-in-place",
+                br.eval(f"document.activeElement === {c}.querySelector('textarea.note')")
+                and br.eval(f"{c}.classList.contains('open')") is False, None)
+
+        # Rated here, it stays put until the next load: the thumb that just
+        # gave the stars may be on its way to the 感想 box.
+        load({first: rec(25, 1000, done=True, doneAt=1000)})
+        br.eval(f"{c}.querySelector('[data-act=\"star\"][data-n=\"4\"]').click()")
+        br.eval("new Promise(r => setTimeout(r, 200))", await_promise=True)
+        rep.add("index", "a-row-rated-here-stays-on-the-shelf-for-the-visit",
+                br.eval(shelf(first)) == "s-review", br.eval(shelf(first)))
+        br.goto_plain(f"{base}/index.html")
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+        rep.add("index", "and-is-filed-under-read-on-the-next-load",
+                br.eval(shelf(first)) == "s-done", br.eval(shelf(first)))
+
         load({first: rec(25, 1000, done=True, doneAt=1000)},
              {first: {"stars": 4, "at": 1000}})
-        rep.add("index", "a-rated-one-does-not",
-                br.eval(f"{c}.classList.contains('open')") is False, None)
-        load({first: rec(7, 1000)})
-        rep.add("index", "nor-does-one-still-being-read",
-                br.eval(f"{c}.classList.contains('open')") is False, None)
-
-        # A default that reasserts itself is not a default. The repaint is
-        # driven by the stepper rather than by a star, deliberately: rating the
-        # story would also remove the condition under test, and the assertion
-        # would pass with the guard deleted.
-        load({first: rec(25, 1000, done=True, doneAt=1000)})
+        rep.add("index", "a-rated-story-is-filed-under-read",
+                br.eval(shelf(first)) == "s-done", br.eval(shelf(first)))
+        rep.add("index", "which-is-folded-while-there-is-more-to-read",
+                br.eval(fold_open) is False and br.eval(shown("#s-done")), None)
+        rep.add("index", "and-counts-what-it-holds",
+                br.eval("document.querySelector('#s-done .sn').textContent") == "1", None)
+        # The number is the reading-order position, not the place in the shelf.
+        late_ord = br.eval(f"{cell(late)}.dataset.ord")
+        rep.add("index", "rows-keep-their-reading-order-number",
+                br.eval(f"getComputedStyle({cell(late)}, '::before').content") == f'"{late_ord}"'
+                and late_ord == "3", late_ord)
+        br.eval("document.querySelector('#s-done > summary').click()")
+        br.goto_plain(f"{base}/index.html")
+        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
+        rep.add("index", "an-opened-fold-stays-open-across-a-reload",
+                br.eval(fold_open) is True, None)
+        # Re-rating a story already behind you is not a reason to lift it to
+        # the top of the page.
         br.eval(f"{c}.querySelector('.disc').click()")
-        rep.add("index", "the-disclosure-closes-an-auto-opened-row",
-                br.eval(f"{c}.classList.contains('open')") is False, None)
-        br.eval(f"{c}.querySelector('[data-act=\"dec\"]').click()")
+        br.eval(f"{c}.querySelector('[data-act=\"star\"][data-n=\"5\"]').click()")
         br.eval("new Promise(r => setTimeout(r, 200))", await_promise=True)
-        rep.add("index", "and-it-stays-closed-through-a-repaint",
-                br.eval(f"{c}.classList.contains('open')") is False, None)
-        rep.add("index", "with-the-story-still-finished-and-unrated",
-                br.eval("JSON.parse(localStorage.getItem('japanese-stories:progress'))")
-                [first]["done"] is True
-                and not br.eval("JSON.parse(localStorage.getItem('japanese-stories:reviews') || '{}')"),
-                None)
-        br.goto_plain(f"{base}/index.html")
-        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
-        rep.add("index", "and-stays-closed-across-a-reload",
-                br.eval(f"{c}.classList.contains('open')") is False, None)
-        # Re-opening it by hand has to clear the flag, or the row can never be
-        # auto-opened again for any later story-finished event.
-        br.eval(f"{c}.querySelector('.disc').click()")
-        br.goto_plain(f"{base}/index.html")
-        br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
-        rep.add("index", "and-re-opening-by-hand-clears-the-flag",
-                br.eval(f"{c}.classList.contains('open')"), None)
+        rep.add("index", "re-rating-a-read-story-leaves-it-under-read",
+                br.eval(shelf(first)) == "s-done", br.eval(shelf(first)))
+
+        load({first: rec(7, 1000)})
+        rep.add("index", "a-story-being-read-stays-in-the-unread-list",
+                br.eval(shelf(first)) == "s-unread", br.eval(shelf(first)))
+
+        # Nothing left to read: a shut fold would leave the page all but empty.
+        load({slug: rec(1, 1000, done=True, doneAt=1000) for slug in every},
+             {slug: {"stars": 3, "at": 1000} for slug in every})
+        rep.add("index", "a-read-out-corpus-opens-the-fold",
+                br.eval(fold_open) is True and not br.eval(shown("#s-unread")), None)
     finally:
         br.drop_init_script(ident)
 

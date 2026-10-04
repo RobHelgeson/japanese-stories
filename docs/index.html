@@ -112,7 +112,6 @@ main {
   margin-bottom: 0.9rem;
   border: 1px solid var(--rule);
   border-radius: 10px;
-  counter-increment: story;
   transition: border-color 0.12s ease, background 0.12s ease;
 }
 .card {
@@ -120,9 +119,10 @@ main {
   text-decoration: none;
   color: inherit;
 }
-main { counter-reset: story; }
+/* attr() rather than a counter: the shelves regroup the rows, and a counter
+   would number them by shelf. The number is the reading-order position. */
 .cell::before {
-  content: counter(story);
+  content: attr(data-ord);
   position: absolute;
   left: 1.4rem;
   top: 1.45rem;
@@ -287,6 +287,53 @@ main { counter-reset: story; }
 .cell.done:not(.open) .disc:hover .fin {
   background: color-mix(in srgb, var(--new) 12%, transparent);
 }
+
+/* The shelves. 感想待ち is first because a finished, unrated story is the
+   one thing on the page that is waiting on you rather than the other way
+   round, and it is a single tap to clear. 読了 is a fold at the foot: by
+   the eighth story most of the list is behind you, and a ladder walked
+   down once has no use for the rungs already climbed. */
+.shelf { margin: 0 0 1.6rem; }
+.shelf[hidden], .sh[hidden] { display: none; }
+.sh {
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 0.6rem;
+}
+.sh .sn {
+  margin-inline-start: 0.5rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+#s-review > .sh { color: var(--accent); }
+#s-done > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  list-style: none;
+  cursor: pointer;
+}
+#s-done > summary::-webkit-details-marker { display: none; }
+#s-done > summary::before { content: "▸"; margin-inline-end: 0.4rem; }
+#s-done[open] > summary::before { content: "▾"; }
+#s-done > summary:hover { color: var(--accent); }
+#s-done[open] > summary { margin-bottom: 0.6rem; }
+
+/* A row waiting on its rating is the one-line finished row with the stars
+   drawn under it: the ask is the only part of 詳細 it needs, so it is
+   there without a tap. The note box opens in place for the same reason.
+   了 goes, since the shelf is named for exactly that. */
+#s-review .cell:not(.open) .rate { display: flex; flex: 0 0 100%; margin-top: 0; }
+#s-review .cell:not(.open) .note:not([hidden]) {
+  display: block;
+  flex: 0 0 100%;
+  margin-bottom: 0.7rem;
+}
+#s-review .cell.done:not(.open) .disc .fin { display: none; }
 
 /* Continue reading. The catalogue is a ladder you walk down once, so the
    one row that matters on almost every visit is the story already open —
@@ -622,7 +669,18 @@ main { counter-reset: story; }
         <span class="rpct"></span>
       </a>
 
-    <div class="cell" data-slug="tokei-no-oto" data-pages="24" data-title="時計の音" data-level="1">
+      <!-- Three shelves, filled by contents.js from the progress and review
+           maps. Every card is built into 未読 so the page still lists every
+           story with no script; the other two stay hidden until paint moves
+           rows into them. -->
+      <section class="shelf" id="s-review" data-shelf="review" hidden>
+        <h2 class="sh">感想待ち<span class="sn"></span></h2>
+        <div class="list"></div>
+      </section>
+      <section class="shelf" id="s-unread" data-shelf="unread">
+        <h2 class="sh" hidden>未読<span class="sn"></span></h2>
+        <div class="list">
+    <div class="cell" data-slug="tokei-no-oto" data-ord="1" data-pages="24" data-title="時計の音" data-level="1">
       <a class="card" href="tokei-no-oto.html">
         <div class="rt">とけいのおと</div>
         <h2>時計の音<span class="lv">Lv1</span></h2>
@@ -661,7 +719,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="maigo-no-tegami" data-pages="16" data-title="迷子の手紙" data-level="2">
+    <div class="cell" data-slug="maigo-no-tegami" data-ord="2" data-pages="16" data-title="迷子の手紙" data-level="2">
       <a class="card" href="maigo-no-tegami.html">
         <div class="rt">まいごのてがみ</div>
         <h2>迷子の手紙<span class="lv">Lv2</span></h2>
@@ -700,7 +758,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="shuden" data-pages="22" data-title="終電" data-level="3">
+    <div class="cell" data-slug="shuden" data-ord="3" data-pages="22" data-title="終電" data-level="3">
       <a class="card" href="shuden.html">
         <div class="rt">しゅうでん</div>
         <h2>終電<span class="lv">Lv3</span></h2>
@@ -739,7 +797,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="entotsu-no-kemuri" data-pages="27" data-title="煙突の煙" data-level="3">
+    <div class="cell" data-slug="entotsu-no-kemuri" data-ord="4" data-pages="27" data-title="煙突の煙" data-level="3">
       <a class="card" href="entotsu-no-kemuri.html">
         <div class="rt">えんとつのけむり</div>
         <h2>煙突の煙<span class="lv">Lv3</span></h2>
@@ -778,7 +836,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="endai-no-shougi" data-pages="23" data-title="縁台の将棋" data-level="3">
+    <div class="cell" data-slug="endai-no-shougi" data-ord="5" data-pages="23" data-title="縁台の将棋" data-level="3">
       <a class="card" href="endai-no-shougi.html">
         <div class="rt">えんだいのしょうぎ</div>
         <h2>縁台の将棋<span class="lv">Lv3</span></h2>
@@ -816,7 +874,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="sanban-no-kansouki" data-pages="34" data-title="三番の乾燥機" data-level="3">
+    <div class="cell" data-slug="sanban-no-kansouki" data-ord="6" data-pages="34" data-title="三番の乾燥機" data-level="3">
       <a class="card" href="sanban-no-kansouki.html">
         <div class="rt">さんばんのかんそうき</div>
         <h2>三番の乾燥機<span class="lv">Lv3</span></h2>
@@ -854,7 +912,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="juugonichi-no-shichifuda" data-pages="30" data-title="十五日の質札" data-level="3">
+    <div class="cell" data-slug="juugonichi-no-shichifuda" data-ord="7" data-pages="30" data-title="十五日の質札" data-level="3">
       <a class="card" href="juugonichi-no-shichifuda.html">
         <div class="rt">じゅうごにちのしちふだ</div>
         <h2>十五日の質札<span class="lv">Lv3</span></h2>
@@ -892,7 +950,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="neko-o-sagasu-tantei" data-pages="30" data-title="猫を探す探偵" data-level="4">
+    <div class="cell" data-slug="neko-o-sagasu-tantei" data-ord="8" data-pages="30" data-title="猫を探す探偵" data-level="4">
       <a class="card" href="neko-o-sagasu-tantei.html">
         <div class="rt">ねこをさがすたんてい</div>
         <h2>猫を探す探偵<span class="lv">Lv4</span></h2>
@@ -931,7 +989,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="shiro-no-kane" data-pages="41" data-title="城の鐘" data-level="5">
+    <div class="cell" data-slug="shiro-no-kane" data-ord="9" data-pages="41" data-title="城の鐘" data-level="5">
       <a class="card" href="shiro-no-kane.html">
         <div class="rt">しろのかね</div>
         <h2>城の鐘<span class="lv">Lv5</span></h2>
@@ -970,7 +1028,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="ikanakatta-hito-no-chizu" data-pages="44" data-title="行かなかった人の地図" data-level="5">
+    <div class="cell" data-slug="ikanakatta-hito-no-chizu" data-ord="10" data-pages="44" data-title="行かなかった人の地図" data-level="5">
       <a class="card" href="ikanakatta-hito-no-chizu.html">
         <div class="rt">いかなかったひとのちず</div>
         <h2>行かなかった人の地図<span class="lv">Lv5</span></h2>
@@ -1009,7 +1067,7 @@ main { counter-reset: story; }
         <button type="button" data-act="clear">消去</button>
       </div>
     </div>
-    <div class="cell" data-slug="rouka-no-kagami" data-pages="25" data-title="廊下の鏡" data-level="5">
+    <div class="cell" data-slug="rouka-no-kagami" data-ord="11" data-pages="25" data-title="廊下の鏡" data-level="5">
       <a class="card" href="rouka-no-kagami.html">
         <div class="rt">ろうかのかがみ</div>
         <h2>廊下の鏡<span class="lv">Lv5</span></h2>
@@ -1049,6 +1107,12 @@ main { counter-reset: story; }
       </div>
     </div>
 
+        </div>
+      </section>
+      <details class="shelf" id="s-done" data-shelf="done" hidden>
+        <summary class="sh">読了<span class="sn"></span></summary>
+        <div class="list"></div>
+      </details>
     </main>
 
     <!-- Both halves of this used to sit at the foot of the list, in the reading
@@ -1231,7 +1295,7 @@ main { counter-reset: story; }
     }
     $("readtot").textContent = done ? " · 読了 " + done + "/" + cells.length : "";
     resume(open, openPage, next);
-    autoOpen(all, null);
+    shelve(all, null);
   }
 
   // 続き on the story already in hand, 次へ on the first one not yet
@@ -1252,44 +1316,90 @@ main { counter-reset: story; }
     el.hidden = false;
   }
 
-  // A story you have finished and not yet rated opens itself, so the
-  // stars are still in front of you on the way out — which is the whole
-  // reason they do not sit behind 編集. A row the reader has opened or
-  // closed by hand is left alone; a preference beats a default.
-  // Both callers already hold the map they painted from, and a push or a
-  // pull paints from the merged result rather than from the store — so
-  // going back to localStorage here can disagree with what is on screen.
-  // A write that silently failed on quota is enough to produce it.
-  function autoOpen(prog, revs) {
-    prog = prog || read();
-    revs = revs || readR();
-    for (var i = 0; i < cells.length; i++) {
-      var cell = cells[i];
-      if (shut[cell.dataset.slug] || cell.classList.contains("open")) continue;
-      var p = prog[cell.dataset.slug], r = revs[cell.dataset.slug];
-      var fin = p && typeof p === "object" && p.done === true;
-      var rated = r && typeof r === "object" && Number(r.stars) >= 1;
-      if (fin && !rated) disclose(cell, true);
-    }
-  }
-
   function disclose(cell, on) {
     cell.classList.toggle("open", on);
     var btn = cell.querySelector(".disc");
     if (btn) btn.setAttribute("aria-expanded", on ? "true" : "false");
   }
 
-  // Which rows have been shut by hand, so the auto-open does not undo the
-  // correction on the next load. A Home Screen install relaunches on
-  // every visit, so an in-memory flag would mean it never held at all.
-  // Device-local and out of the gist deliberately: this is where this
-  // screen is scrolled to, not anything about the reading.
-  var shut = slot("shut");
-  function remember(slug, on) {
-    if (on) delete shut[slug]; else shut[slug] = 1;
-    try {
-      localStorage.setItem("japanese-stories:shut", JSON.stringify(shut));
-    } catch (e) {}
+  // Three shelves: 感想待ち for a story finished and not yet rated, 未読
+  // for everything still to read, in reading order, and 読了 folded away
+  // at the foot. A finished story used to stay in its reading-order slot,
+  // so by the eighth one the list was mostly things behind you, and an
+  // unrated one opened itself in place wherever in the list that was. The
+  // rating is the one thing a finished story still asks for, so it goes to
+  // the top, next to 次へ, and everything else that is finished folds.
+  //
+  // Both callers already hold the map they painted from, and a push or a
+  // pull paints from the merged result rather than from the store — so
+  // going back to localStorage here can disagree with what is on screen.
+  var shelves = { review: $("s-review"), unread: $("s-unread"), done: $("s-done") };
+  // Rated on this page during this visit. Such a row stays on 感想待ち
+  // until the next load, so the stars and the 感想 box do not leave from
+  // under the thumb still using them; a rating that arrives from another
+  // device is not held, and files under 読了 as soon as it lands.
+  var held = {};
+  // The 読了 fold, per device: where this screen is opened to, not
+  // anything about the reading, so it stays out of the gist.
+  var fold = slot("fold");
+
+  // A note box opened on 感想待ち is drawn without opening the row. Off
+  // that shelf a collapsed row hides it, and left open it would reappear
+  // the next time 詳細 is, with its button still saying it is open.
+  function closeNote(cell) {
+    var ta = cell.querySelector("textarea.note"), btn = cell.querySelector(".notebtn");
+    if (ta) ta.hidden = true;
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
+
+  function shelve(prog, revs) {
+    prog = prog || read();
+    revs = revs || readR();
+    var lists = { review: [], unread: [], done: [] };
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i], slug = cell.dataset.slug;
+      var p = prog[slug], r = revs[slug];
+      var fin = !!p && typeof p === "object" && p.done === true;
+      var rated = !!r && typeof r === "object" && Number(r.stars) >= 1;
+      var to = !fin ? "unread" : !rated || held[slug] ? "review" : "done";
+      // Re-parenting a row blurs whatever inside it has focus, which would
+      // take a half-typed note out from under the keyboard. A row with its
+      // note box focused waits for the next paint. Only the box: a 編集
+      // button keeps focus after a click on desktop, and pinning on that
+      // would leave the row it just moved on the wrong shelf.
+      var here = cell.closest(".shelf").dataset.shelf;
+      var ta = cell.querySelector("textarea.note");
+      if (ta && ta === document.activeElement) to = here;
+      lists[to].push(cell);
+      cell.dataset.to = to;
+    }
+    // Two passes. Rows changing shelf move first, and none of them is the
+    // focused one. What stays is already in reading order, so the second
+    // pass only ever inserts the newcomers around it — a staying row is
+    // never itself moved, which is what would blur it.
+    for (var m = 0; m < cells.length; m++) {
+      var c = cells[m];
+      if (c.closest(".shelf").dataset.shelf !== c.dataset.to) {
+        shelves[c.dataset.to].querySelector(".list").appendChild(c);
+        if (c.dataset.to !== "review" && !c.classList.contains("open")) closeNote(c);
+      }
+    }
+    for (var k in lists) {
+      var box = shelves[k], list = box.querySelector(".list"), rows = lists[k];
+      for (var j = 0; j < rows.length; j++) {
+        if (list.children[j] !== rows[j]) list.insertBefore(rows[j], list.children[j] || null);
+      }
+      box.querySelector(".sn").textContent = rows.length;
+    }
+    var rv = lists.review.length, un = lists.unread.length, dn = lists.done.length;
+    shelves.review.hidden = !rv;
+    shelves.done.hidden = !dn;
+    shelves.unread.hidden = !un;
+    // A lone shelf needs no name; the plain list it was before is clearer.
+    shelves.unread.querySelector(".sh").hidden = !(rv || dn);
+    // Folded unless asked otherwise — except when there is nothing left
+    // to read, where a folded 読了 would leave the page all but empty.
+    shelves.done.open = typeof fold.open === "boolean" ? fold.open : !un;
   }
 
   function paintR(all) {
@@ -1315,7 +1425,7 @@ main { counter-reset: story; }
       var btn = cell.querySelector(".notebtn");
       if (btn) btn.classList.toggle("has", !!note);
     }
-    autoOpen(null, all);
+    shelve(null, all);
   }
 
   // The words whose reading was asked for in each story, summed across
@@ -1458,12 +1568,16 @@ main { counter-reset: story; }
     // Ahead of act(): an unrecognised action falls through to its
     // stepper branch, so a disclosure tap would turn a page.
     if (what === "more") {
-      var on = !cell.classList.contains("open");
-      disclose(cell, on);
-      remember(cell.dataset.slug, on);
+      disclose(cell, !cell.classList.contains("open"));
       return;
     }
-    if (what === "star") { star(cell, Number(btn.dataset.n)); return; }
+    if (what === "star") {
+      // Only a row already waiting is held: re-rating one under 読了 must
+      // not lift it to the top of the page.
+      if (cell.closest("#s-review")) held[cell.dataset.slug] = 1;
+      star(cell, Number(btn.dataset.n));
+      return;
+    }
     if (what === "note") {
       var ta = cell.querySelector("textarea.note");
       if (!ta) return;
@@ -1471,8 +1585,9 @@ main { counter-reset: story; }
       // A collapsed row puts the box in a display:none subtree, where it
       // cannot take focus and so is not skipped by paintR's focused-box
       // guard — the next pull would overwrite what was being typed.
-      // Revealing the box opens the row that holds it.
-      if (show) disclose(cell, true);
+      // Revealing the box opens the row that holds it — except on
+      // 感想待ち, where the box is drawn on the collapsed row already.
+      if (show && !cell.closest("#s-review")) disclose(cell, true);
       ta.hidden = !show;
       btn.setAttribute("aria-expanded", show ? "true" : "false");
       if (show) ta.focus();
@@ -1488,7 +1603,9 @@ main { counter-reset: story; }
     var ta = e.target.closest ? e.target.closest("textarea.note") : null;
     if (!ta) return;
     var cell = ta.closest(".cell[data-slug]");
-    if (cell) review(cell.dataset.slug, function (r) { r.note = ta.value; return r; }, true);
+    if (!cell) return;
+    if (cell.closest("#s-review")) held[cell.dataset.slug] = 1;
+    review(cell.dataset.slug, function (r) { r.note = ta.value; return r; }, true);
   });
 
   main.addEventListener("focusout", function (e) {
@@ -1500,6 +1617,13 @@ main { counter-reset: story; }
   // The tab away, the app switch and the Home Screen swipe all land here,
   // and only this one is reliable on iOS.
   window.addEventListener("pagehide", function () { if (flush) pushNow(); });
+
+  // Off the click rather than the toggle event, which also fires when
+  // shelve() sets the default and would record that as a choice.
+  shelves.done.querySelector("summary").addEventListener("click", function () {
+    fold.open = !shelves.done.open;
+    try { localStorage.setItem("japanese-stories:fold", JSON.stringify(fold)); } catch (e) {}
+  });
 
   $("edit").addEventListener("click", function () {
     var on = $("edit").getAttribute("aria-pressed") !== "true";

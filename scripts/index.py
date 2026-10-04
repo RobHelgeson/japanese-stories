@@ -81,7 +81,7 @@ STARS = "".join(
 )
 
 
-def card(story, summary, versions=()):
+def card(story, summary, versions=(), n=0):
     href = html.escape(story["file"])
     title = html.escape(story["title"])
     reading, text = summary
@@ -104,7 +104,9 @@ def card(story, summary, versions=()):
     sum_p = f'<p class="sum">{text}</p>' if text else '<p class="sum none">—</p>'
     # data-title rather than reading the <h2> back: the heading carries the
     # level chip too, so its textContent is not the title.
-    return f"""    <div class="cell" data-slug="{html.escape(slug)}" data-pages="{story["pages"]}" data-title="{title}"{f' data-level="{lv}"' if lv is not None else ""}>
+    # data-ord is the reading-order position, baked in because the contents page
+    # regroups rows into shelves and a CSS counter would renumber them by shelf.
+    return f"""    <div class="cell" data-slug="{html.escape(slug)}" data-ord="{n}" data-pages="{story["pages"]}" data-title="{title}"{f' data-level="{lv}"' if lv is not None else ""}>
       <a class="card" href="{href}">
         {rt}<h2>{title}{f'<span class="lv">Lv{lv}</span>' if lv is not None else ""}</h2>
         {sum_p}
@@ -165,8 +167,8 @@ def main():
               file=sys.stderr)
 
     cards = "".join(
-        card(s, sums.get(s["title"], ("", "")), VERSIONS.get(Path(s["file"]).stem, []))
-        for s in built
+        card(s, sums.get(s["title"], ("", "")), VERSIONS.get(Path(s["file"]).stem, []), i)
+        for i, s in enumerate(built, 1)
     )
     known = built[0]["stats"]["knownVocab"]
     totals = (
