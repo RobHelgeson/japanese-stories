@@ -31,7 +31,24 @@ __CONTENTS_CSS__
         <span class="rpct"></span>
       </a>
 
+      <!-- Three shelves, filled by contents.js from the progress and review
+           maps. Every card is built into 未読 so the page still lists every
+           story with no script; the other two stay hidden until paint moves
+           rows into them. -->
+      <section class="shelf" id="s-review" data-shelf="review" hidden>
+        <h2 class="sh">感想待ち<span class="sn"></span></h2>
+        <div class="list"></div>
+      </section>
+      <section class="shelf" id="s-unread" data-shelf="unread">
+        <h2 class="sh" hidden>未読<span class="sn"></span></h2>
+        <div class="list">
 __CARDS__
+        </div>
+      </section>
+      <details class="shelf" id="s-done" data-shelf="done" hidden>
+        <summary class="sh">読了<span class="sn"></span></summary>
+        <div class="list"></div>
+      </details>
     </main>
 
     <!-- Both halves of this used to sit at the foot of the list, in the reading

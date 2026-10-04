@@ -98,7 +98,6 @@ main {
   margin-bottom: 0.9rem;
   border: 1px solid var(--rule);
   border-radius: 10px;
-  counter-increment: story;
   transition: border-color 0.12s ease, background 0.12s ease;
 }
 .card {
@@ -106,9 +105,10 @@ main {
   text-decoration: none;
   color: inherit;
 }
-main { counter-reset: story; }
+/* attr() rather than a counter: the shelves regroup the rows, and a counter
+   would number them by shelf. The number is the reading-order position. */
 .cell::before {
-  content: counter(story);
+  content: attr(data-ord);
   position: absolute;
   left: 1.4rem;
   top: 1.45rem;
@@ -273,6 +273,53 @@ main { counter-reset: story; }
 .cell.done:not(.open) .disc:hover .fin {
   background: color-mix(in srgb, var(--new) 12%, transparent);
 }
+
+/* The shelves. 感想待ち is first because a finished, unrated story is the
+   one thing on the page that is waiting on you rather than the other way
+   round, and it is a single tap to clear. 読了 is a fold at the foot: by
+   the eighth story most of the list is behind you, and a ladder walked
+   down once has no use for the rungs already climbed. */
+.shelf { margin: 0 0 1.6rem; }
+.shelf[hidden], .sh[hidden] { display: none; }
+.sh {
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 0.6rem;
+}
+.sh .sn {
+  margin-inline-start: 0.5rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+#s-review > .sh { color: var(--accent); }
+#s-done > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  list-style: none;
+  cursor: pointer;
+}
+#s-done > summary::-webkit-details-marker { display: none; }
+#s-done > summary::before { content: "▸"; margin-inline-end: 0.4rem; }
+#s-done[open] > summary::before { content: "▾"; }
+#s-done > summary:hover { color: var(--accent); }
+#s-done[open] > summary { margin-bottom: 0.6rem; }
+
+/* A row waiting on its rating is the one-line finished row with the stars
+   drawn under it: the ask is the only part of 詳細 it needs, so it is
+   there without a tap. The note box opens in place for the same reason.
+   了 goes, since the shelf is named for exactly that. */
+#s-review .cell:not(.open) .rate { display: flex; flex: 0 0 100%; margin-top: 0; }
+#s-review .cell:not(.open) .note:not([hidden]) {
+  display: block;
+  flex: 0 0 100%;
+  margin-bottom: 0.7rem;
+}
+#s-review .cell.done:not(.open) .disc .fin { display: none; }
 
 /* Continue reading. The catalogue is a ladder you walk down once, so the
    one row that matters on almost every visit is the story already open —

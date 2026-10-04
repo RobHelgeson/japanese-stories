@@ -64,6 +64,8 @@ One row per story in reading order, with its level, and the whole thing is gener
 
 The row shows what you need to **pick** a story: the title, its reading, its level, the blurb and how far in you are. 詳細 opens what you need to **finish** with one — the counts, the 苦手 and 新出 words, the stars, the 感想 box and the links to earlier drafts. At seven stories that is tidiness; the list is what it is protecting at fifty.
 
+The rows sit on three shelves. **感想待ち** comes first: a story you have finished and not yet rated, as one line with its stars and 感想 button under the title, because the rating is the one thing a finished story still asks of you. **未読** is everything still to read, as full cards in reading order. **読了** is finished and rated, folded at the foot behind its count, and opens by default only when nothing is left to read; whether it is open is remembered per device. Each row keeps its reading-order number on every shelf. A story rated on this page stays on 感想待ち until the next load, so the row does not move out from under a note you are about to write; a rating made on another device files it under 読了 as soon as it arrives.
+
 続き at the top is the story already in hand, whichever was read most recently, or 次へ on the first one not yet finished. It is built from the progress record at paint time, so it is simply absent on a device that has never read anything, and gone once the set is read out.
 
 案内 in the header holds the two things that are read once and then never again: what the gestures do inside a story, and the token field that connects the gist. Both used to sit in the reading column under the last story, which put a wall of instructions between the list and the end of the page every time you scrolled to the bottom. There is no footer — it printed the eight story titles, generated, beneath a list made of them.
@@ -82,7 +84,7 @@ The store is a plain JSON file on github.com, so correcting a bad record is some
 
 ## Rating a story
 
-Every row on the contents page carries five stars and a 感想 box, and a story you have finished without rating opens itself so the stars are in front of you — the rating is given on the way out of a story, not sat down to. The note stays behind its own button, because a star is the ask and a written note is the extra. Tapping a star sets the rating; tapping the star that is already lit takes it back off, which is the only undo there is. The note is free text, capped at 2000 characters, saved as you type and pushed on a short debounce.
+Every row on the contents page carries five stars and a 感想 box, and a story you have finished without rating moves to 感想待ち at the top with the stars already showing — the rating is given on the way out of a story, not sat down to. The note stays behind its own button, because a star is the ask and a written note is the extra. Tapping a star sets the rating; tapping the star that is already lit takes it back off, which is the only undo there is. The note is free text, capped at 2000 characters, saved as you type and pushed on a short debounce.
 
 Ratings travel in the same secret gist as progress, in a `reviews` map beside `progress` rather than as fields on the progress record. That separation is the whole point: a progress record is replaced whole by whichever side carries the later timestamp, and every page turn bumps that timestamp, so a rating stored there would be erased the next time another device turned a page in the same story.
 
@@ -91,7 +93,7 @@ python3 reviews.py                  # the ratings and notes, joined to corpus.js
 python3 reviews.py --file exp.json  # from a 書き出し export instead, no network
 ```
 
-A row you open or close by hand stays that way, across reloads — the auto-open is a default, and a default that reasserts itself is not one. That one flag is kept in `localStorage` and deliberately not in the gist: it is where this screen is scrolled to, not anything about the reading.
+Until 2026-10-04 an unrated story opened itself in place instead, wherever it sat in the list, and a flag remembered which rows you had shut by hand. Both went with the shelves. The only device-local state left is whether the 読了 fold is open, kept in `localStorage` and deliberately not in the gist: it is where this screen is opened to, not anything about the reading.
 
 `reviews.py` is the reading end, and it is what a new story's brief is chosen against: it prints each rating beside the level, register and length it was a verdict on, then the averages by level and by register, with their counts, and every note in full. A rating is one number and the note underneath it is where the reason lives. It reads the gist through `gh`, which already holds a token with the gist scope, so nothing has to be kept in step with the phone.
 
