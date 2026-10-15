@@ -2899,7 +2899,11 @@ def suite_table(br, rep, base):
     # 終電 27->29 on 2026-09-22: in-block attribution beats for the split
     # turns both second-read reviewers flagged. Two authored pages now fill a
     # second screen; nothing overflows.
-    expect = {"shuden": 29, "neko-o-sagasu-tantei": 30, "maigo-no-tegami": 18,
+    #
+    # 回覧板の返事 (18) recorded 2026-10-14, first measurement, in the same
+    # commit as the story. The first draft measured 26 text screens off 16
+    # authored pages; it was trimmed to 18 because it was briefed short.
+    expect = {"kairanban-no-henji": 18,"shuden": 29, "neko-o-sagasu-tantei": 30, "maigo-no-tegami": 18,
               "tokei-no-oto": 25, "shiro-no-kane": 42, "entotsu-no-kemuri": 28,
               "ikanakatta-hito-no-chizu": 49, "rouka-no-kagami": 25,
               "endai-no-shougi": 23, "sanban-no-kansouki": 37,
