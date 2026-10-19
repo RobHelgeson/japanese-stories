@@ -109,6 +109,26 @@
       }
     },
     {
+      "slug": "kiiroi-kasa",
+      "title": "黄色い傘",
+      "level": 2,
+      "_feature": "Second story in the comic register, and the first comic at level 2. The engine is a ledger: the narrator's exactness is both the comedy and the evidence, and at the climax she reads her own entries 黄1 to 黄8 as a confession. The reader is meant to be a step ahead from page 2, where she complains about the bakery's yellow sign.",
+      "_note": "NO NAMES FOR THE TWO LEADS. She is 本屋さん to him and he is パン屋の主人 to her; the feud keeps them on titles. HER VOICE is neat polite-plain わたし, comedy carried by counting; HIS is loud plain speech, and his daily 「たまにはパン、買いに来てよ！」 is planted to pay off as 「やっと来た！」. ARITHMETIC CHECKED: 10 green; 2 come back to her stand, 8 go to the bakery (the neighbourhood returns to whichever shop it passes, and the umbrellas carry no mark). 8 yellow arrive in her stand (3 by mid June, 5 by end June, 8 by late July); she lends all 8 as 黄1 to 黄8, the last on the morning of the climax. BEAT 5 is inferable: he walks to her shop under one green umbrella with a second under his arm, to return it, and she locks him out with 本日休み. 黄8 goes to the dentist's receptionist, who was the first green umbrella not to come back.",
+      "_premise": "CLIMAX: she crosses the street in the rain with her ledger to accuse the baker, entering his shop for the first time in ten years. He shouts 「本屋さん！やっと来た！」. Behind him eight of her green umbrellas stand dried and rolled, each tagged 本屋 in his big writing. 「で、うちの黄色いのは？」 She has lent every yellow one out and her ledger says to whom; she reads 黄1 to 黄8. She closes it and says 「あんパンを、一つください」, her first purchase in ten years. He laughs the loud laugh. AFTERWORD: see stories-index.md. PREMISE: a fussy bookseller lends ten green umbrellas with a ledger; greens stop coming back and unfamiliar yellow ones arrive; she decides she is being robbed, and finally that the thief is the loud baker opposite whose yellow sign she has resented for a decade. WANT: all ten green umbrellas back, and the swapper caught. NEED: exactness is her fence against owing anyone, needing anyone, or walking into anyone's shop; she has to end up in the wrong, in debt, in public, and pay in the currency the feud refused. SHAPE: three-act, I 1-2 (pp1-5), II 3-5 (pp6-13), III 6-7 (pp14-19). BEATS: 1 the ledger and the ten greens; plants: the yellow sign, his daily greeting, ten years without buying his bread; a green fails to return and a yellow appears (yes-but). 2 three missing, three yellow; she theorises a swapper with kiosk umbrellas and tapes up 緑の傘は本屋の傘です; more yellows, and a boy thanks her for one (no-and). 3 the boy shelters from the rain, only yellows left; she lends one as the thief's repayment and starts a yellow column (yes-but). 4 he shouts 傘！傘！ with his arms full; she reads mockery and shuts the door (no-and). 5 he comes under a green umbrella with a second under his arm; she locks the door and puts out 本日休み; certainty; the ledger balances on her side; she lends 黄8 (yes-but). 6 CLIMAX at the bakery (no-and). 7 home with eight greens and the あんパン; a new paper: either shop is fine; next rain she takes back a yellow without writing anything (yes-but).",
+      "brief": {
+        "pages": 18,
+        "register": "comic",
+        "new_words": 4,
+        "leech_seeds": 5
+      },
+      "new_words": {
+        "傘立て": "umbrella stand — first in p1 with ten green umbrellas standing in it; the story's centre, recurs as where the yellows appear, where the papers are taped, and as the bakery's own stand at the climax",
+        "商店街": "shopping street — p1, as the reason she never marked the umbrellas: no other shop on it lends green ones",
+        "印": "mark, tag — p1 as the mark she decided not to put on the umbrellas; paid off at the climax as his paper tags reading 本屋",
+        "雨宿り": "sheltering from rain — p6, the boy standing in front of the shop, which is why she lends the first yellow"
+      }
+    },
+    {
       "slug": "shuden",
       "title": "終電",
       "level": 3,
