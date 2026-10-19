@@ -2464,7 +2464,7 @@ def suite_index(br, rep, base):
         late_ord = br.eval(f"{cell(late)}.dataset.ord")
         rep.add("index", "rows-keep-their-reading-order-number",
                 br.eval(f"getComputedStyle({cell(late)}, '::before').content") == f'"{late_ord}"'
-                and late_ord == "3", late_ord)
+                and late_ord == str(index.ORDER.index(late) + 1), late_ord)
         br.eval("document.querySelector('#s-done > summary').click()")
         br.goto_plain(f"{base}/index.html")
         br.eval("new Promise(r => setTimeout(r, 300))", await_promise=True)
@@ -2917,7 +2917,19 @@ def suite_table(br, rep, base):
               "tokei-no-oto": 25, "shiro-no-kane": 42, "entotsu-no-kemuri": 28,
               "ikanakatta-hito-no-chizu": 49, "rouka-no-kagami": 25,
               "endai-no-shougi": 23, "sanban-no-kansouki": 37,
-              "juugonichi-no-shichifuda": 30}
+              "juugonichi-no-shichifuda": 30,
+              # The 2026-10-18 batch of ten, recorded at first measurement
+              # in the commit after they shipped; nothing overflows.
+              "shio-no-tamagoyaki": 18,
+              "kiiroi-kasa": 20,
+              "kagi-to-cheen": 24,
+              "kitsune-ni-kashita-sumi": 30,
+              "kashidashichuu-no-hon": 36,
+              "suupu-o-nokosu-kyaku": 31,
+              "chichi-no-hasami": 30,
+              "shiroi-bangou": 47,
+              "nanatsu-no-mado": 34,
+              "chouritsu-no-hokori": 42}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
