@@ -254,6 +254,26 @@
       "new_words": {}
     },
     {
+      "slug": "suupu-o-nokosu-kyaku",
+      "title": "スープを残す客",
+      "level": 4,
+      "_feature": "Second story in the comic register and the first at level 4 since 猫を探す探偵. Three-act, eight beats. The misreading engine is new: every sign of a salt ration (water first, a white medicine packet, a notebook, a hospital sighting) is read by the owner as a verdict on his broth, so each fix he makes aims at the wrong problem and lands on another customer. The climax is three dry lines from a man who almost never speaks, and the owner's turn is shown only in action: he pours the half away and does not look at the line.",
+      "_note": "半分さん IS THE OWNER'S PRIVATE NICKNAME, said only in his head from p2 (小林にも言ったことはない); he lets it slip on p13 and 小林 grins, which is the setup for 小林 writing it on the wall in the last act. FOUR VOICES: 松田 俺 / 〜ぞ / ねえ; 小林 〜っす; 高橋 loud, 〜な / 〜ぞ / あんのか; 半分さん わし / 〜とる / 〜ん, three lines at the climax and one at the close. The health plants are meant to read as health to the reader from first sight while 松田's verdict stays confidently wrong. NO WEEKLY MARCH: visits are undated, the only time markers are その日, ある朝, その週のうちに, 次に. Side characters close on the page: the student gets the お湯 on the wall, 高橋's wife orders it for her health, 小林 gets the nickname. Peeked words reused on purpose: 渡す, 黙る, 隣, 決める, 近所, 返事. Names chosen to survive segmentation whole: 健太, 田中, 大野 and 佐藤 all split or failed check.py in drafting.",
+      "_premise": "CLIMAX: 半分さん drinks the owner's near-saltless private pot to the bottom; 高橋 starts clapping. He takes out the white packet, opens his 手帳 on the counter and orders a regular bowl. Three dry lines: 医者に、一日の塩を決められとる / わしの分は、ここで使うことにしとる / これは、お湯だ。数に入らん. The page logs 松田　半分 against salt on every date. He drinks exactly half of the real bowl, pays for two and leaves; 松田 pours the half away without looking at the line. AFTERWORD: see stories-index.md. PREMISE: 松田 has run a ten-seat ramen shop for thirty years and measures himself by the soup left in the bowl; one quiet regular always drinks exactly half, and 松田 sets out to fix the broth. WANT: 半分さん drinks the bowl to the bottom. NEED: he cannot trust his broth without an empty bowl to tell him so; he has to take the half as the compliment it is. SHAPE: three-act, I 1-2 (pp1-5), II 3-6 (pp6-16), III 7-8 (pp17-23). BEATS: 1 the ritual, pill read as stomach medicine, notebook as a score (no-and). 2 高橋 saw him at the hospital, read as my soup put him there; the want stated (yes-but). 3 double bones; 高橋 loves it, the student sweats, 小林 admits it was always salty, 半分さん drinks less (no-and). 4 the steam theory, a cooled bowl, 小林 serves it to 高橋 (no-and: the rumour of a special bowl). 5 a private small pot with less salt each visit; the line drops; the nickname slips; the student orders it (yes-but). 6 the pot becomes hot water, the big pot burns (no-and). 7 CLIMAX (yes-but: won and worthless). 8 the card 半分さんの on the wall; 半分さん orders regular, わしは、そっちは頼まんぞ / 頼まんでいい.",
+      "brief": {
+        "pages": 22,
+        "register": "comic",
+        "new_words": 4,
+        "leech_seeds": 7
+      },
+      "new_words": {
+        "麺": "noodles. First occurrence p1 is the regular eating them down to the last strand, part of the ritual the whole story watches; recurs in every repetition of that ritual and in 麺の湯を切った",
+        "丼": "the ramen bowl, and the scoreboard of the whole story: the line of soup left in it is what the owner reads. First occurrence p1, arriving and then lifted in both hands",
+        "暖簾": "the shop curtain. First occurrence is the owner hanging it out at eleven, the opening action of the story; the regular ducks under it to leave and arrive, and the last line is spoken through it",
+        "湯気": "steam off the bowl. First occurrence fogs the regular's glasses, which is the red herring the owner chases in the second fix (the cooled bowl)"
+      }
+    },
+    {
       "slug": "shiro-no-kane",
       "title": "城の鐘",
       "level": 5,
