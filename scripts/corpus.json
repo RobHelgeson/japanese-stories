@@ -438,6 +438,30 @@
         "見回り": "the evening round of the windows — the route the prints walk. First occurrence is the time arriving as the student reaches for his coat, and the next sentence is the round itself, done as a procedure",
         "先代": "the previous keeper — first occurrence is his handwriting on the closing list; recurs in the rule, the flashback and the cup"
       }
+    },
+    {
+      "slug": "chouritsu-no-hokori",
+      "title": "調律の埃",
+      "level": 5,
+      "_feature": "Second retrospective (述懐) story, and the first whose memories are told out of order: the frame is itself a past day (the last visit, 2011) seen from 2025, and the memory beats jump 1986, 1975, the 1990s, the 2000s. Chosen against the 城の鐘 review note that the corpus progresses through time monotonically. His speech is held to Kansai (わし, や, へん, はる, まへん) and the two women stay standard.",
+      "_note": "THE LOCK IS HIS OWN HABIT. The dust check is planted p1-2 as a jealous craftsman's quirk and p9 as a secret shared with a seven-year-old, and pays off as the camouflage she used for twenty-five years. Fair clues, all physical and early: the piano holds through 梅雨 and winter heating (p13), the mother answers his boasting with the weather and the hydrangeas (p12, p15), 千夏 comes home in the summer holidays and at New Year, exactly between his spring and autumn visits (p16), red felt where his is green (p17-18), the treble cleaner in autumn than he left it in spring (p19). BRIEF: approved at 6 new words against a 600-token estimate; the story runs ~800 tokens, where the derived budget is 8, and check.py flagged ピン, フェルト and ハンマー as unknown. Those three katakana loans are declared rather than written around, and 響く was dropped for the known 鳴る, so 8 declared. The real reason for the refusal is never stated: p7-8 show her hearing the beats before he names them and him closing the lid early. The closing claim 千夏は、私の弟子だった。 corrects his own refusal on p11 and is earned by watching her tune; the last line is the felt.",
+      "_premise": "CLIMAX: on his announced last visit the tuning pins of the Morimoto upright shine with no dust; he packs to leave, accusing the household of using another tuner; the mother looks past him; 千夏, 43, stands in the doorway with a hammer worn like his and says she did not put the dust back this time. For twenty-five years she tuned the piano between his visits and restored the dust he taught her to read. He detunes a string and hands her his hammer; she fixes it faster and cleaner than he could; he says only 埃は、もう戻さんでええ, tells the mother to call her from now on, and leaves his hammer. AFTERWORD: stories-index.md. PREMISE: a proud tuner judges every piano by the dust on its pins; he refused the daughter of his most loyal house as an apprentice; on his last visit the dust is gone. WANT: to end his career with the Morimoto piano as proof of his craft. NEED: his pride cannot bear being surpassed, and he refused her because her ear frightened him, not because she was a girl. SHAPE: three-act, memories out of order. BEATS: (I) 1 the dust habit, he walks out of houses with clean pins / 2 2011, the Morimoto pins shine / 3 1975, the child hears the beats before he names them, he closes the lid early, then shows her the dust check | (II) 4 1986, she asks to be his 弟子, he refuses and threatens never to return if another hand touches the piano; she leaves / 5 the piano holds its pitch, he boasts, the mother answers with the weather; she comes home at Obon and New Year / 6 the red felt; the treble cleaner than he left it | (III) 7 the climax / 8 the test, the hammer handed over / 9 2025 coda, 千夏は、私の弟子だった, the red felt among his green.",
+      "brief": {
+        "pages": 30,
+        "register": "retrospective",
+        "new_words": 8,
+        "leech_seeds": 9
+      },
+      "new_words": {
+        "調律": "tuning (a piano) — the trade itself. First occurrence is the verb in action, 町のピアノを調律して回った; recurs as 調律師, 調律が終わって, 調律のハンマー",
+        "鍵盤": "keyboard, a key — first occurrence is the thing he will not touch before checking the dust, 鍵盤に触る前に; recurs at the climax as 鍵盤には一度も触らなかった and when 千夏 strikes one key over and over",
+        "弦": "string — framed p7 by the act of tuning two strings together until they stop wobbling; recurs through the treble beats and the test",
+        "埃": "dust — the plant and the lock. First occurrence is on his fingertip after he runs it over the pins; recurs at every check, the secret shown to the child, and her 埃を戻しませんでした",
+        "湿気": "damp, humidity — framed p13 by wood soaking it up and pitch rising; recurs as the damp every other piano drifts in and the Morimoto piano does not",
+        "ピン": "tuning pin — katakana loan, transparent to the reader. First occurrence is under his finger, ピンの頭を指でそっとなでてみる; it is where the dust sits and where the scratches shine",
+        "フェルト": "felt (the tuner's mute) — katakana loan. First occurrence is the red strip found wedged between the treble strings; the colour is the clue, his is green, and it closes the story",
+        "ハンマー": "tuning hammer — katakana loan. First occurrence is the fresh scratches its head leaves on the pins; then hers worn like his, and his handed to her and left behind"
+      }
     }
   ]
 }
