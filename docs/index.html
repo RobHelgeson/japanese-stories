@@ -657,7 +657,7 @@ main {
     <header>
       <h1>物語</h1>
       <span class="spacer"></span>
-      <span id="totals">12 編 · 332 ページ · 1600 文 · 既知語彙 6664<span id="readtot"></span></span>
+      <span id="totals">12 編 · 332 ページ · 1600 文 · 既知語彙 6659<span id="readtot"></span></span>
       <button class="btn" id="guide-open" type="button" aria-haspopup="dialog">案内</button>
       <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
     </header>
@@ -1040,7 +1040,7 @@ main {
         <span>194 文</span>
         <span>852 漢字語</span>
       </div>
-      <div class="chips"><span class="chip weak">苦手 お前、修理、年月、当時、後、流す、渡す、状態、経つ、表、起きる、過ぎる</span><span class="chip new">新出 二百段、叫ぶ、従う、段、王、罰、金属、響く</span></div>
+      <div class="chips"><span class="chip weak">苦手 お前、一方、修理、年月、当時、後、流す、渡す、状態、経つ、表、起きる、過ぎる</span><span class="chip new">新出 二百段、叫ぶ、従う、段、王、罰、金属、響く</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -1079,7 +1079,7 @@ main {
         <span>231 文</span>
         <span>1126 漢字語</span>
       </div>
-      <div class="chips"><span class="chip weak">苦手 位置、年月、折れる、村、案内、正確、残す、渡る、用意、経つ、経験、起きる、起こす、迎える、返事、遅れる、過ぎる</span><span class="chip new">新出 印、導く、岩、岸、峠、崖、足跡、頼る</span></div>
+      <div class="chips"><span class="chip weak">苦手 一方、位置、年月、折れる、村、案内、正確、残す、渡る、用意、経つ、経験、起きる、起こす、迎える、返事、遅れる、過ぎる</span><span class="chip new">新出 印、導く、岩、岸、峠、崖、足跡、頼る</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -1118,7 +1118,7 @@ main {
         <span>107 文</span>
         <span>455 漢字語</span>
       </div>
-      <div class="chips"><span class="chip weak">苦手 仕舞う、位置、残す、用意、過ぎる</span><span class="chip new">新出 光、向き、埃、斜め、明かり、釘</span></div>
+      <div class="chips"><span class="chip weak">苦手 一方、仕舞う、位置、残す、用意、過ぎる</span><span class="chip new">新出 光、向き、埃、斜め、明かり、釘</span></div>
       <div class="rate">
         <span class="stars" role="group" aria-label="評価">
           <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
@@ -1210,6 +1210,8 @@ main {
     <!-- The no-showModal fallback, same as the reader's. -->
     <div id="veil" hidden></div>
     <script src="sync.js"></script>
+    <!-- Offline copy of the published tree; see scripts/sw.js. https only, as in build.REGISTER. -->
+    <script>if (location.protocol === "https:" && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
     <script>
 // Progress is written by the readers into this device's localStorage, so
 // it cannot be baked in here. Pages serves this page and every reader from
