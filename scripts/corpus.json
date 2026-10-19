@@ -129,6 +129,24 @@
       }
     },
     {
+      "slug": "kagi-to-cheen",
+      "title": "鍵とチェーン",
+      "level": 2,
+      "versions": [],
+      "_premise": "CLIMAX: 8:50 on a Saturday; the son (about thirty, moved back home, keeps the household money and his father's pension in a notebook, with a back page dating his father's lapses) has searched every place on his list for the one house key. His father, seventy-one, cheerful, wearing the son's old high-school coat since breakfast, is at the door with one shoe on. The son says, half to himself, 「チェーンは、外からは掛けられない」. The father stops, finds the key in the coat pocket, hands it over, then sets down a damp envelope from the station-front newspaper delivery shop: three weeks' pay. 「お前の手帳に、指輪は書けんだろう」. The son looks at the mother's red circle on next Friday's calendar. He does not put the key back on its dish; he hands it to his father, 「持ってて」, and goes to work late with no key. That night he leaves the chain hanging. AFTERWORD: stories-index.md § Afterwords. PREMISE: the son reads every clue (chain off, wet paper, grey fingertips, his own old coat on his father) as the forgetfulness he dreads; the same facts describe a man getting up at four to earn money his son cannot count. WANT: find the key before nine so he can lock up and leave. NEED: stop managing his father as if he were already old; the secrecy was a reply to him. SHAPE: three-act. BEATS: Act I (1) chain off, son blames himself; wet newspaper, rain in the night; (2) father cheerful at breakfast in the son's coat, grey fingertips logged on the back page, red circle on the calendar, errand at ten; (3) 8:15, key gone from its dish [act break]. Act II (4) the list, crossed off in order; the old coat is not on it; father searching cheerfully; (5) phone to the mother: she has hers, says he is getting up early like when he was young, tells him not to fuss about next week; he cannot say 物忘れ; (6) outside to the neighbour's, nothing; father at the door to leave. Act III (7) the chain line is the turn; key, envelope, the father's one line, the calendar; (8) the key given away, the chain left hanging.",
+      "brief": {
+        "pages": 20,
+        "register": "procedural",
+        "new_words": 4,
+        "leech_seeds": 6
+      },
+      "new_words": {
+        "チェーン": "door chain — framed p1 by its being found undone, チェーンが外れている, before the narrator says he fastens it himself every night. Recurs at the act break, at the turn as the line that can't be fastened from outside, and as the last image",
+        "年金": "pension — framed p4 by the money moving through the son's notebook, 父の年金も毎月僕の手帳に入って、僕の手帳から出ていく, which is the control the father's secret answers",
+        "物忘れ": "forgetfulness — framed by the word sticking in the son's throat on the phone to his mother, and next as the thing he would have to take his father to a doctor for"
+      }
+    },
+    {
       "slug": "shuden",
       "title": "終電",
       "level": 3,
