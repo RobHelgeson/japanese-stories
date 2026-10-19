@@ -80,6 +80,24 @@
       }
     },
     {
+      "slug": "shio-no-tamagoyaki",
+      "title": "塩の卵焼き",
+      "level": 1,
+      "_note": "NOBODY DIES. The mother is in hospital for a few weeks and stays offstage until the climax, ill but not tragic. Written in response to two notes: 時計の音 'the hook never really hit' and 煙突の煙 'another story about a dead person, no twist'. THE TWIST IS RECOVERABLE FROM FACTS ON THE PAGE: 千秋's 卵焼き are sweet and 葵 likes them sweet (p5, said as an argument he wins); 葵 has never washed her own glass (p3, said as a habit); the hospital is next to the school (p7, said as a reproach); she comes home after seven 'with friends'. The climax realisation is three short observed facts (the box on the blanket, 千秋 eating with 葵's chopsticks, 千秋 washing the box at the room's sink), not one complex sentence. The turn is the one line 砂糖は、どのくらい入れるんだ, the first time he asks anyone how to do something; the text does not say so. NAMES: 由美 was the Gate 2 name and splits 由+美 in Ichiran, so the wife became 千秋, which segments whole and fits a woman born in the early 1980s. Peeked words reused on purpose: 渡す, 返事, 黙る, 隣, 決める.",
+      "_premise": "CLIMAX: a weekday at four, the father leaves work early with his wife's pyjamas and walks into her hospital room unannounced. 葵 sits on the bed in uniform; his 弁当箱 is open on the blanket with only the 卵焼き left; 千秋 is eating them with 葵's chopsticks. 葵 shuts the lid too late. 千秋 finishes and says 今日のは、ちょっと塩が多いね, then washes the empty box at the room's sink. 葵 has eaten none of his 卵焼き; 千秋 has eaten all of them; the clean box he was proud of was washed here. He cannot find whom to be angry at, sits down, and asks how much sugar. AFTERWORD: see stories-index.md. PREMISE: 千秋 goes into hospital for a few weeks; her husband, who has never cooked, takes over their thirteen-year-old's lunches; 葵 never says whether it is good, but the box comes home empty and washed, and he decides that means it is. WANT: run the house alone until she is back, with 葵 eating his food. NEED: he decides everything and never asks; asking 千秋 how would mean admitting the house is hers. SHAPE: three-act, I 1-2 (pp1-5), II 3-6 (pp6-9), III 7-8 (pp10-16). BEATS: 1 first morning, 卵焼き 焦げる, salted like his mother's; he hands over the box, she takes it silently and leaves her glass in the sink as always (yes-but). 2 box comes home empty and washed, he is pleased; 千秋 on the phone: 葵は、甘いのが好きなのよ; he answers 卵焼きは塩だ。もう決めた and hangs up (no-and). 3 a week of mornings, fewer burns, always a clean box, always home after seven 'with friends'; he decides not to ask (yes-but). 4 美味しかったか; she answers only that the hospital is next to school and she can see her mother's room; he hears reproach and snaps (no-and). 5 he leaves work early unannounced with the pyjamas (yes-but). 6 CLIMAX as above; he asks how much sugar (no-and: the want is gone, and he asks). 7 one big spoon, a little salt too, 退院は来週; 葵 walks beside him home. 8 next morning, sugar burns, second one right; she takes the box without a reply; that night it comes home empty and unwashed, rice on the lid, and he washes it himself.",
+      "brief": {
+        "pages": 15,
+        "register": "quiet-realism",
+        "new_words": 3,
+        "leech_seeds": 4
+      },
+      "new_words": {
+        "弁当箱": "lunchbox — first met p2 taken off the shelf and packed, 棚から娘の弁当箱を出して…詰める; carries every evening's empty, washed box, the climax on the blanket, and the last unwashed one",
+        "卵焼き": "rolled omelette — first met p1 being cooked, 卵焼きを作り始めた; salt against sugar is the plant, the climax and the last morning",
+        "焦げる": "to burn, scorch — first met p1 as the first omelette going black; recurs as the burns getting fewer and as sugar making the first one burn again"
+      }
+    },
+    {
       "slug": "maigo-no-tegami",
       "title": "迷子の手紙",
       "level": 2,
