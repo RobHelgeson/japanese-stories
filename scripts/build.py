@@ -272,6 +272,12 @@ def render(title, data):
     return html.replace('"__STORY_DATA__"', blob(data))
 
 
+REGISTER = (
+    '    <script>if (location.protocol === "https:" && "serviceWorker" in navigator) '
+    'navigator.serviceWorker.register("sw.js");</script>\n'
+)
+
+
 def render_shell(title, data_href, css_href="reader.css", js_href="reader.js",
                  sync_href="sync.js"):
     """The linked form: a ~2KB document that pulls in the engine and one story.
@@ -296,7 +302,12 @@ def render_shell(title, data_href, css_href="reader.css", js_href="reader.js",
         "    <script>\n__READER_JS__\n    </script>\n",
         f'    <script src="{sync_href}"></script>\n'
         f'    <script src="{data_href}"></script>\n'
-        f'    <script src="{js_href}"></script>\n',
+        f'    <script src="{js_href}"></script>\n'
+        # https only, which is the published site: a reader opened off the
+        # filesystem during story work, or by the harness on localhost, should
+        # never be answered from a cache of an older build. The shell rather
+        # than render(), so docs/versions/ stays frozen.
+        f'{REGISTER}',
     )
     return html.replace("__TITLE__", title)
 

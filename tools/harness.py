@@ -147,6 +147,16 @@ def check_contracts():
             raise SystemExit(
                 f"build contract broken: {name} contains substitution marker(s) {stray}")
 
+    # The worker registration is the same line in two templates, because the
+    # contents page does not go through render_shell. Either one drifting would
+    # leave that page uncached offline, and no browser suite runs on https.
+    if chtml.count(build.REGISTER) != 1 or shell.count(build.REGISTER) != 1:
+        raise SystemExit("build contract broken: build.REGISTER missing from a template")
+    sw = (index.HERE / "sw.js").read_text(encoding="utf-8")
+    for needle in ('"__VERSION__"', "__FILES__"):
+        if sw.count(needle) != 1:
+            raise SystemExit(f"build contract broken: {needle!r} matched {sw.count(needle)}x in sw.js")
+
     folded = index.template()
     left = [m for m in ("__CONTENTS_CSS__", "__CONTENTS_JS__") if m in folded]
     if left:

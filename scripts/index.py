@@ -27,6 +27,7 @@ import sys
 from pathlib import Path
 
 import indexmd
+import offline
 import stats
 
 HERE = Path(__file__).resolve().parent
@@ -181,6 +182,8 @@ def main():
         template().replace("__CARDS__", cards).replace("__TOTALS__", totals),
         encoding="utf-8")
     print(f"{out}\n  {len(built)} stories · {totals}")
+    # Last, because its version hashes index.html along with everything else.
+    print(offline.write(out_dir))
 
 
 if __name__ == "__main__":

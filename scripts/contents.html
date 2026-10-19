@@ -108,6 +108,8 @@ __CARDS__
     <!-- The no-showModal fallback, same as the reader's. -->
     <div id="veil" hidden></div>
     <script src="sync.js"></script>
+    <!-- Offline copy of the published tree; see scripts/sw.js. https only, as in build.REGISTER. -->
+    <script>if (location.protocol === "https:" && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
     <script>
 __CONTENTS_JS__
     </script>
