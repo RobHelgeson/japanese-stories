@@ -245,6 +245,27 @@
       }
     },
     {
+      "slug": "kitsune-ni-kashita-sumi",
+      "title": "狐に貸した隅",
+      "level": 3,
+      "_feature": "Second folktale, and the first told-to-you voice: every unbracketed line is the old woman talking to her grandson, so the frame is a live walk to the field in ル forms and the tale inside it runs in タ. The tale is told in the third person about 'a girl called ハル', and the teller's name is never said in the frame, so 「ハルは、わしじゃ」 is the reveal. 化ける carries the folktale magic: stolen fox rice turns to leaves, given fox rice stays rice.",
+      "_note": "THE SAME FOUR WORDS TWICE: 「わしが刈った」 is the grandmother's lie on p21 and the teller's truth on p25, and the boy is the one who notices the repetition. VEILED PLANTS: 雀に貸しとる (p2) said as a family joke; 松吉さん's warning that fox rice turns to leaves (p10) written as envy, since he is looking at the grandmother's field while he says it; 貸すのはええ。借りるのは嫌いじゃ (p5) as plain pride; 足元を見い (p12) as a real warning about a real stone, paid off as the last line in the boy's mouth. The boy is never named and calls her ばあちゃん throughout. LOGIC: the teller's grandmother is the boy's great-great-grandmother, so he says ハルのばあさま rather than claiming kinship he has not worked out. Rent in rice to the 持ち主 (地主 and 小屋 are unknown; the rice is hung to dry 家の裏). Peeked words reused on purpose: 渡す, 黙る, 返事, 隣, 乾かす.",
+      "_premise": "CLIMAX: the night before harvest, the boy holds the light at the corner by the woods while old ハル, stick handed off so she can stand on her own feet, says to the dark 「わしが刈った」. He says that is what ハル's grandmother said; she says 「ハルは、わしじゃ」. Nothing comes out of the woods. She tells him to cut the corner tomorrow and hang one handful behind the house by itself; if it turns to leaves she will come and say it again. Cost: sixty years of the uncut corner end under his blade, he now knows she was the thief, and there is no sign. AFTERWORD: see stories-index.md. PREMISE: an old woman makes her grandson walk her to the corner of the field she has left uncut for sixty years, telling a fox tale on the way about a girl called ハル. WANT: keep the corner from being cut tomorrow, or failing that keep the reason secret. NEED: to admit she owes; she inherited her grandmother's lend-never-borrow pride and has lived a confession as a yearly habit so as never to say it. SHAPE: three-act; frame (ル) interleaved with tale (タ), no seasonal march. BEATS: I 1 the boy will cut the corner, her sparrow joke loses; but she gets him alone and starts a tale (yes-but). 2 cold summer, the grandmother refuses 松吉さん's rice, lends the poor corner to a too-polite young man; ハル sees a tail; 狐でも、約束は約束じゃ (yes-but). II 3 the fox's corner turns gold, theirs stays thin; 松吉さん says fox rice turns to leaves; the owner's man says rent the day after harvest or the field goes (no-and). 4 frame: the boy asks how she knows ハル's thoughts; 足元を見い (yes-but). 5 rice short; 貸したもんの上に、借りはつくらん; ハル cuts the corner by moonlight and hangs it behind the house (yes-but: stolen). 6 morning, leaves; the grandmother sees ハル's muddy feet and sweeps, saying nothing (no-and). III 7 the fox brings the promised sack; 「わしが刈った」; he looks at ハル, leaves the rice, keeps the corner 刈った人が、返しに来るまで (yes-but). 8 CLIMAX. 9 cut it tomorrow; 帰ろう; the boy leads with the light: ばあちゃん、足元を見て.",
+      "brief": {
+        "pages": 25,
+        "register": "folktale",
+        "new_words": 5,
+        "leech_seeds": 8
+      },
+      "new_words": {
+        "狐": "fox — the borrower. First occurrence p8 is ハル naming what she has just seen under the hem, 「狐だ」, an act of recognition rather than a gloss; recurs as 狐の隅, 狐の米, 狐の稲 and in the boy's last question",
+        "田んぼ": "rice field — the rented land the want is about keeping. First doing work p1, 明日は田んぼを刈る; recurs as the grandmother's field, the thing 松吉さん looks at, and うちの田んぼ at the reveal",
+        "稲": "the rice plant, as distinct from 米 — what grows, is cut, is hung, and turns to leaves. First p4, staying thin and green in a cold summer; recurs on most tale pages",
+        "化ける": "to turn into, of a fox's doing — the mechanism the theft turns on. First p10 inside 松吉さん's warning, then p17 as the fact on the drying line",
+        "刈る": "to cut (grain) — the act the whole debt is about. First p1 in the father's plan; recurs as the theft, the lie, the confession and the instruction"
+      }
+    },
+    {
       "slug": "neko-o-sagasu-tantei",
       "title": "猫を探す探偵",
       "level": 4,
