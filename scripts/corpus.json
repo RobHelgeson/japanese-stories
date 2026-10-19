@@ -394,6 +394,29 @@
         "向き": "the way a thing faces, orientation — distinct from 斜め, which is that the orientation is oblique. Framed p7 in the same sentence that introduces 斜め, 壁と同じ向きに, and fixed by the already-known 向く in the next line, 鏡は玄関の窓のほうを向いている. Recurs wherever the mirror is set or restored",
         "埃": "dust — why the polishing was frequent rather than fussy, and it is held back as an explanation until the payoff. Framed p9 by its own absence, 埃がついていなくても、晴れた日には必ず磨く, which makes the polishing strange before it makes it sensible"
       }
+    },
+    {
+      "slug": "nanatsu-no-mado",
+      "title": "七つの窓",
+      "level": 5,
+      "_feature": "Second story in the ghost-story register, and the first at level 5. The wrong detail is a physical print rather than a document: the half-moon rubber patch the keeper glues onto the student's boot is planted as gruff care and pays off as the only thing in the snow anyone could recognise. One night with one flashback, answering the 城の鐘 note about stories that march through time.",
+      "_note": "THE ORDINARY IS AIRTIGHT ON THE PAGE, because a reader who can explain the prints will: the keeper is awake all night feeding the fire two pieces an hour, the boots are the student's only pair and stand on the rack in sight, the door is at the keeper's back, the snow stops at three and he checks the boots at ten past, the newspaper is still inside at dawn. THE PRINTS ARE NEVER ATTRIBUTED and nobody theorises; there is no narrated fear or awe at the discovery, only walking, looking, going back in. THE 先代 FLASHBACK SITS BESIDE THE PRINTS AND IS NEVER TIED TO THEM: his rule (the keeper goes out first, alone, after a blizzard) and his cup in the rucksack are placed in Act I and Act II and left for the reader. THE WANT RESOLVES IN ACTION, NOT SPEECH: the keeper never asks the boy to come back; he shovels every print, his own included, and packs the cup. 先代 speaks わし-register (じゃ), the keeper 俺 and gruff, the student です・ます. Not a mourned relative: the 先代 is an employer, dead, named only as the source of a rule and a gesture.",
+      "_premise": "CLIMAX: dawn after the storm; going out first and alone as the 先代's rule says, the keeper finds footprints that start at the door, walk the evening round clockwise, stop under each of the seven windows and return to the door, every right print carrying the half-moon patch he glued onto the student's boot; inside, the boots are where he watched them all night, newspaper still in them, the student asleep. He shovels every print away, his own too, and packs the student's cup into the bottom of his rucksack. AFTERWORD: see stories-index.md. PREMISE: early November, the last day of shutting a high hut for winter; the keeper of thirty seasons and the student who has worked three summers and starts a Tokyo job in spring are snowed in for one night in the hut's one heated room. WANT: for the student to come back next summer, never said; its visible form is the cup set back on the shelf. NEED: to admit the mountain is where he went because nothing below waited, and that wanting the boy here is wanting him to become the same; he has to let him go. SHAPE: three-act, I 1-2, II 3-6, III 7-9. BEATS: 1 closing, early snow, trail shut; he returns the cup to the shelf; the 先代's rule on the wall (yes-but, veiled plant). 2 the student's sole splits; the keeper cuts a patch that comes out half-moon, glues it, sets the boots to dry: 朝までは履くな (yes-but, veiled plant). 3 he forbids the evening round in the blizzard (no-and). 4 fuel is short so he stays awake; asked why he has stayed so long, he talks about the wood (no-and). 5 flashback: thirty years ago the 先代 packed his cup on the last morning; he came back and it was on the shelf again (yes-but). 6 at three the snow stops; ten past, he checks the boots; he never sleeps (yes-but). 7 the prints (no-and, climax). 8 he shovels them all and packs the cup (yes-but, the turn). 9 walking down, the student finds the cup; the keeper talks about the snow; the student goes ahead leaving half moons and the keeper walks beside them, not in them (no-and).",
+      "brief": {
+        "pages": 30,
+        "register": "ghost-story",
+        "new_words": 6,
+        "leech_seeds": 9,
+        "grammar_focus": ["とおり", "ものの", "として"]
+      },
+      "new_words": {
+        "小屋": "hut — the setting every beat happens in or around. First occurrence is an act, 山の小屋を閉める, the closing the whole first page is a procedure for. Recurs throughout",
+        "小屋番": "hut keeper — the narrator's job and the subject of the 先代's rule. First occurrence is inside the rule itself, an instruction being carried out, and again as 小屋番として、寝るわけにはいかなかった",
+        "足跡": "footprints — the wrong detail. Held back until the climax, where the first occurrence is the discovery and the next sentences follow them round the hut; recurs as he erases them and in the last page's ordinary prints",
+        "吹雪": "blizzard — first occurs in the 先代's rule on the wall, then as the keeper's reason for forbidding the round, 吹雪だ。窓は昼に俺が見た. The rule's 吹雪の次の朝 is restated at dawn",
+        "見回り": "the evening round of the windows — the route the prints walk. First occurrence is the time arriving as the student reaches for his coat, and the next sentence is the round itself, done as a procedure",
+        "先代": "the previous keeper — first occurrence is his handwriting on the closing list; recurs in the rule, the flashback and the cup"
+      }
     }
   ]
 }

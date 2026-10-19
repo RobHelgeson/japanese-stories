@@ -657,7 +657,7 @@ main {
     <header>
       <h1>物語</h1>
       <span class="spacer"></span>
-      <span id="totals">17 編 · 447 ページ · 2208 文 · 既知語彙 6659<span id="readtot"></span></span>
+      <span id="totals">18 編 · 478 ページ · 2366 文 · 既知語彙 6659<span id="readtot"></span></span>
       <button class="btn" id="guide-open" type="button" aria-haspopup="dialog">案内</button>
       <button class="btn" id="edit" type="button" aria-pressed="false">編集</button>
     </header>
@@ -1324,6 +1324,44 @@ main {
       <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
                 placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
         <div class="vers"><span>版</span><a class="ver" href="versions/rouka-no-kagami.v1.html">v1</a><span class="cur">現行</span></div>
+      <div class="manage" hidden>
+        <button type="button" data-act="done">読了</button>
+        <span class="step">
+          <button type="button" data-act="dec" aria-label="一つ前のページへ">−</button>
+          <output data-out="page">—</output>
+          <button type="button" data-act="inc" aria-label="一つ先のページへ">＋</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" data-act="clear">消去</button>
+      </div>
+    </div>
+    <div class="cell" data-slug="nanatsu-no-mado" data-ord="18" data-pages="31" data-title="七つの窓" data-level="5">
+      <a class="card" href="nanatsu-no-mado.html">
+        <div class="rt">ななつのまど</div>
+        <h2>七つの窓<span class="lv">Lv5</span></h2>
+        <p class="sum">Snowed in on the last night of shutting a mountain hut for winter, the keeper of thirty seasons sits up feeding the fire beside the student who has said he will not come back.</p>
+        <div class="prog" hidden><span class="track"><i></i></span><span class="pct"></span></div>
+      </a>
+      <button type="button" class="disc" data-act="more" aria-expanded="false" aria-label="詳細"><span class="dlabel">詳細</span><span class="fin">了</span></button>
+      <div class="meta">
+        <span>31 ページ</span>
+        <span>158 文</span>
+        <span>820 漢字語</span>
+      </div>
+      <div class="chips"><span class="chip weak">苦手 修理、去年、押し入れ、残す、流す、積もる、起きる、足りる、返事、過ぎる</span><span class="chip new">新出 先代、吹雪、小屋、見回り、足跡</span></div>
+      <div class="rate">
+        <span class="stars" role="group" aria-label="評価">
+          <button type="button" data-act="star" data-n="1" aria-pressed="false" aria-label="星1つ">★</button>
+          <button type="button" data-act="star" data-n="2" aria-pressed="false" aria-label="星2つ">★</button>
+          <button type="button" data-act="star" data-n="3" aria-pressed="false" aria-label="星3つ">★</button>
+          <button type="button" data-act="star" data-n="4" aria-pressed="false" aria-label="星4つ">★</button>
+          <button type="button" data-act="star" data-n="5" aria-pressed="false" aria-label="星5つ">★</button>
+        </span>
+        <span class="mspacer"></span>
+        <button type="button" class="notebtn" data-act="note" aria-expanded="false">感想</button>
+      </div>
+      <textarea class="note" rows="3" maxlength="2000" hidden aria-label="感想"
+                placeholder="What worked, what dragged, what you had to re-read. This feeds the next story's brief."></textarea>
       <div class="manage" hidden>
         <button type="button" data-act="done">読了</button>
         <span class="step">
