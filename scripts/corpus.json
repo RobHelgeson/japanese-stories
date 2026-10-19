@@ -356,6 +356,29 @@
       }
     },
     {
+      "slug": "shiroi-bangou",
+      "title": "白い番号",
+      "level": 4,
+      "versions": [],
+      "_feature": "Procedural register, level 4, the second mystery in the corpus after 猫を探す探偵 and written against its review: the boy is the centre and gets the last move, nobody is paid half for a trope, and nobody is dead. The plant does visible work of its own: the white paint number under every 防犯登録 sticker is introduced recovering a stolen bike for the police on page 1, which also misdirects the reader toward theft. The reader can reach the buyer from three facts before the ledger opens: 木 begun and struck out on the repair slip, 雄 shared by 雄太 and 雄一, and the saddle set for someone ten centimetres taller.",
+      "_note": "Topic changed at Gate 1 by the orchestrating session: option 1 (an old man who pushes rather than rides) overlapped another level 4 story in the same batch. Responds to reviews.py: 猫を探す探偵 ★4 (boy disappears, unexplained half pay), 城の鐘 ★4 (monotonic day-by-day time, generic voices), 煙突の煙 ★2 (another dead person). Time moves morning, evening, night, ten days, one evening; no sequence of days. Voices: narrator 俺/〜ぞ/〜な to the boy, 道子 〜わよ/あんた, 雄太 です・ます slipping, 木村 polite and brief. CONTACT HISTORY, made consistent at Gate 2: father and son met once, in March at the station, after six years; the father bought the bike here that morning, guessing the height; the boy told him the new surname then and refused his address, so the bike is registered to the father; no contact since; the father came back in summer fishing for any sign; the mother does not know the meeting happened.",
+      "_premise": "CLIMAX: after closing, 木村 signs the transfer as previous owner and writes 中村雄太 as new owner without asking, sees the saddle three fingers below the height he chose in March, asks only about the brakes; the boy folds the signed paper into his pocket and tells the narrator not to register it: if stopped again he will say it is 木村's bicycle. The narrator tapes the old sticker back over his white number and corrects 170 to 160 in the ledger, the first correction in thirty years. AFTERWORD: stories-index.md. PREMISE: a high-schooler wants a nearly new bike registered to himself, says it is secondhand with no paper; under the scratched sticker is the shop's own white number, and the ledger says the narrator sold it in March to a man buying it for his son. WANT (雄太): the bike in his own name so it cannot lead back to his father. NEED: to admit he wants his father. Narrator's cost: phoning a customer out of the ledger, against his rule, against the boy's wish, in front of his wife. SHAPE: three-act. BEATS: ACT I (1) police bring a stolen bike, identified by the white number; second stop means a call home / (2) the boy, the saddle, the lie, 木 crossed out, no home number. ACT II (3) the number under the sticker, the ledger, 170; registration refused / (4) 道子 remembers the father's summer visit, the rule holds / (5) the forged paper, 雄 stroke for stroke / (6) 'we sold this bike in March'; the meeting, the mother, the police. ACT III (7) the call, the rule broken aloud / (8) climax / (9) tape, ledger, 160.",
+      "brief": {
+        "pages": 28,
+        "register": "procedural",
+        "new_words": 6,
+        "leech_seeds": 8
+      },
+      "new_words": {
+        "防犯": "crime prevention, met only inside 防犯登録, the bicycle registration sticker every bike in Japan carries; declared as 防犯 because Ichiran segments the compound as 防犯 + 登録 and 登録 is known, the sticker every bike in Japan carries. First doing work p1, peeled off a stolen bike so its owner cannot be found; the engine of the plot, since a name mismatch on it is what gets the boy stopped",
+        "台帳": "the shop's sales ledger. First carried out of the back and searched with a finger p3, then shelved as the thing shown only to police",
+        "剥ぐ": "to peel off, written throughout as 剥がす; keyed 剥ぐ because Ichiran lemmatises every 剥がす form in this story (剥がして, 剥がした, 剥がせて, 剥がし) to 剥ぐ, so a 剥がす key matches nothing. First as what a thief did to the sticker p1, then what the boy half did and the narrator finished",
+        "ペンキ": "paint. First wiped clear of grime to reveal the number p2; the hidden number of the title",
+        "中古": "secondhand. The boy's lie, first said in answer to where he got it, and repeated as what he told his mother",
+        "サドル": "saddle. First as the job the boy asks for; its height is the clue that the buyer guessed a son he had not seen"
+      }
+    },
+    {
       "slug": "shiro-no-kane",
       "title": "城の鐘",
       "level": 5,
