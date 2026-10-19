@@ -274,6 +274,26 @@
       }
     },
     {
+      "slug": "chichi-no-hasami",
+      "title": "父の鋏",
+      "level": 4,
+      "versions": ["v1"],
+      "_premise": "CLIMAX: 佐野's monthly cut. The father's scissors drag instead of cutting above the ear, 佐野 hisses (the same っ as p5), the open scissors shake. 修 steps in with his own scissors; 佐野 speaks past him to the father in the mirror: 先月も、その前の月も痛かったぞ。黙ってりゃ、勝が自分で気づくと思ったんだがな. 修 remembers the silent Sunday nights and the thumb on the blade. TURN: 私は自分の鋏を台に置いて、父の手から鋏を取った。 He sharpens on the dry 砥石 in the back while the two old men talk baseball through the curtain, hands the scissors back, and the father tests one hair and says 寝かせすぎだ. 修 never cuts 佐野. AFTERWORD: stories-index.md. PREMISE: 修, 34, works beside his father in their two-chair 床屋. The father's hands shake; he still cuts his oldest regulars with his own scissors and will not discuss stopping. WANTS: 修, to cut 佐野, which would make the shop his. 父 (勝, わし), to keep cutting his regulars with his own scissors and never be seen failing. 佐野 (下町, 〜ぞ/〜な), いつもの from 勝 and nothing else; his secret is that he has known about the dull blades for months. NEED (修): he has never asked or offered anything, and waits to be handed the chair as proof, which is his father's pride in him. He must offer the thing he resents rather than claim the thing he wants. SHAPE: three-act, across the month between two visits, childhood recalled inside it. BEATS: I-1 佐野's っ, covered by a joke; the scissors sound dull; 修 blames the hands (yes-but: cut done, 修 resolves the father must stop). I-2 childhood Sundays made to sharpen (研がされた), 寝かせすぎだ / もう少し立てろ; he has not touched a stone since school; this Sunday the back room is silent and he reads it as tiredness (no-and). II-3 来月から俺がやる; わしの客だ; next morning the case is locked (no-and). II-4 修 asks 佐野 directly; the wedding haircut; 勝の鋏でいい (no-and). II-5 岡田 defects to the station chain; at night the father, case open, thumb on the blade, unexplained (yes-but). III-6 climax. III-7 the dry stone, the sharpening, the talk through the curtain (yes-but: blade fixed, and so he is not the one cutting). III-8 寝かせすぎだ; 佐野 to 修, 来月も頼むぞ, the first time he has looked him in the eye. III-9 Sunday night, the father behind him with an unturned newspaper: もう少し立てろ; everything laid out on a towel.",
+      "brief": {
+        "pages": 25,
+        "register": "quiet-realism",
+        "new_words": 5,
+        "leech_seeds": 8
+      },
+      "new_words": {
+        "研ぐ": "to sharpen, on a stone — the chore the son was made to do as a boy and refused ever since, and the act after the turn. First doing work p8 as something paid for and handed off, 駅前の店に持っていって研いでもらう. Recurs through the childhood Sundays, the climax and the last page",
+        "刃": "blade — first in the same habit, 刃が鈍くなる前に, then on the stone, under the father's thumb at night, and turned to the lamp at the payoff",
+        "砥石": "whetstone — first wet and worked by the father's hands, 砥石を水で濡らして刃を当て. Recurs as the thing the boy was sat in front of, the thing the man swore off, and dry on the shelf at the climax",
+        "鈍い": "dull, of a blade and of its sound — planted p2 as a sound the son blames on shaking hands, then as the son's own sharpening habit, then as the sound of the climax and the sound that stops",
+        "剃刀": "razor — first used rather than named: the father shaves 佐野's neck with his right hand gripped in his left. Recurs on the mirror shelf, in the same gesture after the turn, and on the last page's stone"
+      }
+    },
+    {
       "slug": "shiro-no-kane",
       "title": "城の鐘",
       "level": 5,
