@@ -286,6 +286,27 @@
       }
     },
     {
+      "slug": "kashidashichuu-no-hon",
+      "title": "貸出中の本",
+      "level": 3,
+      "_feature": "Second ghost story, and a deliberately different mechanism from 十五日の質札: nobody visits, nothing is duplicated, no record is dug into. One object moves, a bookmark advancing overnight in a locked library, and it is reported only as page numbers, never as a shiver. The veiled plant is the narrator's rigidity: 貸出中の本は、返却されるまでお待ちください, said to an angry patron on p5 and read as her flaw, is the line she turns on the boy at the climax, where it protects a reader instead of an order.",
+      "_note": "THE GHOST IS NEVER NAMED OR EXPLAINED. The 1981 borrower exists only as record detail: the due-date stamp 57.1.5 (Showa 57, 1982), the blank return space, and the pre-merger town name on the bookmark. Nobody speculates aloud. THE CLIMAX IS LEGIBLE WITHOUT NARRATION: the page numbers 288 and 300 are planted that morning, so 二百八十八ページと、二百五十八ページだった is the whole of her reasoning. THE OLD STAMP is planted p4 as a paperweight and pays off twice: she sets it to 57.1.5 to close the old loan on time, then to a date two weeks off for his. HIS FIRST LOAN NEVER REACHES THE COMPUTER, which still shows 0: the want is won in the one form she no longer counts. 一冊 is declared as the narrator's counting word. Peeked words reused on purpose: 渡す, 貼る, 処理, 記録, 黙る, 返事. Names: 樹 (いつき), a current boy's name, chosen because the batch already had a 湊; 小林 and 森 segment whole. 暖房 rather than ストーブ, and ハンコ for the date stamper, both inside the known set.",
+      "_premise": "CLIMAX: December 28, the last afternoon before the New Year closure. The 1981 bookmark is 12 pages from the end; 樹, ten, is 30 behind it. After refusing every card form since spring he brings one signed by his mother. She makes the card, he asks to take the book home over the break, and she refuses: 「この本は、まだ貸出中なの」. He leaves with an empty card and waits on the entrance bench rather than at the heater. AFTERWORD: see stories-index.md. PREMISE: the return box at a small town library brings back a children's novel last borrowed in 1981, written off decades ago; its bookmark, printed with the pre-merger library name, advances every night in a building only the narrator can unlock, and the boy who waits there every afternoon starts racing it. WANT: 樹 to get a card and borrow a book. NEED: she counts reading instead of seeing it; her strict rule must be applied to a reader no system counts, at the cost of the loan she wanted. SHAPE: three-act, I 1-2, II 3-5, III 6-8. BEATS: 1 the book with no barcode, card due 57.1.5, return blank; 館長 says the free shelf; she keeps it; the old stamp as paperweight (yes-but). 2 the overdue-reservation patron gets the rule; 樹 refuses the form again (no-and). 3 bookmark 41 to 58 in a locked building; she tells nobody (yes-but). 4 compressed mornings; 樹 asks what it is and starts at page one (yes-but: reading, in the one book she cannot lend). 5 he notices it moving and races it; she deflects to the heater; 小林 shelves it on the free shelf and she takes it back (no-and). 6 CLIMAX (no-and). 7 January 5, the due date: the bookmark is behind the last page; she stamps 57.1.5 into the return space; he does not come for two days (yes-but). 8 he returns; she writes his number under the 1981 line and stamps a due date by hand; the computer still says 0; his white bookmark at 258 and the old one at the back.",
+      "brief": {
+        "pages": 25,
+        "register": "ghost-story",
+        "new_words": 5,
+        "leech_seeds": 8
+      },
+      "new_words": {
+        "栞": "bookmark — the wrong detail and the recycling engine. First occurrence p7 falls out of the book onto the desk and is picked up, never defined. Recurs as page numbers every morning, as the boy's white one beside it, and as the last image",
+        "返却": "return (of a library book) — first occurrence p1 in 返却ポスト being emptied before opening, the ordinary the story holds steady. Recurs in her rule, 返却されるまでお待ちください, and as the locked door behind the return box",
+        "貸出": "lending, loan — first in the rule she gives the angry mother p5, then as the count on her monthly report, the title, the climax line and the 0 on his card",
+        "挟む": "to put between, slip in — first p7 as an action, she slips the fallen bookmark back in at page 41. Recurs as 挟んであった each morning and in the last sentence",
+        "一冊": "one (book) — her counting word. First p1 as the one book the machine will not read, then 一冊も本を借りたことがない, the zero she keeps writing down, and 一冊の本に栞が二枚"
+      }
+    },
+    {
       "slug": "neko-o-sagasu-tantei",
       "title": "猫を探す探偵",
       "level": 4,
