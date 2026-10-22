@@ -69,6 +69,8 @@ Before any Japanese exists, write and stop on:
 CLIMAX    one scene. Specific, unexpected, and emotionally messy
 AFTERWORD full spoiler, in English — what the story is actually doing
 PREMISE   two or three sentences
+ANCHOR    the object, place, ritual or phrase the story keeps coming
+          back to, and the 3-6 new words it carries
 WANT      the external goal — tangible, visible, sayable in one clause
 NEED      the internal one — the wound or the flaw the want is hiding
 SHAPE     three-act (default), two-act, or five-act
@@ -87,6 +89,10 @@ The September 2026 audit is the evidence. Six of eight stories ended by stating 
 **Want and need are two tracks, and the second is what makes the first cost something.** The want is the external goal: win the tournament, find the cat, finish the bell. It is visible, the character can say it out loud, and on its own it produces the straight line — wants X, does Y, gets X. The need is the internal one: the wound, the flaw, or the thing about themselves they have not admitted. Write both before the beats, and bind them with the rule that makes them a story rather than two lists: **the character cannot have the want until they face the need**, and most often they give up the want in order to get it.
 
 This is the machinery behind § Craft's "one turn, and the reader can point at it". The turn is the sentence where the need is faced, and the want is what it costs. The old rule said a change happens somewhere; it never said the change was internal, and it never said anything was surrendered for it.
+
+**The anchor is where the new words live, and it is chosen after the climax.** Every story so far has had a physical object at its centre — fifteen of twenty-two titles are X の Y — and this document called it the recycling engine. Measured, it is not that. The repeated-word floor is cleared with room to spare without it: the weakest story is at 56.8% against 40%, at 55.8% with every declared new word removed, and at 41% on content words alone once pronouns and light verbs are removed as well. What the cluster around an object does is carry the new words. Each needs `max(2, round(tokens / 150))` occurrences and a first occurrence inside an action, and an object's own nouns supply both without the prose working at it: 弁当箱 ×13, 駒 ×15, 桶 ×11, 栞 ×20. A story spread over several settings would pay for several clusters out of a budget of one new word per hundred tokens, which is how the circumlocution and apposition failures return. So the requirement is **one narrow cluster the story is about in action**. An object is the cheapest way to get one and not the only way: a place (七つの窓's hut), a ritual (the Sunday game, the rotating board) or a repeated phrase can anchor a story as well. Name which, and name the new words it will carry, so the sheet shows the story has a vocabulary plan.
+
+**The anchor comes after the climax for the same reason everything else on the sheet does.** Choosing the object first hands you the story that objects hand out: the thing carries clues, the protagonist misreads them, the reader stays a step ahead. Five of the recent afterwords describe that engine almost word for word. It is a good engine and nothing here forbids it, but it should be chosen at the climax rather than inherited from the noun. No story has yet been written on a non-object anchor. The first one is a test of this section, and what it shows belongs here: the risks are thin new-word counts and glossed introductions, not the floor, and `stats.py --strict` will report the first.
 
 **Declare the shape.** Three are documented below. Three-act is the default and the others are chosen deliberately, per story, at this gate — not derived from the topic, the level, or the page count, and not a parameter of Gate 1. Name the shape on the sheet and mark the act boundaries on the beats, because an undeclared shape is indistinguishable from no shape.
 
@@ -117,7 +123,7 @@ Beat counts are given as fractions of the sheet, not as numbers, because the she
 
 Whichever shape is declared, it is a shape to build toward and not a form to fill. A beat that exists because the act diagram has a slot there is worse than an act boundary in a slightly wrong place.
 
-Record the whole sheet — climax, afterword reference, premise, want, need, shape, and beats — as `_premise` on the `corpus.json` entry, alongside the existing `_feature` and `_note` prose keys. It is a prose key and nothing parses it; write it as the sheet, not as a schema.
+Record the whole sheet — climax, afterword reference, premise, anchor, want, need, shape, and beats — as `_premise` on the `corpus.json` entry, alongside the existing `_feature` and `_note` prose keys. It is a prose key and nothing parses it; write it as the sheet, not as a schema.
 
 **The gate is bigger than it was, and that is deliberate.** The old sheet was three lines and could be approved at a glance. This one has a climax, two tracks, a declared shape, and a filter applied to every beat, and it takes a real reading. That is the cost of the enforcement mechanism: no script checks any of this, none should try (§ Metrics are floors, not targets), and the entire weight of six craft techniques rests on someone reading the sheet and sending it back. A skimmed Gate 2 enforces nothing.
 
@@ -135,7 +141,7 @@ The rules below are what to do. The prohibitions further down are what not to do
 
 ### Register
 
-`quiet-realism` is the default and describes the current six: one concrete object at the centre, close narration, ends on an image rather than a claim. That was a house style that fell out of the recycling requirement rather than a decision, so it is now a declared choice — `folktale` and `procedural` already exist in the corpus as undeclared one-offs. Register changes voice and structure. It never relaxes the narrow-domain rule, because the object at the centre is the recycling engine.
+`quiet-realism` is the default and describes the current six: one concrete object at the centre, close narration, ends on an image rather than a claim. That was a house style that fell out of the recycling requirement rather than a decision, so it is now a declared choice — `folktale` and `procedural` already exist in the corpus as undeclared one-offs. Register changes voice and structure. It never relaxes the narrow-domain rule, because the anchor's vocabulary is what carries the new words (§ Gate 2).
 
 ## The level ladder
 
@@ -263,7 +269,7 @@ An annotation on a verb stem covers its inflection, so `｜行《い》った` c
 - **No em dashes, en dashes, or standalone hyphens-as-pause in the English translations.** Hyphenated compound words are fine. Translations should read as natural literary English, never as glosses.
 - Personal names must survive segmentation whole. ｜竜崎《りゅうざき》 splits into ｜竜《りゅう》 + ｜崎《さき》; ｜松田《まつだ》、｜青山《あおやま》、｜梓《あずさ》、｜澪《みお》 do not.
 - **A Japanese name in a `>` line takes the marker form, and takes the Japanese order.** The translation sheet renders ruby, so ｜青山《あおやま》 ｜梓《あずさ》 shows the reader the reading the story is teaching. Romaji was the old habit and it carried the western pronunciation the kana exist to replace. Surname first, matching the Japanese it translates — `Azusa Aoyama` was right as romaji precisely because that is English order, and in kanji it becomes 梓 青山, which no Japanese text writes. Three exceptions, each because the marker earns nothing: a katakana name (クロ) has no reading to carry; a settled English place name stays English, so Tokyo rather than ｜東京《とうきょう》; and Ms. / Mrs. are not names, they are what 様 and さん already say.
-- Keep the domain narrow. That is what produces recycling, and it is the only honest way to hit the repeated-word share floor.
+- Keep the domain narrow. The anchor's vocabulary is where the new words recur without the prose working at it (§ Gate 2). It is not what clears the repeated-word share floor: on the repo's own measure every story clears that by 15 points or more with its new words removed.
 
 ## The revision pass
 
