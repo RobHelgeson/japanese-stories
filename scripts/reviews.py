@@ -70,7 +70,9 @@ def pages(slug, entry):
 
 
 def join(reviews):
-    default_reg = (CORPUS.get("defaults") or {}).get("register")
+    # Stories briefed before registers were declared were all quiet-realism; the
+    # default is now "random", which is not a register a story can have.
+    default_reg = "quiet-realism"
     rows = []
     for n, entry in enumerate(CORPUS["stories"], 1):
         slug = entry["slug"]

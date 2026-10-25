@@ -16,6 +16,7 @@ carries comment keys and one-line arrays that json.dump would reformat.
 
 import argparse
 import json
+import random
 import unicodedata
 from pathlib import Path
 
@@ -49,6 +50,9 @@ def resolve(args):
     level = take("level", args.level, D["level"])
     pages = take("pages", args.pages, D["pages"])
     register = take("register", args.register, D["register"])
+    if register == "random":
+        register = random.choice(REGISTERS)
+        src["register"] = "random"
     page_slack = take("page_slack", args.page_slack, None)
     tokens = pages * D["tokens_per_page"]
 
