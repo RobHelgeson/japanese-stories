@@ -24,5 +24,9 @@
     "叫ぶ": "to shout — the king's shout at the climax",
     "段": "counter for steps — 二百段 is the concrete detail 階段は長くて replaced",
     "二百段": "Ichiran parses this as one token, so 段 alone never matches — listed so the reader still marks it"
+  },
+  "墨の量": {
+    "筆": "brush — the narrator's writing tool in the diary scenes; no known word stands in for it",
+    "土佐": "Tosa, the province he governed — the one place name on the page, and the diary's own name"
   }
 }
