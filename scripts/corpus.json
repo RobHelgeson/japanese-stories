@@ -366,6 +366,26 @@
       }
     },
     {
+      "slug": "shitakiri-suzume",
+      "title": "舌切り雀",
+      "level": 3,
+      "_adaptation": "Retelling of the traditional tale, after 楠山正雄 「舌切りすずめ」 (Aozora card 18378, author died 1950; text not copied, wording is ours). Plot, cast and ending kept as in the tale: the starch, the cut tongue, the walk to the bamboo thicket, the two boxes, the old woman's heavy box and the monsters. Replacements: 井戸ばた to 川; しば刈り to 木を切りに山へ; 座敷 to 家; ごちそう to plain 料理; さんご and 宝珠 to 金, 銀 and 宝; 入道 and 一つ目小僧 to 化け物 shown as a one-eyed thing and a snake; つづら to 箱; 睨む to the monsters speaking. Cut: the 一つ目小僧 names. Additions that are ours: the 糊-checking habit (plant), the cage door left open, the empty cage as the closing image.",
+      "_premise": "CLIMAX: night, the old woman on a roadside stone with the heavy box, lifts the lid a finger's width to look before home. The first thing out is a tongue, which licks her cheek; then monsters, one-eyed, snake-long, one all tongue; 「欲ばりばばあ」. She throws away stick and box and runs; at the door she opens her mouth and no voice comes out. AFTERWORD: see stories-index.md. PREMISE: an old woman cuts out the tongue of her husband's sparrow over a dish of starch. He walks through fields and mountains to the sparrow's house and is sent home with a light box of treasure; his wife goes for the heavy one. ANCHOR: the walk and the call, 野を越え、山を越え / 舌切り雀、お宿はどこだ, said once by each of them, plus the two objects the tale hangs on, the 籠 and the dish of 糊; carries 糊, 籠, 欲, 藪 and 野. Chosen after the climax, since the tongues in the box answer the starch and the cage is what the old man comes home to. WANT: the old man wants to find the sparrow; the old woman wants the bigger box. NEED: the old man must say something instead of only pitying; the old woman has no need she faces, the tale gives her the want and its price. SHAPE: three-act, climax in the last quarter. BEATS: I 1 cage and the starch checked every morning (veiled plant) (yes-but: the dish is hers and watched). 2 the cage door left open, the sparrow licks the dish empty (no-and: she returns to the empty dish). 3 the tongue cut; the old man returns to the empty cage and only pities (no-and). II 4 he walks out calling the rhyme and a voice answers from the thicket (yes-but: she speaks badly). 5 feast and dance, two boxes, he takes the light one because he is old (yes-but). 6 at home gold and silver; his wife is furious he left the heavy one (yes-but). III 7 she walks all night and asks for the gift before she has sat down (no-and: the sparrow stays polite). 8 CLIMAX. 9 she runs home without a voice; he says only 「だから、言ったろう」 and shuts the empty cage.",
+      "brief": {
+        "pages": 25,
+        "register": "folktale",
+        "new_words": 7,
+        "leech_seeds": 8
+      },
+      "new_words": {
+        "糊": "starch for washing, the dish she checks each morning and the whole offence. First occurrence p2 as an action, she tests it with her finger; recurs in the quarrel, the empty dish and the sparrow's apology",
+        "籠": "cage, where the sparrow lives and what the old man comes home to. First occurrence p1 as where he puts the bird; recurs as the open door, the empty cage and the last image",
+        "欲": "greed, from 欲を出す and 欲ばり, the tale's own engine. First occurrence p13 in the old man's mouth as a reproach; recurs as the monsters' word",
+        "藪": "bamboo thicket, where the sparrow's house is hidden. First occurrence p8 as a voice answering from inside it; recurs on both journeys",
+        "野": "open fields, the first half of the refrain 野を越え、山を越え. First occurrence p7 as the walk itself; recurs each time anyone walks to the thicket"
+      }
+    },
+    {
       "slug": "neko-o-sagasu-tantei",
       "title": "猫を探す探偵",
       "level": 4,
