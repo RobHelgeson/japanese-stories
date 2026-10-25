@@ -156,6 +156,7 @@ What it found about the stories, with n=6:
 - **The older craft rules hold.** Ending, dialogue, want/need and shape passed on nearly every sheet. Every reader picked the intended ending, and every English-only read ended on an image.
 - **The Japan is in the rendering and not in the plan.** The Japanese-only readers find 5 to 8 items of Japanese texture in most stories. Moved to the Midwest, the climax survives in two of four sheets and the turn in two of four, which is the September verdict again: English-designed, Japanese-rendered.
 - **Narration that explains itself shows in all six English-only reads**, and at least three state the theme in a mid-story aside. AUTHORING's rule says never state the theme; the revision-pass check looks only at the last page.
+- **Two stories have Japanese words in their English lines**: two in ｜黄色《きいろ》い｜傘《かさ》 and four in ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》, each two characters long, outside any name. The English-only readers flagged them. Whether they are deliberate has not been checked, and no story was changed.
 - **The two controls the audit picked as strong did not both behave as strong, and the weak one was not weak.** Either the picks were wrong or the tests measure something narrower than "feels Japanese". Do not read the controls as validated.
 
 What it found about the panel, all since fixed in `PANEL.md` except where noted:
