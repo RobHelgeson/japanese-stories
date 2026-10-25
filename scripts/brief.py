@@ -194,6 +194,8 @@ def main():
         return
 
     show(b, src)
+    if src["register"] == "random":
+        print(f"Register was drawn at random; pin it with --register {b['register']} on later runs.")
     print("Proceed, or adjust anything?")
 
 

@@ -173,7 +173,7 @@ The rules below are what to do. The prohibitions further down are what not to do
 
 ### Register
 
-The default is `random`: `brief.py` draws one register uniformly from the `registers` block of `corpus.json` and prints which, and Rob can override it at Gate 1. Adding a register to that block adds it to the draw, so a new type needs no other step. `quiet-realism` is one entry among the rest: one concrete object at the centre, close narration, ends on an image rather than a claim. It was a house style that fell out of the recycling requirement rather than a decision, which is why it is now a declared choice like the others. Register changes voice and structure. It never relaxes the narrow-domain rule, because the anchor's vocabulary is what carries the new words (§ Gate 2).
+The default is `random`: `brief.py` draws one register uniformly from the `registers` block of `corpus.json` and prints which, and Rob can override it at Gate 1. The draw is unseeded, so once a register is settled pass it back as `--register` on every later run, or the next invocation redraws it. Adding a register to that block adds it to the draw, so a new type needs no other step. `quiet-realism` is one entry among the rest: one concrete object at the centre, close narration, ends on an image rather than a claim. It was a house style that fell out of the recycling requirement rather than a decision, which is why it is now a declared choice like the others. Register changes voice and structure. It never relaxes the narrow-domain rule, because the anchor's vocabulary is what carries the new words (§ Gate 2).
 
 ## The level ladder
 
