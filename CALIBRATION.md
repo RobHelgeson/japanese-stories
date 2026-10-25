@@ -138,6 +138,45 @@ The ladder was inverted on the one axis it claimed. `stats.py` now measures ever
 
 The set carried 11 leech words across five stories before 2026-09-10 and 63 after. `weak_forms()` read only `Card_Morph_Map`, which AnkiMorphs populates for the `Morphs::*` decks alone, so of 876 unsuspended leech cards it could see 35. Reading the Core, Jlab and Duolingo note fields as well took the usable pool from 14 kanji words to 189.
 
+## The panel against six stories, 2026-10-25
+
+The first run of the panel (`PANEL.md`) was a dry run on six of the 22 stories, chosen as a spread of levels and registers with deliberate controls: ｜回覧板《かいらんばん》の｜返事《へんじ》 and ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 as strong-culture stories, ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》 as a weak one. Four had a stored sheet and got the sheet-stage roles as well. 41 agents, about half a million tokens a story. **Nothing below is a rating of the stories, and no number here is a target.** The detailed reports contained plot and were not kept; this is the rule-level record.
+
+| Story | Sheet stage | Draft stage |
+| --- | --- | --- |
+| ｜時計《とけい》の｜音《おと》 (L1) | no stored sheet | Japanese-only readers 7/10 and 7/10. Culture sparse, 3 items. Voices only partly distinct. English-only reader: 10 places where the narration explains, including the theme stated before it is shown. Afterword claims restraint the readers did not find. |
+| ｜黄色《きいろ》い｜傘《かさ》 (L2) | Send back. Locator could not place it in Japan (2/5). Nothing breaks on transplant. A guess matched the climax mechanism, against a leaked input. | 8/10 and 8/10, voices distinct, 8 Japan items, the practice named by both readers. Theme's emphasis differs from the afterword. |
+| ｜回覧板《かいらんばん》の｜返事《へんじ》 (L3) | Send back, the strongest. Climax, shape and want/need pass; locator placed it (4/5). Climax and turn change on transplant, but only by importing an equivalent institution. | 9/10 and 8/10, 8 Japan items, no hard fact errors. Readers named the practice and part of the pressure. |
+| ｜狐《きつね》に｜貸《か》した｜隅《すみ》 (L3) | Send back. Season passes. Climax and turn survive transplant. Two guesses matched the mechanism. Plants spent early. Rite unsourced. | 8/10 and 7/10, afterword matches, both readers named the pressure. Minor voice flags on one elderly speaker. |
+| ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》 (L4) | no stored sheet | 8/10 and 8/10, voices distinct, 5 and 7 Japan items. Both readers found 8 to 9 turns split across 「」. Both flagged a day count that does not add up. Theme stated in an aside. |
+| ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 (L5) | Send back, 10 substantive and 5 format-only failures. Locator could not place it. Climax survives transplant. | Weakest on culture: 4 and 7 Japan items, one reader called it "otherwise a generic fable"; neither named the planned practice or pressure. Voices only partly distinct. 10 to 12 lines read as translated. |
+
+What it found about the stories, with n=6:
+
+- **The older craft rules hold.** Ending, dialogue, want/need and shape passed on nearly every sheet. Every reader picked the intended ending, and every English-only read ended on an image.
+- **The Japan is in the rendering and not in the plan.** The Japanese-only readers find 5 to 8 items of Japanese texture in most stories. Moved to the Midwest, the climax survives in two of four sheets and the turn in two of four, which is the September verdict again: English-designed, Japanese-rendered.
+- **Narration that explains itself shows in all six English-only reads**, and at least three state the theme in a mid-story aside. AUTHORING's rule says never state the theme; the revision-pass check looks only at the last page.
+- **Two stories have Japanese words in their English lines**: two in ｜黄色《きいろ》い｜傘《かさ》 and four in ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》, each two characters long, outside any name. The English-only readers flagged them. Whether they are deliberate has not been checked, and no story was changed.
+- **The two controls the audit picked as strong did not both behave as strong, and the weak one was not weak.** Either the picks were wrong or the tests measure something narrower than "feels Japanese". Do not read the controls as validated.
+
+What it found about the panel, all since fixed in `PANEL.md` except where noted:
+
+- **The transplant bar could not be met.** Zero of about 35 beats broke, because "breaks" meant only "no longer exists". It now includes "can be kept only by inventing an equivalent institution, custom or obligation", and the transplanter also says whether the character would speak the need aloud. This is untested: the new wording has not been run against the four reports.
+- **The guess test was voided on three of four sheets**, the NEED line having partly given the ending away. NEED is now the flaw and never its resolution, and the guesser reports whether it was handed the answer.
+- **The corpus comparison was not reproducible.** For the same pair of stories one critic counted three shared axes and the other counted one. `AXES.md` is the fix.
+- **File paths carried the story's romaji name**, and one locator used it to guess the country. Blind roles now get neutral names.
+- **Instruction-level blindness leaked slightly.** Three critics read beyond their assigned sections, and the repo could not be made unreachable. The blind readers self-reported clean.
+- **`reviews.py` could not reach Rob's ratings from a cloud session**, so the critic's "against Rob" check ran on the quotes in `_note` fields only. Fixed without putting ratings in the repo: Rob pastes a 書き出し export at the start of each batch, see `PANEL.md` § Ratings in a cloud session.
+
+### Rob's ratings against the six
+
+Set beside the findings from a run of `reviews.py` with 12 of 22 stories rated. **Four of the six are rated. 狐に貸した隅 and 行かなかった人の地図 are not**, and they are the two stories where the panel had the most to say about culture. This repo is public and holds no stars and no notes, so this section is the rule-level result only. n is four, so read the notes and not the stars.
+
+- **Four things his notes named that no role checked**, each now a check in `PANEL.md`: pace and the hook; energy after the climax; a choice the ending turns on that nothing earlier motivates, and a character used and then dropped; and the afterword read as writing. Pace and the hook went to the English-only reader. The next two went to it and to the sheet critic. The afterword went to the reconciler, and it is the weakest of the four because the panel shares the author's model family and may not see the tic. Only Rob's next note on an afterword will say whether it does anything.
+- **A flag is not a miss.** The sheet-stage culture findings, the transplant result and three of the draft-stage reader flags are not named in any of the four notes. Silence is not agreement, since no note discusses culture, so the dry run's main finding stays uncalibrated until one of the two unrated stories is read.
+- **The transplant result may have been the old bar.** The only failing item the table records for 回覧板の返事 is that its climax and turn changed on transplant only by importing an equivalent institution, which the revised bar counts as BREAKS. That is unverified until the revised wording is run against the four reports.
+- **Open: which English-only findings send a draft back.** `PANEL.md` says a draft is sent back "on the readers' findings" and does not say which, so a flag from that reader has no defined consequence. This is a decision for Rob and is not settled here.
+
 ## Related
 
 - `AUTHORING.md` — the craft spec, and where the floors are stated as rules
