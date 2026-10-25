@@ -9,6 +9,7 @@ This is a change of who reads, not of what is checked. Every rule in AUTHORING.m
 - **Independence.** Each role is a fresh agent. It gets the artifact and the inputs listed for it below, never the author's reasoning, earlier drafts, or another role's opinion unless the role is defined as reading it. An agent that has watched the story being argued for will agree with it.
 - **The author never grades its own work.** The English read-back was already "very nearly circular" when the author did it (AUTHORING § The English has to stand alone). The author runs the mechanical checks and revises. Every judgement below belongs to someone else.
 - **Cite the rule.** A send-back names the AUTHORING rule it applies and the beat or line it applies to. "Feels flat" is not a verdict.
+- **Blind means blind to the path too.** A blind role is given its input as a file with a neutral name (`a.txt`, `b.txt`) in a directory with a neutral name, and the prompt never carries the title or the slug. The first audit put the story's romaji name in every path, and one locator used it to guess the country.
 - **A pass is a floor.** The panel does not rank stories and its verdicts are prose. Nothing here becomes a number to optimise (CALIBRATION.md, § The reference band; AUTHORING § Metrics are floors, not targets).
 
 ## Who sees what
@@ -41,6 +42,8 @@ Asked: *Write three different endings for this story, one scene each, most likel
 
 This is the spoiler-free form of "do not write the obvious climax" (AUTHORING § Gate 2). A story composed front to back arrives at the ending it was always going to arrive at, and an agent that has only the premise will find that ending. If one of the three matches the sheet's CLIMAX in mechanism — not in detail — the climax is the obvious one, and the sheet is rebuilt from a new climax, not patched.
 
+**The guesser also reports whether it was handed the answer.** Asked last: *Did anything you were given state, or all but state, how the story ends?* The first audit showed why. On three of four sheets the input partly gave the ending away, mostly through the NEED line, and a guess made against a leaked input proves nothing in either direction. A yes or a partly voids the test and sends the sheet back at once to have the leaking line rewritten, and the critic does not weigh a guess made against it. The fix belongs to the author: NEED is the flaw and never its resolution (AUTHORING § Gate 2, want and need).
+
 ### Locator
 
 **Gets:** CLIMAX, WANT, NEED and BEATS, with the CULTURE block removed, every parenthesised Japanese term removed, and every character's name (taken from VOICES) replaced by a letter. **Never gets:** the title, PREMISE, CULTURE, or anything else.
@@ -53,9 +56,15 @@ This is the test of whether the sheet's Japan is in its causes or only in its la
 
 **Gets:** the full sheet. **Never gets:** the guesses or the locator's finding.
 
-Asked: *Move this story to a small town in the American Midwest, present day, changing only what has to change. For each beat say SURVIVES, CHANGES or BREAKS, and why. Does the climax survive the move? Does the beat where the need is faced? Which specific pressure in the CULTURE block is the thing that breaks?*
+Asked: *Move this story to a small town in the American Midwest, present day, changing only what has to change. For each beat say SURVIVES, CHANGES or BREAKS, and why. Then: does the climax survive the move? Does the beat where the need is faced? In the moved version, would the character say the need aloud? Which specific pressure in the CULTURE block is the thing that is lost?*
 
-**The climax and the turn have to break.** Beats that merely change, a name and a food and a street, are the cost of any move and prove nothing. A climax that survives is a climax that a Japanese pressure did not make, and a turn that survives is a need that could have been spoken in English. Both send the sheet back as garnish. The transplanter is also asked to name the PRESSURE that breaks them, which checks that the pressure written on the sheet is the one doing the work.
+The three words are defined in the prompt, because the first audit showed the transplanter will otherwise pick its own:
+
+- **SURVIVES.** Works as written, with trivial changes.
+- **CHANGES.** Names, foods, objects and places change. The cause and the cost of the beat do not.
+- **BREAKS.** The cause or the cost of the beat is gone, **or the move can keep it only by inventing an equivalent institution, custom or obligation** that the new place does not have.
+
+**The climax and the turn have to break, and the need has to stay unsaid.** The first audit used "breaks" to mean only "no longer exists", and zero of about 35 beats across four sheets did, the two strongest-culture stories among them. That is the wrong bar. The cause of a story (a debt, a pride, a promise) rarely disappears in another country. What Japan supplies is the institution that makes it binding and the pressure that keeps it unsaid, and that is what a move has to invent to keep the beat. A beat that merely changes is the cost of any move and proves nothing. So the climax and the turn each have to be BREAKS in this sense, and if the character would simply say the need aloud in the moved version, a Japanese pressure was not what held it, whatever the sheet names. Either failure sends the sheet back as garnish. The transplanter is also asked to name the PRESSURE that is lost, which checks that the pressure written on the sheet is the one doing the work.
 
 ### Sheet critic
 
@@ -79,7 +88,7 @@ Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of 
   - ABSENT accounted for. Name anything a Japanese writer on this subject would include that is neither in the sheet nor cut on purpose.
   - CARRIED honest: the practice's vocabulary is either inside the known set or paid for by a named `new_words` budget.
   - Beats carry the Japanese term for every culturally load-bearing noun and verb, rather than a paraphrase.
-  - **The locator and transplanter findings are binding.** A locator that cannot place the story in Japan, or a transplanter whose report has the climax or the turn surviving, is a SEND BACK for garnish whatever the rest of the block looks like.
+  - **The locator and transplanter findings are binding.** A locator that cannot place the story in Japan, a transplanter whose report has the climax or the turn short of BREAKS, or a need the character would simply say aloud in the moved version, is a SEND BACK for garnish whatever the rest of the block looks like.
 - **Inside the culture, at the level of fact.** AUTHORING § Craft, "Write from inside the culture": speech, fact, absence. Check any institution, object or procedure the story leans on before it becomes the story's centre.
 - **Against the corpus.** Name the nearest existing story on each of six axes: domain, central object, relationship, climax mechanism, ending gesture, and practice and pressure. Say what differs. Three or more axes shared is a send-back. Also check anything Rob's notes name as a tic. Sheets recorded before the CULTURE block existed have no practice or pressure to read, so infer them from `_premise` and say you did.
 - **Against Rob.** List every note from `reviews.py` that is a constraint on this brief and say whether the sheet respects it. A departure from a default parameter has to say which review it responds to.
@@ -99,8 +108,10 @@ Build the two inputs like this, in a UTF-8 locale or `sed` matches bytes and str
 ```bash
 export LC_ALL=C.UTF-8
 grep -v '^>' stories/<slug>.txt | sed -E 's/｜([^《]*)《[^》]*》/\1/g' > ja.txt
-grep    '^>' stories/<slug>.txt | sed -E 's/^> ?//; s/｜([^《]*)《[^》]*》/\1/g' > en.txt
+grep    '^>' stories/<slug>.txt | sed -E 's/^> ?//; s/｜([^《]*)《([^》]*)》/\1（\2）/g' > en.txt
 ```
+
+The two commands differ on purpose. A Japanese name in a `>` line takes the marker form (AUTHORING § Writing rules), and stripping it to bare kanji leaves the English reader a character it has no way to read. `en.txt` keeps the reading beside it, 梓（あずさ）, which is what the translation sheet shows.
 
 ### Japanese-only readers
 
@@ -122,6 +133,8 @@ Two readers is the minimum, so that a disagreement is visible. Four is better fo
 ### English-only reader
 
 **Gets:** `en.txt`. Asked: *Is this a short story worth reading? What happens, in three sentences? Where does it read as captions rather than prose? Does it end on an image or on a claim?* This is AUTHORING § The English has to stand alone, done by someone who did not write it.
+
+It is told that names appear in script with their reading in parentheses, as the translation sheet shows them, and are not to be counted as untranslated text. **Any other Japanese script in the English is a finding**, and the reader is asked to say where. The first audit found a few such words, two characters each, in the English lines of two of six stories, which a native editor would want to know about whether or not they were meant.
 
 ### Reconciler
 
@@ -169,6 +182,10 @@ The panel is the same model family as the author, so it has correlated blind spo
 - At ship time write `_gate` on the `corpus.json` entry, prose and no numbers: rounds, what was sent back and for which rule, where the readers found the ending. It sits beside `_premise`, `_feature` and `_note`, and nothing parses it.
 - When Rob rates a story, read his note against `_gate`. **A note naming something the panel passed is a hole in this file**, so add the rule to the role that should have caught it. That is how his feedback compounds without his reading anything in advance.
 - After every five rated stories gated this way, set the panel's verdicts beside the ratings in CALIBRATION.md. n is tiny and will stay tiny for a long time. Read the notes, not the mean, as `reviews.py` already says.
+
+## Existing stories
+
+Stories that shipped before the CULTURE block are audited at **the draft stage only**: the Japanese-only pair, the English-only reader and the reconciler. Their sheets are not re-gated. Five have no stored sheet, five more predate the sheet format, and the first audit showed the sheet-stage roles measure the plan and not what Rob reads, so a retrofit of the sheet stage would mostly grade documents that no longer drive anything. The reconciler runs without PRACTICE and PRESSURE and compares the readers with each other and with the afterword.
 
 ## What the panel cannot do
 
