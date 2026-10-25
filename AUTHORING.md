@@ -4,7 +4,7 @@ Write a story the reader can read without a dictionary, at a declared difficulty
 
 Everything below is enforced or measured by the scripts in `scripts/`. Run them; do not eyeball.
 
-**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written — and it is built backward, from the climax. Only then draft — and the draft runs the other way round, in Japanese, a page at a time, with the English written last. See § Drafting.
+**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be, and Rob settles it. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written — and it is built backward, from the climax. **The panel passes Gate 2, not Rob**: he is the only reader, and a sheet he approves is a story he has already read. See [PANEL.md](PANEL.md). Only then draft — and the draft runs the other way round, in Japanese, a page at a time, with the English written last. See § Drafting.
 
 ## Before writing
 
@@ -13,7 +13,7 @@ cd scripts
 export ICHIRAN_URL=http://localhost:3005   # or wherever your Ichiran runs; comma-separate fallbacks
 python3 have.py 単語1 単語2 ...      # ✓ known / ✗ not / ✓ (weak) leech. Batch 30-50.
 python3 stats.py                      # every story against its declared level
-python3 reviews.py                    # what the reader thought of the ones so far
+python3 reviews.py                    # what the reader thought of the ones so far; the sheet critic reads it too
 python3 peeks.py                      # the words the reader had to tap for, ranked
 ```
 
@@ -53,7 +53,7 @@ Print the table, **then stop and ask.** Do not draft until the brief is confirme
 
 Every parameter has a default, so a bare invocation is a complete brief. Defaults live in `corpus.json`'s `defaults` block, not here — a default nothing reads is a suggestion. `grammar_focus` names must be keys of `GRAMMAR_PATTERNS` in `stats.py`; `brief.py` rejects the rest.
 
-With no topic given, propose two or three domains the corpus has not used. The six so far are watches, letters, trains, a bathhouse, a missing cat, and a cast bell.
+With no topic given, propose two or three **practices** the corpus has not used: a named custom, institution or procedure and the pressure it puts on the people inside it, not just an object (§ The CULTURE block). The PRACTICE and PRESSURE columns of `AXES.md` say what has been used, and `AXES.md` is a spoiler file, so read it in a subagent and bring Rob only the candidates. Run `have.py` over the vocabulary of each candidate before proposing it, as 三番の乾燥機 did, because a practice the known set cannot name is a `new_words` bill the brief has to say it is paying.
 
 **Run `reviews.py` before proposing anything.** It prints the star ratings and notes from the contents page against the level, register and length each was a verdict on. Read the notes rather than the averages: a note naming what dragged or what had to be re-read is a constraint on the next brief, while a mean over three ratings is a number looking for a pattern. Say which review you are responding to when a parameter departs from the default because of one — an unattributed change to `dialogue` or `register` is indistinguishable from a whim, and the brief is the only record either way. Nothing here is automatic: no parameter is derived from a rating, and a low-rated register is not retired on the strength of one story.
 
@@ -66,27 +66,34 @@ With no topic given, propose two or three domains the corpus has not used. The s
 Before any Japanese exists, write and stop on:
 
 ```
+CULTURE   PRACTICE  the custom, institution or procedure it runs on, written as a procedure
+          PRESSURE  the social force that makes the want cost and the need unsayable
+          VOICES    per character: first person, address, politeness, endings, era
+          SEASON    the month, as a subject
+          ABSENT    what a Japanese writer would include here, kept or cut on purpose
+          CARRIED   what rides on known words, and what needs new_words
+          (named in Japanese; never a scene)
 CLIMAX    one scene. Specific, unexpected, and emotionally messy
 AFTERWORD full spoiler, in English — what the story is actually doing
 PREMISE   two or three sentences
 ANCHOR    the object, place, ritual or phrase the story keeps coming
           back to, and the 3-6 new words it carries
 WANT      the external goal — tangible, visible, sayable in one clause
-NEED      the internal one — the wound or the flaw the want is hiding
+NEED      the internal one — the wound or flaw the want is hiding, never how it ends
 SHAPE     three-act (default), two-act, or five-act
 BEATS     6-10, built backward from the climax, act boundaries marked,
           each resolving as a yes-but or a no-and
 ```
 
-**The order of that list is itself the rule.** Every line above is produced against the lines above it, and the sheet is worth nothing produced in any other order — a climax chosen after the beats is the climax the beats were already heading for.
+**The order of that list is itself the rule.** Every line above is produced against the lines above it, and the sheet is worth nothing produced in any other order — a climax chosen after the beats is the climax the beats were already heading for, and a culture chosen after the beats is the story the beats already were, with Japanese names put on it. See § The CULTURE block.
 
-**Write the climax first, and do not write the obvious one.** A story composed front to back arrives at the ending it was always going to arrive at, because each beat is chosen to follow the one before it and the last one has nowhere else to go. So write the final scene before anything else exists: a specific scene rather than a representative one, with something in it nobody would have predicted from the premise, and a cost the character actually pays. Then build every earlier beat backward from it, planting what that particular climax needs in order to land as earned rather than arranged.
+**Write the climax first, and do not write the obvious one.** A story composed front to back arrives at the ending it was always going to arrive at, because each beat is chosen to follow the one before it and the last one has nowhere else to go. So write the final scene before any other scene exists: a specific scene rather than a representative one, with something in it nobody would have predicted from the premise, and a cost the character actually pays. Then build every earlier beat backward from it, planting what that particular climax needs in order to land as earned rather than arranged.
 
 The September 2026 audit is the evidence. Six of eight stories ended by stating their own meaning, and in every case the evaluator named an earlier line as the real ending, unprompted — 網棚は、最後まで空いたままだった, 私は止めなかった, 部品の箱の隣ではなく、机の上に置いた。 Those endings were not chosen. They were arrived at, found thin, and then explained, which is what the closing thesis sentence in § Writing rules always is.
 
 **The afterword is still written before drafting; it is now written second.** It used to be written last, as a patch for the removed theme statement, and inverting it made it the design document. The climax takes that job now, which changes what the afterword is rather than when it happens: it is a reading of a scene that already exists rather than a statement of intent, and that is a better test, because an afterword you cannot write off your own climax means the climax is not carrying anything. Everything else stands. If you cannot write it before drafting you have a situation and not a story, and it has a canonical home — the `## Afterwords` section of `stories/stories-index.md` — so writing it early means writing it where it will live.
 
-**Want and need are two tracks, and the second is what makes the first cost something.** The want is the external goal: win the tournament, find the cat, finish the bell. It is visible, the character can say it out loud, and on its own it produces the straight line — wants X, does Y, gets X. The need is the internal one: the wound, the flaw, or the thing about themselves they have not admitted. Write both before the beats, and bind them with the rule that makes them a story rather than two lists: **the character cannot have the want until they face the need**, and most often they give up the want in order to get it.
+**Want and need are two tracks, and the second is what makes the first cost something.** The want is the external goal: win the tournament, find the cat, finish the bell. It is visible, the character can say it out loud, and on its own it produces the straight line — wants X, does Y, gets X. The need is the internal one: the wound, the flaw, or the thing about themselves they have not admitted. Write both before the beats, and bind them with the rule that makes them a story rather than two lists: **the character cannot have the want until they face the need**, and most often they give up the want in order to get it. **Write the need as the flaw and never as its resolution.** The panel's guesser is handed PREMISE, WANT and NEED and asked to predict the ending, and in the first audit three of four sheets partly gave the ending away through the NEED line, which voided the test. "She cannot ask anyone for help" is a need. "She asks, and is refused" is the climax, and it belongs on the CLIMAX line.
 
 This is the machinery behind § Craft's "one turn, and the reader can point at it". The turn is the sentence where the need is faced, and the want is what it costs. The old rule said a change happens somewhere; it never said the change was internal, and it never said anything was surrendered for it.
 
@@ -97,6 +104,21 @@ This is the machinery behind § Craft's "one turn, and the reader can point at i
 **Declare the shape.** Three are documented below. Three-act is the default and the others are chosen deliberately, per story, at this gate — not derived from the topic, the level, or the page count, and not a parameter of Gate 1. Name the shape on the sheet and mark the act boundaries on the beats, because an undeclared shape is indistinguishable from no shape.
 
 **Every beat resolves as a yes-but or a no-and.** See § Craft, first rule. The beats are where that rule is enforced, and a sheet where it holds nowhere is the thing to send back.
+
+### The CULTURE block
+
+**The stories are written in English first, and an English story with Japanese names on it is what that produces.** Four evaluators reading the Japanese alone returned the same verdict independently in September: English-designed, Japanese-rendered. § Craft's "Write from inside the culture" names the symptoms at three depths, speech, fact and absence, and a check run afterwards can find them. This block puts the culture in the sheet before there is a plot to relabel: it is chosen where the story is chosen, not applied to a finished one.
+
+It comes first for the reason CLIMAX comes before BEATS, and it names what the story runs on and never a scene. The climax is still the first scene written.
+
+- **PRACTICE.** One named custom, institution or procedure, written as a procedure: who does what, in which order, on which day, and what each step is called. A 回覧板 has a house to pass it to and a day to do it by; a 四十九日 has a sequence. If you cannot write it that way you do not know it well enough to build a story on, so look it up in a source rather than recalling it, and say so in `_gate`. Decoration is a practice named and not run.
+- **PRESSURE.** The social force that makes the want cost something and keeps the need unsaid, by its Japanese name — 遠慮, 義理, 世間体, 恩, お返し, 察し, 建前, 迷惑, 面子, 先輩・後輩 — and what it forbids this character to say or do. **The need has to be unspeakable because of it.** A need an American character would say in one line is a need the pressure is not holding.
+- **VOICES.** For every speaker: first person, how each other character addresses them and how they address each (surname, お母さん, 先生, an omitted subject), politeness toward each, sentence-final habits (〜わ, 〜ぞ, 〜ん, です・ます), age, region, era. A shift of register between two characters is a candidate for the turn. ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 gives four speakers four voices, and 山は紙に入らん is the line named most Japanese in the corpus. Pick every name for the era of the person it belongs to, and check them against one another.
+- **SEASON.** The month and what it brings: 行事, weather, food, work. The test is whether the story could move to another month without changing a beat. If it could, season is a section marker, which the corpus already has.
+- **ABSENT.** What a Japanese writer on this subject would include that the premise does not yet have, kept or cut on purpose. A grandson clearing a house has 形見, 遺品整理, 四十九日 and 仏壇 to account for. Say which are in and why each of the others is out.
+- **CARRIED.** Which of the above ride on known words (behaviour, address, objects, gestures) and which need new ones, with the `new_words` budget that pays for them. **Culture costs vocabulary**: a bakery was rejected as the setting for 三番の乾燥機 over 窯, 生地, 粉 and 小麦, none of them in the known set. The default is to carry culture on behaviour inside the known set: an offer refused before it is accepted (遠慮), a shoe set straight at the door, a gift returned at half its value (半返し). Widen `new_words` at Gate 1 only for one named practice, as 三番の乾燥機 did for its obligatory nouns, and name the practice there.
+
+**Write the beats with the Japanese term in them.** English gives a beat a Western shape while it is being written, so every culturally load-bearing noun or verb in a beat carries its term in parentheses straight after the English: *she returns the gift (お返し) within the week*, not *she returns the gift*. A beat that paraphrases a custom has already been translated. The parenthesis is also what lets the panel strip the Japanese back out of the sheet and test whether anything was left ([PANEL.md](PANEL.md) § Locator).
 
 ### The three shapes
 
@@ -123,9 +145,19 @@ Beat counts are given as fractions of the sheet, not as numbers, because the she
 
 Whichever shape is declared, it is a shape to build toward and not a form to fill. A beat that exists because the act diagram has a slot there is worse than an act boundary in a slightly wrong place.
 
-Record the whole sheet — climax, afterword reference, premise, anchor, want, need, shape, and beats — as `_premise` on the `corpus.json` entry, alongside the existing `_feature` and `_note` prose keys. It is a prose key and nothing parses it; write it as the sheet, not as a schema.
+Record the whole sheet — culture, climax, afterword reference, premise, anchor, want, need, shape, and beats — as `_premise` on the `corpus.json` entry, alongside the existing `_feature` and `_note` prose keys. It is a prose key and nothing parses it; write it as the sheet, not as a schema.
 
 **The gate is bigger than it was, and that is deliberate.** The old sheet was three lines and could be approved at a glance. This one has a climax, two tracks, a declared shape, and a filter applied to every beat, and it takes a real reading. That is the cost of the enforcement mechanism: no script checks any of this, none should try (§ Metrics are floors, not targets), and the entire weight of six craft techniques rests on someone reading the sheet and sending it back. A skimmed Gate 2 enforces nothing.
+
+### Who reads the sheet
+
+**The panel does, and Rob does not, unless he asks.** The same reading is required and it is no lighter: a guesser who sees only the premise tries to predict the climax, then a sheet critic who has the corpus, the craft rules and the output of `reviews.py` checks every line above, one rule at a time, and sends the sheet back by name. Three send-backs drop the story, and a dropped story never reaches Rob. The author does not grade its own sheet.
+
+The panel also tests the culture directly, and it is the one check here that does not read the sheet at its word. A **locator** gets the sheet with every Japanese term, name and the CULTURE block taken out and is asked where it is set; a **transplanter** moves the beats to a small town in the American Midwest and reports which ones break. A beat breaks when the move can keep it only by inventing an equivalent institution, custom or obligation. The climax and the beat where the need is faced have to be among them, and the character has to stay silent about the need in the moved version too. If they do not, the culture was garnish.
+
+What Rob gets is a **card**: level, register, length, shape, a domain phrase at the `## Summaries` ceiling, which rules the sheet was sent back for, the nearest existing story and how it differs, which of his review notes it responds to, and a question if the panel cannot settle one without him. No scene, no name, no line. He can raise it to the blurb, or to the full sheet, by saying so. The card is not a stop; drafting continues unless it carries a question.
+
+The protocol, the questions each role is asked and the inputs each is kept from are in [PANEL.md](PANEL.md). Authoring runs in a subagent or a child session so that none of the story passes through the thread Rob is watching.
 
 ## Craft
 
@@ -136,7 +168,7 @@ The rules below are what to do. The prohibitions further down are what not to do
 - **Plant and pay off, and veil the plant.** ｜猫《ねこ》を｜探《さが》す｜探偵《たんてい》 plants the boxes clue on page 7 and does not recall it until page 20. What that example does not yet do is hide it: a plant the reader files as a plant has spent the twist in advance. Plant it as a habit, a piece of scenery, or a line said for some other reason, so that it is doing visible work of its own at the time and a second job at the climax. This is structural under the three-act default, where the plants live in Act I and pay off in Act III.
 - **Concrete before abstract.** An abstract noun has to be earned by a physical detail that came first. This serves the vocabulary constraint too: concrete nouns are what the known set is richest in.
 - **Withhold, never confuse.** The reader sees one sentence at a time and the inference chains run thirty-plus sentences. Information must stay retrievable — plant it concretely, and never ask the reader to hold an ambiguity across pages.
-- **Write from inside the culture, not from English with Japanese words.** The story has to be one a Japanese reader recognises as theirs, not an American story rendered into Japanese. This is the corpus's named defect and the audit found it at three depths. **Speech:** an eighty-year-old craftsman, a schoolboy, a knight captain and a middle-aged detective all spoke identical neutral textbook Japanese — no ｜役割語《やくわりご》 anywhere, 私 where a novel gives the dying master わし, no 〜ぞ / 〜な / 〜さ on any male character. Also あなた as a second-person address where Japanese uses the surname or nothing, and おばあさん used inside a family where it is おばあちゃん. **Fact:** a 定期券 carrying a company name, which is the 社員証; one 桶 left inverted as the anomaly, when inverted is how they are stored; 閉店 for a 銭湯 closing, which is 廃業; a conductor checking tickets on a 通勤 train; ten-day domestic mail, which is four at the outside; 部屋 and 表札 and a neighbour's garden in one dwelling. **Absence:** a story about a grandson clearing his grandfather's house containing no 遺品整理, no 形見, no ｜四十九日《しじゅうくにち》 — 形見 is the word for the watch. And season used only as a section marker, never as a subject, in a tradition that organises prose of this length by it. The corpus proves it can do this, so it is a process defect and not a capability one: ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 gives four speakers four voices — 祖父 わし, 甚平 〜ん / 〜とな, 千代 わたし, 蓮 です・ます — and its 山は紙に入らん was named the single most Japanese line in the corpus. Check the era of every name against every other, and check any institution, object or procedure the story leans on before it becomes the story's centre. Nothing in the validation stack sees any of this.
+- **Write from inside the culture, not from English with Japanese words.** The story has to be one a Japanese reader recognises as theirs, not an American story rendered into Japanese. This is the corpus's named defect and the audit found it at three depths. **Speech:** an eighty-year-old craftsman, a schoolboy, a knight captain and a middle-aged detective all spoke identical neutral textbook Japanese — no ｜役割語《やくわりご》 anywhere, 私 where a novel gives the dying master わし, no 〜ぞ / 〜な / 〜さ on any male character. Also あなた as a second-person address where Japanese uses the surname or nothing, and おばあさん used inside a family where it is おばあちゃん. **Fact:** a 定期券 carrying a company name, which is the 社員証; one 桶 left inverted as the anomaly, when inverted is how they are stored; 閉店 for a 銭湯 closing, which is 廃業; a conductor checking tickets on a 通勤 train; ten-day domestic mail, which is four at the outside; 部屋 and 表札 and a neighbour's garden in one dwelling. **Absence:** a story about a grandson clearing his grandfather's house containing no 遺品整理, no 形見, no ｜四十九日《しじゅうくにち》 — 形見 is the word for the watch. And season used only as a section marker, never as a subject, in a tradition that organises prose of this length by it. The corpus proves it can do this, so it is a process defect and not a capability one: ｜行《い》かなかった｜人《ひと》の｜地図《ちず》 gives four speakers four voices — 祖父 わし, 甚平 〜ん / 〜とな, 千代 わたし, 蓮 です・ます — and its 山は紙に入らん was named the single most Japanese line in the corpus. Check the era of every name against every other, and check any institution, object or procedure the story leans on before it becomes the story's centre. No script sees any of this. It is built into the sheet (§ The CULTURE block) and read by the panel, which is the only thing that can.
 - **Nobody says what they mean.** On-the-nose dialogue — a character stating what they feel, or answering the emotional question they were asked — is the default and has to be written against. Three constraints, applied per scene: **a secret**, one piece of information each character in the scene is actively keeping from the others; **misdirection**, no direct answer to a direct emotional question, so they change the subject, deflect into a physical action, or say something beside the point; and **conflicting agendas**, a different micro-goal per character, so one wants an answer and the other wants to leave the room. The vocabulary constraint bites unevenly here and picks the technique for you. Deflection into action and changing the subject cost nothing — a hand moved, a cup set down, a question about the weather are all inside the known set. Sarcasm and irony need range that set may not hold; check with `have.py` before building a scene on one. The corpus already has the good version: 「静かにしろ。音が聞こえない」 is a command with a reason and no softening, and 「この鏡は動かさないでください」 is a woman asking her own family with ください, which is neither an order nor a plea and says the whole power gradient without naming it.
 
 ### Register
@@ -250,7 +282,7 @@ So the test is not "same speaker, therefore merge". It is **continuous or not**:
 python3 stats.py ../stories/<slug>.txt --turns   # every run of adjacent quoted lines
 ```
 
-Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest alternate unless a beat says otherwise. Two neighbours you would give to the same speaker, with no silence between them, are one turn wrongly split. Nothing gates this — neither speaker identity nor a pause is recoverable from the text, so the script prints and you judge.
+Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest alternate unless a beat says otherwise. Two neighbours you would give to the same speaker, with no silence between them, are one turn wrongly split. Nothing gates this — neither speaker identity nor a pause is recoverable from the text, so the script prints and a reader judges. The reader is the panel's Japanese-only pair, who are asked to name every speaker cold ([PANEL.md](PANEL.md)); the author who wrote the turns cannot, because the author remembers who said them. The author runs `--turns` and sends the output to the readers' subagent, not to Rob: it prints dialogue.
 
 ## Furigana
 
@@ -296,7 +328,7 @@ Of the six, this is the one most easily bought rather than fixed, so two things 
 
 ### The English has to stand alone
 
-Read only the `>` lines, top to bottom, ignoring the Japanese. **It must be a short story worth reading.** Not a gloss track, not a sequence of captions. This is half of what actually gets read, and it is the cheapest strong check available.
+Read only the `>` lines, top to bottom, ignoring the Japanese. **It must be a short story worth reading.** Not a gloss track, not a sequence of captions. This is half of what actually gets read, and it is the cheapest strong check available. The panel's English-only reader does it, because the author who wrote the translation reads the Japanese through it.
 
 This check used to sit up with the craft rules, before drafting, where it was very nearly circular: the English being read back was the English the story had been planned in, so it confirmed the plan and little else. Under § Drafting the English is derived from finished Japanese, which makes this a real check on a translation — and the first place a gloss track shows up, because English that reads as captions is usually reporting Japanese that was never prose.
 
@@ -344,12 +376,13 @@ To work on the reader UI rather than a story, `python3 build.py <story> --split 
 
 ## Where a story lands
 
-Four places. Miss one and the corpus is inconsistent in a way only some of them report:
+Five places. Miss one and the corpus is inconsistent in a way only some of them report:
 
 1. `stories/<slug>.txt` — the story
-2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `new_words`, inserted after the last story of its level rather than appended. `stories[]` order is the contents page's order, and the contents page reads in level order.
-3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
+2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `_gate` (what the panel found, in prose — [PANEL.md](PANEL.md) § Calibration), `new_words`, inserted after the last story of its level rather than appended. `stories[]` order is the contents page's order, and the contents page reads in level order.
+3. `stories/stories-index.md` `## Summaries` — one bullet, **the situation and the want and never the turn**: the contents page shows it before Rob picks the story. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
+5. `AXES.md` — one row in the table, from the sheet and the afterword, tabulated by a second reader independently and settled by a third where they differ ([AXES.md](AXES.md) § How it is used). It is a standalone file and not a `corpus.json` key because `corpus.json` is a data input to every story's build, and an edit to it re-segments all of them
 
 Then rebuild twice, because the pitch table is read from the built data rather than from the source:
 
@@ -366,14 +399,16 @@ That second one is the assertion that matters, because the failure mode here is 
 ## Modes
 
 - **new** — the default, all four steps above.
-- **revise `<slug>`** — edit the `.txt` in place. The brief already exists; re-run `stats.py --strict` against it.
+- **revise `<slug>`** — edit the `.txt` in place. The brief already exists; re-run `stats.py --strict` against it, and re-run the panel's draft-stage readers ([PANEL.md](PANEL.md)) on the new text.
 - **version `<slug>`** — archive the current text to `stories/versions/<slug>.vN.txt`, add `vN` to that entry's `versions[]`, then write the new current. **`rebuild.py` does not build the archive**, and this document said for a while that it did. `rebuild.py:200-202` skips every archived target unless `--versions` is passed, on purpose: an archive re-rendered with today's engine "preserves the story and not the reading it shipped with" (`rebuild.py:172-174`). Nothing is lost by that, because A/B comparison never needed a built archive — `stats.py --diff <old>.txt <new>.txt` reads the two source files and prints both columns.
 
 ## Committing
 
 Two lanes.
 
-**A story-only change** — a new or revised `.txt`, its `corpus.json` entry, its `stories-index.md` bullets, and the rebuilt files under `docs/` — goes straight to `main` once `stats.py --strict` and `check.py` pass. Those are the review: they are stricter about a story than reading the generated HTML would be.
+**A story-only change** — a new or revised `.txt`, its `corpus.json` entry, its `stories-index.md` bullets, and the rebuilt files under `docs/` — goes straight to `main` once `stats.py --strict` and `check.py` pass and the panel has passed it ([PANEL.md](PANEL.md)). Those are the review: they are stricter about a story than reading the generated HTML would be.
+
+**Commit subjects name the title and the domain and nothing else:** `Add <title>, a <domain> story`. A subject that carries the want or the turn spoils the story in `git log`, and several already do. Rob follows these sessions in the app.
 
 **Anything touching the engine** — `scripts/*.py`, `reader.html`, `reader.css`, `reader.js` — goes on a branch, gets reviewed, and is merged. A change that touches both takes the engine lane.
 
