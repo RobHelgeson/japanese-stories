@@ -53,7 +53,7 @@ Print the table, **then stop and ask.** Do not draft until the brief is confirme
 
 Every parameter has a default, so a bare invocation is a complete brief. Defaults live in `corpus.json`'s `defaults` block, not here — a default nothing reads is a suggestion. `grammar_focus` names must be keys of `GRAMMAR_PATTERNS` in `stats.py`; `brief.py` rejects the rest.
 
-With no topic given, propose two or three **practices** the corpus has not used: a named custom, institution or procedure and the pressure it puts on the people inside it, not just an object (§ The CULTURE block). The `_premise` of each story in `corpus.json` says what has been used. Run `have.py` over the vocabulary of each candidate before proposing it, as 三番の乾燥機 did, because a practice the known set cannot name is a `new_words` bill the brief has to say it is paying.
+With no topic given, propose two or three **practices** the corpus has not used: a named custom, institution or procedure and the pressure it puts on the people inside it, not just an object (§ The CULTURE block). The PRACTICE and PRESSURE columns of `AXES.md` say what has been used, and `AXES.md` is a spoiler file, so read it in a subagent and bring Rob only the candidates. Run `have.py` over the vocabulary of each candidate before proposing it, as 三番の乾燥機 did, because a practice the known set cannot name is a `new_words` bill the brief has to say it is paying.
 
 **Run `reviews.py` before proposing anything.** It prints the star ratings and notes from the contents page against the level, register and length each was a verdict on. Read the notes rather than the averages: a note naming what dragged or what had to be re-read is a constraint on the next brief, while a mean over three ratings is a number looking for a pattern. Say which review you are responding to when a parameter departs from the default because of one — an unattributed change to `dialogue` or `register` is indistinguishable from a whim, and the brief is the only record either way. Nothing here is automatic: no parameter is derived from a rating, and a low-rated register is not retired on the strength of one story.
 
@@ -370,12 +370,13 @@ To work on the reader UI rather than a story, `python3 build.py <story> --split 
 
 ## Where a story lands
 
-Four places. Miss one and the corpus is inconsistent in a way only some of them report:
+Five places. Miss one and the corpus is inconsistent in a way only some of them report:
 
 1. `stories/<slug>.txt` — the story
 2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `_gate` (what the panel found, in prose — [PANEL.md](PANEL.md) § Calibration), `new_words`, inserted after the last story of its level rather than appended. `stories[]` order is the contents page's order, and the contents page reads in level order.
 3. `stories/stories-index.md` `## Summaries` — one bullet, **the situation and the want and never the turn**: the contents page shows it before Rob picks the story. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
+5. `AXES.md` — one row in the table, from the sheet and the afterword, tabulated by a second reader independently and settled by a third where they differ ([AXES.md](AXES.md) § How it is used). It is a standalone file and not a `corpus.json` key because `corpus.json` is a data input to every story's build, and an edit to it re-segments all of them
 
 Then rebuild twice, because the pitch table is read from the built data rather than from the source:
 

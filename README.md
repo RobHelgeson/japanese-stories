@@ -146,6 +146,7 @@ docs/             what GitHub Pages serves
   versions/       archived drafts, self-contained and frozen
 AUTHORING.md      the craft spec a new story is written against
 PANEL.md          who gates a story, and what Rob sees of it (a card, not the sheet)
+AXES.md           how each story is built, in a closed vocabulary, so a new one can be checked against them (a spoiler file)
 CALIBRATION.md    where every threshold came from, and what was measured wrong
 ```
 

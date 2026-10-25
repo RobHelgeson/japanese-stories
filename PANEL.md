@@ -68,7 +68,7 @@ The three words are defined in the prompt, because the first audit showed the tr
 
 ### Sheet critic
 
-**Gets:** the sheet, the guesser's endings, the locator's placement, the transplanter's report; AUTHORING.md § Gate 2, § The CULTURE block, § Craft, § Register; `_premise`, `_feature` and `_note` for every story in `corpus.json`; the output of `python3 reviews.py`. **Never gets:** the author's notes, or the drafting conversation. On a repeat round it also gets the list of what it sent back last time, and nothing else from that round.
+**Gets:** the sheet, the guesser's endings, the locator's placement, the transplanter's report; AUTHORING.md § Gate 2, § The CULTURE block, § Craft, § Register; `AXES.md`; the `_note` of every story in `corpus.json`, for the reader's quoted reviews; the output of `python3 reviews.py`. **Never gets:** the author's notes, or the drafting conversation. On a repeat round it also gets the list of what it sent back last time, and nothing else from that round.
 
 Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of reason:
 
@@ -90,7 +90,7 @@ Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of 
   - Beats carry the Japanese term for every culturally load-bearing noun and verb, rather than a paraphrase.
   - **The locator and transplanter findings are binding.** A locator that cannot place the story in Japan, a transplanter whose report has the climax or the turn short of BREAKS, or a need the character would simply say aloud in the moved version, is a SEND BACK for garnish whatever the rest of the block looks like.
 - **Inside the culture, at the level of fact.** AUTHORING § Craft, "Write from inside the culture": speech, fact, absence. Check any institution, object or procedure the story leans on before it becomes the story's centre.
-- **Against the corpus.** Name the nearest existing story on each of six axes: domain, central object, relationship, climax mechanism, ending gesture, and practice and pressure. Say what differs. Three or more axes shared is a send-back. Also check anything Rob's notes name as a tic. Sheets recorded before the CULTURE block existed have no practice or pressure to read, so infer them from `_premise` and say you did.
+- **Against the corpus.** Fill the six axes of `AXES.md` for this sheet from its vocabulary (domain, object, relationship, climax, ending, and practice with pressure), then compare with the table by identity: an axis is shared with a story when the values match, and practice-and-pressure when both do. Name the nearest story on each axis and the value shared. **Three or more axes shared with one story is a send-back.** Do not judge similarity by reading the other stories' prose, and propose a new value by name where none fits rather than using OTHER. Apply the tie-breaks in `AXES.md` where two values both fit, and give PRESSURE the least weight, since it is the axis the two tabulators disagreed on most. Also check anything Rob's notes name as a tic.
 - **Against Rob.** List every note from `reviews.py` that is a constraint on this brief and say whether the sheet respects it. A departure from a default parameter has to say which review it responds to.
 
 The critic's overall word is PASS, SEND BACK, or DROP. Three SEND BACK rounds on the sheet is a DROP.
