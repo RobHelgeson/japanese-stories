@@ -1,0 +1,147 @@
+# The panel
+
+Rob is the only reader, and every story is meant to be read fresh. Gate 2 used to hand him the whole English sheet to approve — climax, afterword, beats — which spent the story before he opened it. The panel replaces that read. **Rob is the reader and the taste signal; the panel is the gate.**
+
+This is a change of who reads, not of what is checked. Every rule in AUTHORING.md § Gate 2 and § Craft still applies, still has no script behind it, and is still enforced by something reading the sheet and sending it back. What changes is that the something is no longer Rob. The repo already ran this experiment: the September 2026 audit's evaluators named the real ending of six of eight stories unprompted, and the 09-19 second blind read found the corpus's clearest tell, circumlocution around the obligatory noun. Independent readers with the rubric and no stake in the draft find what the author cannot. Rob's ratings and notes find what they cannot.
+
+## Rules of the panel
+
+- **Independence.** Each role is a fresh agent. It gets the artifact and the inputs listed for it below, never the author's reasoning, earlier drafts, or another role's opinion unless the role is defined as reading it. An agent that has watched the story being argued for will agree with it.
+- **The author never grades its own work.** The English read-back was already "very nearly circular" when the author did it (AUTHORING § The English has to stand alone). The author runs the mechanical checks and revises. Every judgement below belongs to someone else.
+- **Cite the rule.** A send-back names the AUTHORING rule it applies and the beat or line it applies to. "Feels flat" is not a verdict.
+- **A pass is a floor.** The panel does not rank stories and its verdicts are prose. Nothing here becomes a number to optimise (CALIBRATION.md, § The reference band; AUTHORING § Metrics are floors, not targets).
+
+## Who sees what
+
+Rob sees the **card** and nothing the card does not hold. Three levels, set by him per story, default 0:
+
+| Level | Rob sees                                                                  |
+| ----- | ------------------------------------------------------------------------- |
+| 0     | the card only — the default                                               |
+| 1     | the card and the `## Summaries` blurb, which is the ceiling for any message to him |
+| 2     | the card and the full sheet, as Gate 2 used to work                       |
+
+He says so when he wants more, usually at Gate 1. Nothing in `brief.py` carries it and nothing should: it is a preference about Rob, not a property of the story.
+
+**The `## Summaries` blurb states the situation and the want, never the turn.** It is what the contents page shows him before he picks a story, so a blurb that names the reveal spoils the story on the shelf. Write it as the premise sentence of the sheet, not the afterword in short.
+
+## Gate 2, in order
+
+1. **Author** writes the sheet (AUTHORING § Gate 2), in English, in a subagent.
+2. **Guesser** runs on PREMISE, WANT, NEED, level and register alone.
+3. **Sheet critic** reads the sheet, the guesses, the corpus, and Rob's notes, and returns a verdict.
+4. Send back, revise, repeat from 2 (below). A pass records the sheet as `_premise` on the `corpus.json` entry.
+5. The orchestrator posts the **card** and drafting begins. The card is not a stop unless it carries a question.
+
+### Guesser
+
+**Gets:** title, level, register, PREMISE, WANT, NEED. **Never gets:** CLIMAX, BEATS, AFTERWORD, SHAPE, any other story.
+
+Asked: *Write three different endings for this story, one scene each, most likely first. Then say in a sentence what you expect it to be about.*
+
+This is the spoiler-free form of "do not write the obvious climax" (AUTHORING § Gate 2). A story composed front to back arrives at the ending it was always going to arrive at, and an agent that has only the premise will find that ending. If one of the three matches the sheet's CLIMAX in mechanism — not in detail — the climax is the obvious one, and the sheet is rebuilt from a new climax, not patched.
+
+### Sheet critic
+
+**Gets:** the sheet and the guesses; AUTHORING.md § Gate 2, § Craft, § Register; `_premise`, `_feature` and `_note` for every story in `corpus.json`; the output of `python3 reviews.py`. **Never gets:** the author's notes, or the drafting conversation. On a repeat round it also gets the list of what it sent back last time, and nothing else from that round.
+
+Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of reason:
+
+- **Climax.** A specific scene rather than a representative one? Something in it that the premise did not predict — and did any guess land on it? A cost the character actually pays?
+- **Afterword.** A reading of this climax, or a statement of intent? Could it be written off the climax alone?
+- **Want and need.** Want visible and sayable in one clause? Need distinct from it? Does the character have to face the need to get the want, and most often give the want up to get it?
+- **Shape.** Declared, boundaries marked, and a story that fits it rather than a form being filled.
+- **Every beat.** Yes-but or no-and. Write the honest join to the next beat: そして / それから is a list of events, だから / しかし is causality, and an all-だから sheet is the straight line the rule exists to break.
+- **Plants.** Name each plant and its payoff. For each plant, what is it doing at the time, as a habit, scenery or an offhand line, that is not planting? A plant a reader would file as a plant is spent.
+- **Ending.** Does the last page state what it means? A claim-ending is permitted only if it corrects a fact about a person (the guard recorded on 廊下の鏡) and never concludes.
+- **Dialogue.** Per scene: a secret each, misdirection, conflicting agendas.
+- **Inside the culture.** AUTHORING § Craft, "Write from inside the culture," as written: speech, fact, absence. Check the era of every name against every other, and any institution, object or procedure the story leans on.
+- **Against the corpus.** Name the nearest existing story on each of five axes: domain, central object, relationship, climax mechanism, ending gesture. Say what differs. Three or more axes shared is a send-back. Also check anything Rob's notes name as a tic.
+- **Against Rob.** List every note from `reviews.py` that is a constraint on this brief and say whether the sheet respects it. A departure from a default parameter has to say which review it responds to.
+
+The critic's overall word is PASS, SEND BACK, or DROP. Three SEND BACK rounds on the sheet is a DROP.
+
+## The draft, in order
+
+1. **Author** drafts in Japanese a page at a time (AUTHORING § Drafting), writes the English afterwards, and runs `stats.py --turns --strict`, `check.py` and `voice.py`. These are the mechanical checks and pass or fail as they always have.
+2. **Japanese-only readers**, two independent agents, on the Japanese alone.
+3. **English-only reader**, one agent, on the `>` lines alone.
+4. **Reconciler** compares what the readers took from the story with the AFTERWORD.
+5. Send back or pass, and the card.
+
+Build the two inputs like this, in a UTF-8 locale or `sed` matches bytes and strips nothing:
+
+```bash
+export LC_ALL=C.UTF-8
+grep -v '^>' stories/<slug>.txt | sed -E 's/｜([^《]*)《[^》]*》/\1/g' > ja.txt
+grep    '^>' stories/<slug>.txt | sed -E 's/^> ?//; s/｜([^《]*)《[^》]*》/\1/g' > en.txt
+```
+
+### Japanese-only readers
+
+**Get:** `ja.txt`. Furigana and English stripped, the repo unreachable, no corpus, no sheet, no brief. The September protocol exactly, which is the point: it is the only read that sees the story as a Japanese reader would, and it is the only one that returned a verdict nobody expected.
+
+Asked:
+
+1. Which sentence reads as the ending? Quote it.
+2. What is the story doing, in two sentences?
+3. How natural is the Japanese, out of ten? Quote the three lines that sound most like a translation.
+4. Name the speaker of every 「」 line. List the ones you could not name, and every pair of adjacent turns you would give to the same speaker with no silence between them.
+5. What is the longest stretch where every narration sentence ends the same way?
+6. Is there anything a Japanese reader would not accept as fact: an era, an institution, a procedure, a way of speaking?
+
+Two readers is the minimum, so that a disagreement is visible. Four is better for a first story in a new register.
+
+### English-only reader
+
+**Gets:** `en.txt`. Asked: *Is this a short story worth reading? What happens, in three sentences? Where does it read as captions rather than prose? Does it end on an image or on a claim?* This is AUTHORING § The English has to stand alone, done by someone who did not write it.
+
+### Reconciler
+
+**Gets:** the AFTERWORD from the sheet; the three readers' two-sentence readings and the ending line each one picked. **Never gets:** the story, or the beats.
+
+Asked: *Does what the readers took from the story match the afterword: yes, partly, or no? Did they pick the intended ending, and if not what did they pick?* Both failures are real and mean different things. If the readers disagree with the afterword, the story is not delivering it or the afterword is wrong, and the author has to say which.
+
+## Send-backs and escalation
+
+- **Gate 2:** three rounds, then DROP.
+- **Draft:** two rounds on the readers' findings, then DROP.
+- A dropped story never reaches Rob. The next card carries one line: how many were dropped, and the rule that dropped them, by name.
+- **Rob is asked only when** the panel splits on something only taste can settle; a rule collides with one of his own notes; or the story needs a Gate 1 parameter moved. The question has to be answerable without the plot, as an axis rather than a scene (quieter or more comic; closed or left open). A question that cannot be put that way is a DROP.
+
+## The card
+
+```
+CARD  <title>   L<level>  <register>  <pages>p   shape: <name>
+Domain      <noun phrase, at the Summaries ceiling>
+Gate 2      passed on round <n> of 3; sent back for: <rule names only>
+Draft       <n> Japanese-only reads, ending found <where intended | elsewhere>, naturalness <range>
+Nearest     <existing story> on <axis>; differs by <axis-level difference, no plot>
+Your notes  responds to <title ★n>: held | not held
+Mechanical  stats --strict ✓  check.py ✓  turns ✓
+Dropped     <n>: <rule names>
+Needs you   none | <the question>
+```
+
+Naturalness is a range and it gates nothing. Nothing on the card is a scene, a name, a line or a turn.
+
+## Containment
+
+Rob follows sessions in the app, so anything that goes through the main thread is on his screen. The panel does not make a story spoiler-free if the story is printed beside it.
+
+- **Authoring and the whole panel run in subagents, or in a child session.** The orchestrating thread posts the card and nothing else. It does not `Read` a story in flight, print `--turns` or `voice.py`, or quote a line. A subagent's final report is not shown to Rob; whether the app shows a subagent's inner tool calls, or a child session's transcript, is not something this repo controls, so keep the story's text out of any call you can.
+- **Commit subjects name the title and the domain, never the want or the turn.** The existing history spoils: "a white number under a scratched sticker", "footprints on the evening round". A subject is `Add <title>, a <domain> story`.
+- **The final message after a story is the card.** Not a summary of the story, not "what I did."
+- `_premise`, the Afterwords bullet and the story file itself are in files Rob does not open. That holds only while nothing recites them.
+
+## Calibration
+
+The panel is the same model family as the author, so it has correlated blind spots, and it has no taste to disagree with. Rob's ratings are the only check on it.
+
+- At ship time write `_gate` on the `corpus.json` entry, prose and no numbers: rounds, what was sent back and for which rule, where the readers found the ending. It sits beside `_premise`, `_feature` and `_note`, and nothing parses it.
+- When Rob rates a story, read his note against `_gate`. **A note naming something the panel passed is a hole in this file**, so add the rule to the role that should have caught it. That is how his feedback compounds without his reading anything in advance.
+- After every five rated stories gated this way, set the panel's verdicts beside the ratings in CALIBRATION.md. n is tiny and will stay tiny for a long time. Read the notes, not the mean, as `reviews.py` already says.
+
+## What the panel cannot do
+
+It cannot tell whether a story will move Rob. It can tell that the climax is not the one a stranger would guess, that the ending does not explain itself, that a Japanese reader would not trip on the facts, and that the story does what its afterword says. "Unexpected to a model" is not "unexpected to Rob."

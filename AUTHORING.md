@@ -4,7 +4,7 @@ Write a story the reader can read without a dictionary, at a declared difficulty
 
 Everything below is enforced or measured by the scripts in `scripts/`. Run them; do not eyeball.
 
-**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written — and it is built backward, from the climax. Only then draft — and the draft runs the other way round, in Japanese, a page at a time, with the English written last. See § Drafting.
+**Two gates, in order. Stop at each one.** Gate 1 settles what the story is briefed to be, and Rob settles it. Gate 2 settles whether it is a story at all, in English, before a single Japanese sentence is written — and it is built backward, from the climax. **The panel passes Gate 2, not Rob**: he is the only reader, and a sheet he approves is a story he has already read. See [PANEL.md](PANEL.md). Only then draft — and the draft runs the other way round, in Japanese, a page at a time, with the English written last. See § Drafting.
 
 ## Before writing
 
@@ -13,7 +13,7 @@ cd scripts
 export ICHIRAN_URL=http://localhost:3005   # or wherever your Ichiran runs; comma-separate fallbacks
 python3 have.py 単語1 単語2 ...      # ✓ known / ✗ not / ✓ (weak) leech. Batch 30-50.
 python3 stats.py                      # every story against its declared level
-python3 reviews.py                    # what the reader thought of the ones so far
+python3 reviews.py                    # what the reader thought of the ones so far; the sheet critic reads it too
 python3 peeks.py                      # the words the reader had to tap for, ranked
 ```
 
@@ -120,6 +120,14 @@ Whichever shape is declared, it is a shape to build toward and not a form to fil
 Record the whole sheet — climax, afterword reference, premise, want, need, shape, and beats — as `_premise` on the `corpus.json` entry, alongside the existing `_feature` and `_note` prose keys. It is a prose key and nothing parses it; write it as the sheet, not as a schema.
 
 **The gate is bigger than it was, and that is deliberate.** The old sheet was three lines and could be approved at a glance. This one has a climax, two tracks, a declared shape, and a filter applied to every beat, and it takes a real reading. That is the cost of the enforcement mechanism: no script checks any of this, none should try (§ Metrics are floors, not targets), and the entire weight of six craft techniques rests on someone reading the sheet and sending it back. A skimmed Gate 2 enforces nothing.
+
+### Who reads the sheet
+
+**The panel does, and Rob does not, unless he asks.** The same reading is required and it is no lighter: a guesser who sees only the premise tries to predict the climax, then a sheet critic who has the corpus, the craft rules and the output of `reviews.py` checks every line above, one rule at a time, and sends the sheet back by name. Three send-backs drop the story, and a dropped story never reaches Rob. The author does not grade its own sheet.
+
+What Rob gets is a **card**: level, register, length, shape, a domain phrase at the `## Summaries` ceiling, which rules the sheet was sent back for, the nearest existing story and how it differs, which of his review notes it responds to, and a question if the panel cannot settle one without him. No scene, no name, no line. He can raise it to the blurb, or to the full sheet, by saying so. The card is not a stop; drafting continues unless it carries a question.
+
+The protocol, the questions each role is asked and the inputs each is kept from are in [PANEL.md](PANEL.md). Authoring runs in a subagent or a child session so that none of the story passes through the thread Rob is watching.
 
 ## Craft
 
@@ -244,7 +252,7 @@ So the test is not "same speaker, therefore merge". It is **continuous or not**:
 python3 stats.py ../stories/<slug>.txt --turns   # every run of adjacent quoted lines
 ```
 
-Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest alternate unless a beat says otherwise. Two neighbours you would give to the same speaker, with no silence between them, are one turn wrongly split. Nothing gates this — neither speaker identity nor a pause is recoverable from the text, so the script prints and you judge.
+Read down each block and name a speaker for every line. Tagged lines say who they are and close their turn; the rest alternate unless a beat says otherwise. Two neighbours you would give to the same speaker, with no silence between them, are one turn wrongly split. Nothing gates this — neither speaker identity nor a pause is recoverable from the text, so the script prints and a reader judges. The reader is the panel's Japanese-only pair, who are asked to name every speaker cold ([PANEL.md](PANEL.md)); the author who wrote the turns cannot, because the author remembers who said them. The author runs `--turns` and sends the output to the readers' subagent, not to Rob: it prints dialogue.
 
 ## Furigana
 
@@ -290,7 +298,7 @@ Of the six, this is the one most easily bought rather than fixed, so two things 
 
 ### The English has to stand alone
 
-Read only the `>` lines, top to bottom, ignoring the Japanese. **It must be a short story worth reading.** Not a gloss track, not a sequence of captions. This is half of what actually gets read, and it is the cheapest strong check available.
+Read only the `>` lines, top to bottom, ignoring the Japanese. **It must be a short story worth reading.** Not a gloss track, not a sequence of captions. This is half of what actually gets read, and it is the cheapest strong check available. The panel's English-only reader does it, because the author who wrote the translation reads the Japanese through it.
 
 This check used to sit up with the craft rules, before drafting, where it was very nearly circular: the English being read back was the English the story had been planned in, so it confirmed the plan and little else. Under § Drafting the English is derived from finished Japanese, which makes this a real check on a translation — and the first place a gloss track shows up, because English that reads as captions is usually reporting Japanese that was never prose.
 
@@ -341,8 +349,8 @@ To work on the reader UI rather than a story, `python3 build.py <story> --split 
 Four places. Miss one and the corpus is inconsistent in a way only some of them report:
 
 1. `stories/<slug>.txt` — the story
-2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `new_words`, inserted after the last story of its level rather than appended. `stories[]` order is the contents page's order, and the contents page reads in level order.
-3. `stories/stories-index.md` `## Summaries` — one bullet. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
+2. `scripts/corpus.json` `stories[]` — entry with `level`, `brief`, `_premise` (the whole Gate 2 sheet), `_gate` (what the panel found, in prose — [PANEL.md](PANEL.md) § Calibration), `new_words`, inserted after the last story of its level rather than appended. `stories[]` order is the contents page's order, and the contents page reads in level order.
+3. `stories/stories-index.md` `## Summaries` — one bullet, **the situation and the want and never the turn**: the contents page shows it before Rob picks the story. Without it `index.py` warns and the card ships with no blurb and no kana reading; nothing else in the pipeline checks
 4. `stories/stories-index.md` `## Afterwords` — one bullet, written at Gate 2
 
 Then rebuild twice, because the pitch table is read from the built data rather than from the source:
@@ -360,14 +368,16 @@ That second one is the assertion that matters, because the failure mode here is 
 ## Modes
 
 - **new** — the default, all four steps above.
-- **revise `<slug>`** — edit the `.txt` in place. The brief already exists; re-run `stats.py --strict` against it.
+- **revise `<slug>`** — edit the `.txt` in place. The brief already exists; re-run `stats.py --strict` against it, and re-run the panel's draft-stage readers ([PANEL.md](PANEL.md)) on the new text.
 - **version `<slug>`** — archive the current text to `stories/versions/<slug>.vN.txt`, add `vN` to that entry's `versions[]`, then write the new current. **`rebuild.py` does not build the archive**, and this document said for a while that it did. `rebuild.py:200-202` skips every archived target unless `--versions` is passed, on purpose: an archive re-rendered with today's engine "preserves the story and not the reading it shipped with" (`rebuild.py:172-174`). Nothing is lost by that, because A/B comparison never needed a built archive — `stats.py --diff <old>.txt <new>.txt` reads the two source files and prints both columns.
 
 ## Committing
 
 Two lanes.
 
-**A story-only change** — a new or revised `.txt`, its `corpus.json` entry, its `stories-index.md` bullets, and the rebuilt files under `docs/` — goes straight to `main` once `stats.py --strict` and `check.py` pass. Those are the review: they are stricter about a story than reading the generated HTML would be.
+**A story-only change** — a new or revised `.txt`, its `corpus.json` entry, its `stories-index.md` bullets, and the rebuilt files under `docs/` — goes straight to `main` once `stats.py --strict` and `check.py` pass and the panel has passed it ([PANEL.md](PANEL.md)). Those are the review: they are stricter about a story than reading the generated HTML would be.
+
+**Commit subjects name the title and the domain and nothing else:** `Add <title>, a <domain> story`. A subject that carries the want or the turn spoils the story in `git log`, and several already do. Rob follows these sessions in the app.
 
 **Anything touching the engine** — `scripts/*.py`, `reader.html`, `reader.css`, `reader.js` — goes on a branch, gets reviewed, and is merged. A change that touches both takes the engine lane.
 
