@@ -7,7 +7,7 @@
 ## How it is used
 
 - **The sheet critic fills six values for the new sheet from the vocabulary below and compares them with the table.** The six axes are DOMAIN, OBJECT, RELATIONSHIP, CLIMAX, ENDING and PRACTICE with PRESSURE, which count together as one axis. An axis is shared with a story when the values are identical, and practice-and-pressure is shared only when both match. For each axis the critic names the nearest story and the value they share.
-- **Three or more shared axes with one story is a send-back.** Of the 231 pairs among the first 22 stories, one pair shares three axes, 14 share two, and none share four, so three is as close as the closest pair already in the corpus.
+- **Three or more shared axes with one story is a send-back.** Of the 276 pairs among the first 24 stories, two pairs share three axes, 18 share two, and none share four, so three is as close as the closest pairs already in the corpus. One of the two is 号令 with 三番の乾燥機, on object, relationship and ending; 号令 shipped before this rule and would have drawn a send-back on it.
 - **The critic does not judge similarity from the other stories' prose.** If no value fits a new sheet, it proposes a new value by name rather than using OTHER. OTHER is a flag that the vocabulary has a gap.
 - **When a story ships, add its row.** A tabulator fills it from the sheet and the afterword, a second one fills it independently, and a third settles any disagreement, which is how this table was built. It is the fifth place a story lands (AUTHORING.md § Where a story lands).
 - **A new value goes in with a one-line definition that says how to tell it from its neighbours.** Re-tabulate nothing unless the new definition takes cells from an existing value.
@@ -34,7 +34,7 @@ These come from the cells the first two tabulators disagreed on. Each is a propo
 
 ## How this table was built
 
-On 2026-10-25, from the stored sheets, afterwords and blurbs, not from the stories themselves. Two tabulators worked independently from the same vocabulary and agreed on 138 of 154 cells, 90%: DOMAIN 22 of 22, OBJECT 21, RELATIONSHIP 22, CLIMAX 18, ENDING 20, PRACTICE 19, PRESSURE 16. A third reader settled the 16 disputed cells, taking tabulator A's value on six, B's on eight, and flagging two as ties. **PRESSURE is the least reliable axis, so a match on it deserves the least weight.** The Conf column is L where a story has no stored sheet or several values were judgement calls, and no row is H, because nothing here read a story.
+On 2026-10-25, from the stored sheets, afterwords and blurbs, not from the stories themselves. Two tabulators worked independently from the same vocabulary and agreed on 138 of 154 cells, 90%: DOMAIN 22 of 22, OBJECT 21, RELATIONSHIP 22, CLIMAX 18, ENDING 20, PRACTICE 19, PRESSURE 16. A third reader settled the 16 disputed cells, taking tabulator A's value on six, B's on eight, and flagging two as ties. Two stories that reached `main` while the table was being built, 号令 and 墨の量, were added the same day by the same method. The vocabulary fit both without a single OTHER, the two tabulators agreed on 13 of 14 cells, and the one dispute, on PRESSURE, went to tabulator A. Across all 24 stories that is 151 agreed cells of 168, 90%. **PRESSURE is the least reliable axis, so a match on it deserves the least weight.** The Conf column is L where a story has no stored sheet or several values were judgement calls, and no row is H, because nothing here read a story. Both late additions are L: each tabulator rated them low on its own, though their sheets are of the current format, so the vocabulary's first test on stories it was not built from is a weaker result than the agreement figure alone suggests.
 
 ## The vocabulary
 
@@ -161,6 +161,8 @@ Record each story as one PRACTICE plus one PRESSURE, chosen from the two lists b
 | 回覧板の返事 | 3 | RESIDENTS_COLLECTIVE | WRITTEN_MESSAGE | NEIGHBOURS | RECORD_READ_OUT | WRITTEN_ENTRY_OR_MESSAGE | CORRESPONDENCE_AND_NOTICE | 建前 | M |
 | 狐に貸した隅 | 3 | FARM_OR_VILLAGE_LAND | LAND_OR_PREMISES | GRANDPARENT_AND_GRANDCHILD | CONFESSION | LINE_OF_SPEECH | HANDED_DOWN_RULE_OR_PACT | 意地 | M |
 | 貸出中の本 | 3 | PUBLIC_INSTITUTION | RECORD_OR_REGISTER | CUSTODIAN_AND_PATRON | RULE_UPHELD_AT_COST | OBJECT_PLACED | LOAN_PLEDGE_AND_RETURN | 建前 | M |
+| 号令 | 3 | PUBLIC_COMMONS | INSTALLED_FIXTURE | ROUTINE_ACQUAINTANCES | PHYSICAL_DEMONSTRATION | ROUTINE_RESUMES | STANDING_APPOINTMENT | 建前 | L |
+| 墨の量 | 3 | TRANSIT | TRACE_OR_SIGNAL | SPOUSES_OR_PARTNERS | HIDDEN_FACT_SAID | OBJECT_PLACED | TRAVEL_AND_DEPARTURE | 察し | L |
 | 猫を探す探偵 | 4 | HIRED_PROFESSIONAL | LIVING_THING | STRANGERS_BY_CHANCE | DEDUCTION | DEFLATED_FACT | PAID_COMMISSION | none | L |
 | スープを残す客 | 4 | SERVICE_PREMISES | FOOD_OR_VESSEL | PROVIDER_AND_CUSTOMER | HIDDEN_FACT_SAID | LINE_OF_SPEECH | REGULAR_PATRONAGE | 察し | M |
 | 父の鋏 | 4 | SERVICE_PREMISES | TOOL_OF_SKILL | PARENT_AND_CHILD | HIDDEN_FACT_SAID | ROUTINE_RESUMES | APPRENTICESHIP_AND_SUCCESSION | 面子 | M |
