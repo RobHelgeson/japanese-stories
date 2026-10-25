@@ -41,7 +41,7 @@ Print the table, **then stop and ask.** Do not draft until the brief is confirme
 | `pages`         | 25, ±10%                 | `stats.py` brief check                            |
 | `page_slack`    | none — `page_tolerance`  | `stats.py` brief check — ±N pages, absolute       |
 | `topic`         | none — propose 2-3       | Gate 2                                            |
-| `register`      | `quiet-realism`          | Gate 2                                            |
+| `register`      | random from `registers`  | Gate 2                                            |
 | `new_words`     | 1.0 per 100 tokens       | `stats.py` brief check                            |
 | `repeats`       | ≥40% repeated-word share | `stats.py` target                                 |
 | `leech_seeds`   | 1.5 per 100 tokens       | `stats.py` brief check                            |
@@ -173,7 +173,7 @@ The rules below are what to do. The prohibitions further down are what not to do
 
 ### Register
 
-`quiet-realism` is the default and describes the current six: one concrete object at the centre, close narration, ends on an image rather than a claim. That was a house style that fell out of the recycling requirement rather than a decision, so it is now a declared choice — `folktale` and `procedural` already exist in the corpus as undeclared one-offs. Register changes voice and structure. It never relaxes the narrow-domain rule, because the anchor's vocabulary is what carries the new words (§ Gate 2).
+The default is `random`: `brief.py` draws one register uniformly from the `registers` block of `corpus.json` and prints which, and Rob can override it at Gate 1. The draw is unseeded, so once a register is settled pass it back as `--register` on every later run, or the next invocation redraws it. Adding a register to that block adds it to the draw, so a new type needs no other step. `quiet-realism` is one entry among the rest: one concrete object at the centre, close narration, ends on an image rather than a claim. It was a house style that fell out of the recycling requirement rather than a decision, which is why it is now a declared choice like the others. Register changes voice and structure. It never relaxes the narrow-domain rule, because the anchor's vocabulary is what carries the new words (§ Gate 2).
 
 ## The level ladder
 

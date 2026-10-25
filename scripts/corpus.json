@@ -16,7 +16,7 @@
     "pages": 25,
     "page_tolerance": 0.1,
     "tokens_per_page": 20,
-    "register": "quiet-realism",
+    "register": "random",
     "new_words": null,
     "leech_seeds": null,
     "repeats": null,
@@ -25,12 +25,13 @@
   },
 
   "registers": {
-    "_comment": "Five object-centred, quiet, past-tense stories closing on a concrete image is a house style that fell out of the recycling requirement rather than a decision anyone made. Naming it makes it a choice. Two of the alternatives already exist in the corpus as undeclared one-offs. Register changes voice and structure; it never relaxes the narrow-domain rule, because whatever the story is anchored on, an object or a ritual, is what its words recur on.",
-    "quiet-realism": "the default and the current five: one concrete object at the centre, close narration, ends on an image rather than a claim",
+    "_comment": "Adding a register here also adds it to the pool that `defaults.register: random` draws from, so a new type needs no other step. Five object-centred, quiet, past-tense stories closing on a concrete image is a house style that fell out of the recycling requirement rather than a decision anyone made. Naming it makes it a choice. Two of the alternatives already exist in the corpus as undeclared one-offs. Register changes voice and structure; it never relaxes the narrow-domain rule, because whatever the story is anchored on, an object or a ritual, is what its words recur on.",
+    "quiet-realism": "the original house style, now one register among the rest: one concrete object at the centre, close narration, ends on an image rather than a claim",
     "folktale": "城の鐘: nested time frames, a told-to-you voice, the turn stated once in dialogue",
     "procedural": "猫を探す探偵: a clue planted early and paid off late, the reader able to reach the answer from facts already on the page",
     "comic": "回覧板の返事: dramatic irony as the engine. The narrator misreads one thing consistently and the reader is a step ahead of him; the stakes stay small and social; 役割語 and dry dialogue carry the jokes rather than narration explaining them. The turn still costs the character something, and it ends on the ordinary resuming rather than on a punchline.",
     "ghost-story": "none yet, the 怪談 shape: the ordinary held steady until one detail is wrong, and the wrong detail is never explained. Ends on the ordinary resuming, not on a reveal — nobody names what happened and no character theorises about it, which is also what keeps it off the closing-thesis defect. Two guards, both from the September 2026 reviews. The dead must not be a relative the protagonist is mourning: 時計の音 and 煙突の煙 are that story twice and were rated ★2 both times, the second explicitly as derivative of the first, so grief is not what this register is for. And the wrong detail has to be retrievable — planted concretely, payable from facts already on the page — because 縁台の将棋 was marked down for a twist that was obvious and a premise that was never stated, which are the two ways this shape fails.",
+    "epistolary": "none yet: the story told only through what the characters write to each other, notes, messages, a passed diary. No narrator between the reader and the page. Each entry is dated or addressed, voices separate by how each person writes, and what the writers leave unsaid carries the turn. Ends on a final entry, not a summary",
     "retrospective": "廊下の鏡, the 述懐 voice: an older narrator looking back, long subordinated sentences as the shape of memory, ends on a claim rather than an image. The claim is about the WORLD — a person, the object, a fact the narrator now holds — never about what the story means; that second thing is the closing-thesis defect cut from four of five stories in September 2026, and this register sits closer to it than any other. The guard that makes it safe is that the narrator earns the claim by watching a physical event, so the last page reports a correction of fact rather than a conclusion."
   },
 
