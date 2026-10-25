@@ -68,7 +68,7 @@ The three words are defined in the prompt, because the first audit showed the tr
 
 ### Sheet critic
 
-**Gets:** the sheet, the guesser's endings, the locator's placement, the transplanter's report; AUTHORING.md § Gate 2, § The CULTURE block, § Craft, § Register; `AXES.md`; the `_note` of every story in `corpus.json`, for the reader's quoted reviews; the output of `python3 reviews.py`. **Never gets:** the author's notes, or the drafting conversation. On a repeat round it also gets the list of what it sent back last time, and nothing else from that round.
+**Gets:** the sheet, the guesser's endings, the locator's placement, the transplanter's report; AUTHORING.md § Gate 2, § The CULTURE block, § Craft, § Register; `AXES.md`; the `_note` of every story in `corpus.json`, for the reader's quoted reviews; the output of `python3 reviews.py`, or of `python3 reviews.py --file <export>` in a session that cannot reach the gist (§ Ratings in a cloud session). **Never gets:** the author's notes, or the drafting conversation. On a repeat round it also gets the list of what it sent back last time, and nothing else from that round.
 
 Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of reason:
 
@@ -194,7 +194,18 @@ The panel is the same model family as the author, so it has correlated blind spo
 
 - At ship time write `_gate` on the `corpus.json` entry, prose and no numbers: rounds, what was sent back and for which rule, where the readers found the ending. It sits beside `_premise`, `_feature` and `_note`, and nothing parses it.
 - When Rob rates a story, read his note against `_gate`. **A note naming something the panel passed is a hole in this file**, so add the rule to the role that should have caught it. That is how his feedback compounds without his reading anything in advance.
-- After every five rated stories gated this way, set the panel's verdicts beside the ratings in CALIBRATION.md. n is tiny and will stay tiny for a long time. Read the notes, not the mean, as `reviews.py` already says.
+- After every five rated stories gated this way, set the panel's verdicts beside the ratings, in a session that holds the export, and record the rule-level result in CALIBRATION.md without stars or notes. n is tiny and will stay tiny for a long time. Read the notes, not the mean, as `reviews.py` already says.
+
+### Ratings in a cloud session
+
+This repo is public and holds no stars and no notes. A cloud session cannot reach the gist, so Rob supplies the ratings at the start of each batch.
+
+1. On the contents page Rob taps 書き出し. The export appears in the box and is copied to the clipboard.
+2. Rob pastes it as the first message of the batch.
+3. The session saves it outside the checkout, for example `/tmp/ratings/exp.json`, and runs `python3 scripts/reviews.py --file /tmp/ratings/exp.json`. The sheet critic gets that output and not the file.
+4. The export is never written under the repo, committed, or quoted in a commit message, `_gate`, a doc or a file in the repo. Delete it when the batch ends.
+
+The export also carries reading progress and peeks, which `reviews.py` ignores. A session that can reach the gist runs `python3 reviews.py` as before.
 
 ## Existing stories
 

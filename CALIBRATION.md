@@ -166,7 +166,16 @@ What it found about the panel, all since fixed in `PANEL.md` except where noted:
 - **The corpus comparison was not reproducible.** For the same pair of stories one critic counted three shared axes and the other counted one. `AXES.md` is the fix.
 - **File paths carried the story's romaji name**, and one locator used it to guess the country. Blind roles now get neutral names.
 - **Instruction-level blindness leaked slightly.** Three critics read beyond their assigned sections, and the repo could not be made unreachable. The blind readers self-reported clean.
-- **`reviews.py` could not reach Rob's ratings from a cloud session**, so the critic's "against Rob" check ran on the quotes in `_note` fields only. Open: the ratings have not yet been set beside these findings, which is the first real calibration of the panel and needs a session that can read the gist.
+- **`reviews.py` could not reach Rob's ratings from a cloud session**, so the critic's "against Rob" check ran on the quotes in `_note` fields only. Fixed without putting ratings in the repo: Rob pastes a 書き出し export at the start of each batch, see `PANEL.md` § Ratings in a cloud session.
+
+### Rob's ratings against the six
+
+Set beside the findings from a run of `reviews.py` with 12 of 22 stories rated. **Four of the six are rated. 狐に貸した隅 and 行かなかった人の地図 are not**, and they are the two stories where the panel had the most to say about culture. This repo is public and holds no stars and no notes, so this section is the rule-level result only. n is four, so read the notes and not the stars.
+
+- **Four things his notes named that no role checked**, each now a check in `PANEL.md`: pace and the hook; energy after the climax; a choice the ending turns on that nothing earlier motivates, and a character used and then dropped; and the afterword read as writing. Pace and the hook went to the English-only reader. The next two went to it and to the sheet critic. The afterword went to the reconciler, and it is the weakest of the four because the panel shares the author's model family and may not see the tic. Only Rob's next note on an afterword will say whether it does anything.
+- **A flag is not a miss.** The sheet-stage culture findings, the transplant result and three of the draft-stage reader flags are not named in any of the four notes. Silence is not agreement, since no note discusses culture, so the dry run's main finding stays uncalibrated until one of the two unrated stories is read.
+- **The transplant result may have been the old bar.** The only failing item the table records for 回覧板の返事 is that its climax and turn changed on transplant only by importing an equivalent institution, which the revised bar counts as BREAKS. That is unverified until the revised wording is run against the four reports.
+- **Open: which English-only findings send a draft back.** `PANEL.md` says a draft is sent back "on the readers' findings" and does not say which, so a flag from that reader has no defined consequence. This is a decision for Rob and is not settled here.
 
 ## Related
 
