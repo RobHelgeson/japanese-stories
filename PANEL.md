@@ -28,8 +28,8 @@ He says so when he wants more, usually at Gate 1. Nothing in `brief.py` carries 
 ## Gate 2, in order
 
 1. **Author** writes the sheet (AUTHORING § Gate 2), in English, in a subagent.
-2. **Guesser** runs on PREMISE, WANT, NEED, level and register alone.
-3. **Sheet critic** reads the sheet, the guesses, the corpus, and Rob's notes, and returns a verdict.
+2. **Guesser**, **locator** and **transplanter** run in parallel, each on its own cut of the sheet. They do not see one another.
+3. **Sheet critic** reads the sheet, all three findings, the corpus, and Rob's notes, and returns a verdict.
 4. Send back, revise, repeat from 2 (below). A pass records the sheet as `_premise` on the `corpus.json` entry.
 5. The orchestrator posts the **card** and drafting begins. The card is not a stop unless it carries a question.
 
@@ -41,9 +41,25 @@ Asked: *Write three different endings for this story, one scene each, most likel
 
 This is the spoiler-free form of "do not write the obvious climax" (AUTHORING § Gate 2). A story composed front to back arrives at the ending it was always going to arrive at, and an agent that has only the premise will find that ending. If one of the three matches the sheet's CLIMAX in mechanism — not in detail — the climax is the obvious one, and the sheet is rebuilt from a new climax, not patched.
 
+### Locator
+
+**Gets:** CLIMAX, WANT, NEED and BEATS, with the CULTURE block removed, every parenthesised Japanese term removed, and every character's name (taken from VOICES) replaced by a letter. **Never gets:** the title, PREMISE, CULTURE, or anything else.
+
+Asked: *Where and when is this set? What in it tells you? Could it be set anywhere else, and what would have to change?*
+
+This is the test of whether the sheet's Japan is in its causes or only in its labels. If the locator says "a small town, anywhere" or places it somewhere else, the culture is a coat of paint on the plot. The Japanese terms in the beats are what the author wrote to make the culture structural, so taking them out is how you find out whether anything structural was underneath. A story whose sheet survives the stripping with Japan still legible has put the culture in what the characters want and cannot say.
+
+### Transplanter
+
+**Gets:** the full sheet. **Never gets:** the guesses or the locator's finding.
+
+Asked: *Move this story to a small town in the American Midwest, present day, changing only what has to change. For each beat say SURVIVES, CHANGES or BREAKS, and why. Does the climax survive the move? Does the beat where the need is faced? Which specific pressure in the CULTURE block is the thing that breaks?*
+
+**The climax and the turn have to break.** Beats that merely change, a name and a food and a street, are the cost of any move and prove nothing. A climax that survives is a climax that a Japanese pressure did not make, and a turn that survives is a need that could have been spoken in English. Both send the sheet back as garnish. The transplanter is also asked to name the PRESSURE that breaks them, which checks that the pressure written on the sheet is the one doing the work.
+
 ### Sheet critic
 
-**Gets:** the sheet and the guesses; AUTHORING.md § Gate 2, § Craft, § Register; `_premise`, `_feature` and `_note` for every story in `corpus.json`; the output of `python3 reviews.py`. **Never gets:** the author's notes, or the drafting conversation. On a repeat round it also gets the list of what it sent back last time, and nothing else from that round.
+**Gets:** the sheet, the guesser's endings, the locator's placement, the transplanter's report; AUTHORING.md § Gate 2, § The CULTURE block, § Craft, § Register; `_premise`, `_feature` and `_note` for every story in `corpus.json`; the output of `python3 reviews.py`. **Never gets:** the author's notes, or the drafting conversation. On a repeat round it also gets the list of what it sent back last time, and nothing else from that round.
 
 Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of reason:
 
@@ -55,8 +71,17 @@ Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of 
 - **Plants.** Name each plant and its payoff. For each plant, what is it doing at the time, as a habit, scenery or an offhand line, that is not planting? A plant a reader would file as a plant is spent.
 - **Ending.** Does the last page state what it means? A claim-ending is permitted only if it corrects a fact about a person (the guard recorded on 廊下の鏡) and never concludes.
 - **Dialogue.** Per scene: a secret each, misdirection, conflicting agendas.
-- **Inside the culture.** AUTHORING § Craft, "Write from inside the culture," as written: speech, fact, absence. Check the era of every name against every other, and any institution, object or procedure the story leans on.
-- **Against the corpus.** Name the nearest existing story on each of five axes: domain, central object, relationship, climax mechanism, ending gesture. Say what differs. Three or more axes shared is a send-back. Also check anything Rob's notes name as a tic.
+- **The CULTURE block.** Each field against AUTHORING § The CULTURE block:
+  - PRACTICE written as a procedure a Japanese reader would check step by step, and correct. Anything stated that you cannot confirm, flag; do not wave it through.
+  - PRESSURE named in Japanese, and the need unspeakable because of it. Would an American character say the need in one line?
+  - VOICES distinct for every speaker, right for their age, region and era, and every name right for its bearer's era and for the others'.
+  - SEASON a subject and not a marker.
+  - ABSENT accounted for. Name anything a Japanese writer on this subject would include that is neither in the sheet nor cut on purpose.
+  - CARRIED honest: the practice's vocabulary is either inside the known set or paid for by a named `new_words` budget.
+  - Beats carry the Japanese term for every culturally load-bearing noun and verb, rather than a paraphrase.
+  - **The locator and transplanter findings are binding.** A locator that cannot place the story in Japan, or a transplanter whose report has the climax or the turn surviving, is a SEND BACK for garnish whatever the rest of the block looks like.
+- **Inside the culture, at the level of fact.** AUTHORING § Craft, "Write from inside the culture": speech, fact, absence. Check any institution, object or procedure the story leans on before it becomes the story's centre.
+- **Against the corpus.** Name the nearest existing story on each of six axes: domain, central object, relationship, climax mechanism, ending gesture, and practice and pressure. Say what differs. Three or more axes shared is a send-back. Also check anything Rob's notes name as a tic. Sheets recorded before the CULTURE block existed have no practice or pressure to read, so infer them from `_premise` and say you did.
 - **Against Rob.** List every note from `reviews.py` that is a constraint on this brief and say whether the sheet respects it. A departure from a default parameter has to say which review it responds to.
 
 The critic's overall word is PASS, SEND BACK, or DROP. Three SEND BACK rounds on the sheet is a DROP.
@@ -88,7 +113,9 @@ Asked:
 3. How natural is the Japanese, out of ten? Quote the three lines that sound most like a translation.
 4. Name the speaker of every 「」 line. List the ones you could not name, and every pair of adjacent turns you would give to the same speaker with no silence between them.
 5. What is the longest stretch where every narration sentence ends the same way?
-6. Is there anything a Japanese reader would not accept as fact: an era, an institution, a procedure, a way of speaking?
+6. Is there anything a Japanese reader would not accept as fact: an era, an institution, a procedure?
+7. Describe how each speaker talks: first person, how they address the others, politeness, endings. Do they sound like different people? Is anyone's speech wrong for their age, gender, region or era?
+8. What in this could only have happened in Japan? Quote it. What reads as an English idea in Japanese, or as written for a reader who does not live there?
 
 Two readers is the minimum, so that a disagreement is visible. Four is better for a first story in a new register.
 
@@ -98,9 +125,9 @@ Two readers is the minimum, so that a disagreement is visible. Four is better fo
 
 ### Reconciler
 
-**Gets:** the AFTERWORD from the sheet; the three readers' two-sentence readings and the ending line each one picked. **Never gets:** the story, or the beats.
+**Gets:** the AFTERWORD, and the PRACTICE and PRESSURE lines, from the sheet; the three readers' two-sentence readings, the ending line each one picked, and each Japanese-only reader's answer to question 8. **Never gets:** the story, or the beats.
 
-Asked: *Does what the readers took from the story match the afterword: yes, partly, or no? Did they pick the intended ending, and if not what did they pick?* Both failures are real and mean different things. If the readers disagree with the afterword, the story is not delivering it or the afterword is wrong, and the author has to say which.
+Asked: *Does what the readers took from the story match the afterword: yes, partly, or no? Did they pick the intended ending, and if not what did they pick? Did the readers' "only in Japan" answers name the practice or the pressure, or something else?* Both failures are real and mean different things. If the readers disagree with the afterword, the story is not delivering it or the afterword is wrong, and the author has to say which. If the readers name something other than the practice and the pressure, the culture the draft delivers is not the culture the sheet planned, and one of the two has to move.
 
 ## Send-backs and escalation
 
@@ -117,6 +144,7 @@ Domain      <noun phrase, at the Summaries ceiling>
 Gate 2      passed on round <n> of 3; sent back for: <rule names only>
 Draft       <n> Japanese-only reads, ending found <where intended | elsewhere>, naturalness <range>
 Nearest     <existing story> on <axis>; differs by <axis-level difference, no plot>
+Culture     <practice> run on <pressure>; transplant breaks the turn ✓; locator placed it ✓; readers named it ✓
 Your notes  responds to <title ★n>: held | not held
 Mechanical  stats --strict ✓  check.py ✓  turns ✓
 Dropped     <n>: <rule names>
@@ -145,3 +173,5 @@ The panel is the same model family as the author, so it has correlated blind spo
 ## What the panel cannot do
 
 It cannot tell whether a story will move Rob. It can tell that the climax is not the one a stranger would guess, that the ending does not explain itself, that a Japanese reader would not trip on the facts, and that the story does what its afterword says. "Unexpected to a model" is not "unexpected to Rob."
+
+**Nor can it certify the culture is right.** The locator and transplanter find culture that is decoration, and the readers find English in Japanese dress, which are the failures the corpus actually has. An agent's account of a custom, though, can be confidently wrong in a way that reads fine, and a regional or era detail that is slightly off is the hardest thing for it to see. Two things narrow this and neither closes it. The author has to be able to write the PRACTICE as a procedure from a source, not from recall, and the critic flags what it cannot confirm. And a Japanese-only reader who says a procedure is wrong has found a fact error, which is a send-back whatever else passed. Rob's notes remain the only ground truth, and when one says a detail is wrong, add the check that would have caught it to the role that passed it.
