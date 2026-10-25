@@ -52,6 +52,7 @@ On 2026-10-25, from the stored sheets, afterwords and blurbs, not from the stori
 - FARM_OR_VILLAGE_LAND: agricultural land and the village economy around it, with tenancy, harvest and neighbours' dependence on weather and crops.
 - REMOTE_TERRAIN: mountain, forest, coast, or a lodge or road beyond ordinary settlement, where distance and weather shape what people can do.
 - HIRED_PROFESSIONAL: a private professional engaged by a client for a task and a fee (search, advice, errand); the job brief is the frame.
+- TEAM_OR_CLUB: a membership group joined for a shared competitive, practice or performance purpose (sports team, club, troupe, band), with internal rank, its own duties and facilities, and no public served; the tie is the shared purpose, not proximity (RESIDENTS_COLLECTIVE) or a ruler's command (COURT_OR_GARRISON).
 - COURT_OR_GARRISON: a ruler's household, castle, army or other seat of command, where orders and rank decide events.
 - OTHER: none of the above fits; use rarely and name the missing kind of place.
 
@@ -83,6 +84,7 @@ On 2026-10-25, from the stored sheets, afterwords and blurbs, not from the stori
 - STRANGERS_BY_CHANCE: people with no prior tie thrown together briefly, by one night, one exchange or one misdirected contact.
 - ROUTINE_ACQUAINTANCES: people with no tie outside a repeated fixed-time meeting, who know each other only through that routine.
 - SUCCESSOR_AND_ABSENT_PREDECESSOR: a living person who occupies the place, post or secret of someone dead, gone or never met, where the tie runs only through what that person left and they are not kin.
+- SENIOR_AND_JUNIOR_TEAMMATES: two non-kin members of one team or club who are unequal by year, where the tie is the seniority order and shared duty and nothing is handed on (MENTOR_AND_SUCCESSOR) and they are not equals (FRIENDS_OR_PEERS).
 - FRIENDS_OR_PEERS: equals who chose each other and share a history.
 - OTHER: a central pair that fits none of the above; use rarely and name the tie.
 
@@ -152,6 +154,7 @@ Record each story as one PRACTICE plus one PRESSURE, chosen from the two lists b
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 時計の音 | 1 | HOME_HOUSEHOLD | KEEPSAKE | GRANDPARENT_AND_GRANDCHILD | UNEXPLAINED_EVENT | SENSORY_MOMENT | ESTATE_CLEARING_AND_MOURNING | 察し | L |
 | 塩の卵焼き | 1 | HOME_HOUSEHOLD | FOOD_OR_VESSEL | PARENT_AND_CHILD | HIDDEN_FACT_SEEN | ACT_OF_CARE | HOUSEHOLD_STEWARDSHIP | 遠慮 | M |
+| 六時五十分 | 1 | TEAM_OR_CLUB | WRITTEN_MESSAGE | SENIOR_AND_JUNIOR_TEAMMATES | CONFESSION | WRITTEN_ENTRY_OR_MESSAGE | REGISTRY_AND_OFFICIAL_RULE | 先輩・後輩 | M |
 | 迷子の手紙 | 2 | HOME_HOUSEHOLD | WRITTEN_MESSAGE | SUCCESSOR_AND_ABSENT_PREDECESSOR | CONCEALMENT_CHOSEN | LINE_OF_SPEECH | CORRESPONDENCE_AND_NOTICE | 遠慮 | L |
 | 黄色い傘 | 2 | OWNER_RUN_SHOP | GOODS_IN_TRANSFER | NEIGHBOURS | RECORD_READ_OUT | ROUTINE_RESUMES | LOAN_PLEDGE_AND_RETURN | 意地 | M |
 | 鍵とチェーン | 2 | HOME_HOUSEHOLD | ACCESS_DEVICE | PARENT_AND_CHILD | DEDUCTION | OBJECT_PLACED | HOUSEHOLD_STEWARDSHIP | 意地 | M |
@@ -175,3 +178,5 @@ Record each story as one PRACTICE plus one PRESSURE, chosen from the two lists b
 | 廊下の鏡 | 5 | HOME_HOUSEHOLD | INSTALLED_FIXTURE | GRANDPARENT_AND_GRANDCHILD | PHYSICAL_DEMONSTRATION | NARRATED_CORRECTION | HANDED_DOWN_RULE_OR_PACT | 義理 | M |
 | 七つの窓 | 5 | REMOTE_TERRAIN | TRACE_OR_SIGNAL | MENTOR_AND_SUCCESSOR | UNEXPLAINED_EVENT | ROUTINE_RESUMES | HANDED_DOWN_RULE_OR_PACT | 遠慮 | L |
 | 調律の埃 | 5 | SKILLED_TRADE | TRACE_OR_SIGNAL | MENTOR_AND_SUCCESSOR | HIDDEN_FACT_SAID | NARRATED_CORRECTION | APPRENTICESHIP_AND_SUCCESSION | 面子 | M |
+
+六時五十分 was added on 2026-10-25 by two independent tabulators from its sheet and afterword; they agreed on 6 of 7 cells, and the one dispute, DOMAIN (RESIDENTS_COLLECTIVE against a new value), went to a third reader, who took the new value TEAM_OR_CLUB. Both tabulators proposed SENIOR_AND_JUNIOR_TEAMMATES for RELATIONSHIP. The two new values were not applied back to earlier rows: a team or club may have been forced into RESIDENTS_COLLECTIVE, PUBLIC_INSTITUTION or COURT_OR_GARRISON elsewhere in the table, and nothing was re-tabulated. Close calls recorded: OBJECT (WRITTEN_MESSAGE against RECORD_OR_REGISTER), CLIMAX (CONFESSION against HIDDEN_FACT_SAID), PRACTICE (REGISTRY_AND_OFFICIAL_RULE against CORRESPONDENCE_AND_NOTICE, a weak fit because the rule governs a roster), PRESSURE (先輩・後輩 against 察し and 迷惑).

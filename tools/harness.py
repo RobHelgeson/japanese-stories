@@ -2939,7 +2939,10 @@ def suite_table(br, rep, base):
               "sumi-no-ryou": 41,
               # 舌切り雀 (31) recorded 2026-10-25, first measurement, in the same
               # commit as the story; tight=0 and nothing overflows.
-              "shitakiri-suzume": 31}
+              "shitakiri-suzume": 31,
+              # 六時五十分 (15) recorded 2026-10-25, first measurement, in the same
+              # commit as the story; tight=0 and nothing overflows.
+              "rokuji-gojuppun": 15}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
