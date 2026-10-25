@@ -16,11 +16,11 @@ This is a change of who reads, not of what is checked. Every rule in AUTHORING.m
 
 Rob sees the **card** and nothing the card does not hold. Three levels, set by him per story, default 0:
 
-| Level | Rob sees                                                                  |
-| ----- | ------------------------------------------------------------------------- |
-| 0     | the card only — the default                                               |
+| Level | Rob sees                                                                           |
+| ----- | ---------------------------------------------------------------------------------- |
+| 0     | the card only — the default                                                        |
 | 1     | the card and the `## Summaries` blurb, which is the ceiling for any message to him |
-| 2     | the card and the full sheet, as Gate 2 used to work                       |
+| 2     | the card and the full sheet, as Gate 2 used to work                                |
 
 He says so when he wants more, usually at Gate 1. Nothing in `brief.py` carries it and nothing should: it is a preference about Rob, not a property of the story.
 
@@ -38,17 +38,17 @@ He says so when he wants more, usually at Gate 1. Nothing in `brief.py` carries 
 
 **Gets:** title, level, register, PREMISE, WANT, NEED. **Never gets:** CLIMAX, BEATS, AFTERWORD, SHAPE, any other story.
 
-Asked: *Write three different endings for this story, one scene each, most likely first. Then say in a sentence what you expect it to be about.*
+Asked: _Write three different endings for this story, one scene each, most likely first. Then say in a sentence what you expect it to be about._
 
 This is the spoiler-free form of "do not write the obvious climax" (AUTHORING § Gate 2). A story composed front to back arrives at the ending it was always going to arrive at, and an agent that has only the premise will find that ending. If one of the three matches the sheet's CLIMAX in mechanism — not in detail — the climax is the obvious one, and the sheet is rebuilt from a new climax, not patched.
 
-**The guesser also reports whether it was handed the answer.** Asked last: *Did anything you were given state, or all but state, how the story ends?* The first audit showed why. On three of four sheets the input partly gave the ending away, mostly through the NEED line, and a guess made against a leaked input proves nothing in either direction. A yes or a partly voids the test and sends the sheet back at once to have the leaking line rewritten, and the critic does not weigh a guess made against it. The fix belongs to the author: NEED is the flaw and never its resolution (AUTHORING § Gate 2, want and need).
+**The guesser also reports whether it was handed the answer.** Asked last: _Did anything you were given state, or all but state, how the story ends?_ The first audit showed why. On three of four sheets the input partly gave the ending away, mostly through the NEED line, and a guess made against a leaked input proves nothing in either direction. A yes or a partly voids the test and sends the sheet back at once to have the leaking line rewritten, and the critic does not weigh a guess made against it. The fix belongs to the author: NEED is the flaw and never its resolution (AUTHORING § Gate 2, want and need).
 
 ### Locator
 
 **Gets:** CLIMAX, WANT, NEED and BEATS, with the CULTURE block removed, every parenthesised Japanese term removed, and every character's name (taken from VOICES) replaced by a letter. **Never gets:** the title, PREMISE, CULTURE, or anything else.
 
-Asked: *Where and when is this set? What in it tells you? Could it be set anywhere else, and what would have to change?*
+Asked: _Where and when is this set? What in it tells you? Could it be set anywhere else, and what would have to change?_
 
 This is the test of whether the sheet's Japan is in its causes or only in its labels. If the locator says "a small town, anywhere" or places it somewhere else, the culture is a coat of paint on the plot. The Japanese terms in the beats are what the author wrote to make the culture structural, so taking them out is how you find out whether anything structural was underneath. A story whose sheet survives the stripping with Japan still legible has put the culture in what the characters want and cannot say.
 
@@ -56,7 +56,7 @@ This is the test of whether the sheet's Japan is in its causes or only in its la
 
 **Gets:** the full sheet. **Never gets:** the guesses or the locator's finding.
 
-Asked: *Move this story to a small town in the American Midwest, present day, changing only what has to change. For each beat say SURVIVES, CHANGES or BREAKS, and why. Then: does the climax survive the move? Does the beat where the need is faced? In the moved version, would the character say the need aloud? Which specific pressure in the CULTURE block is the thing that is lost?*
+Asked: _Move this story to a small town in the American Midwest, present day, changing only what has to change. For each beat say SURVIVES, CHANGES or BREAKS, and why. Then: does the climax survive the move? Does the beat where the need is faced? In the moved version, would the character say the need aloud? Which specific pressure in the CULTURE block is the thing that is lost?_
 
 The three words are defined in the prompt, because the first audit showed the transplanter will otherwise pick its own:
 
@@ -78,6 +78,8 @@ Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of 
 - **Shape.** Declared, boundaries marked, and a story that fits it rather than a form being filled.
 - **Every beat.** Yes-but or no-and. Write the honest join to the next beat: そして / それから is a list of events, だから / しかし is causality, and an all-だから sheet is the straight line the rule exists to break.
 - **Plants.** Name each plant and its payoff. For each plant, what is it doing at the time, as a habit, scenery or an offhand line, that is not planting? A plant a reader would file as a plant is spent.
+- **Characters.** Name every character who appears and say what each is for and where each leaves the story. One used for a beat and then dropped, rather than resolved, is a SEND BACK. No AUTHORING rule states this yet; cite this line.
+- **Resolution choices.** Name the choice the ending turns on and the earlier beat that makes this character make it. A stock gesture with no such beat is a SEND BACK. Check the beats after the climax as well as the climax: say what each one adds and whether the sheet could end sooner.
 - **Ending.** Does the last page state what it means? A claim-ending is permitted only if it corrects a fact about a person (the guard recorded on 廊下の鏡) and never concludes.
 - **Dialogue.** Per scene: a secret each, misdirection, conflicting agendas.
 - **The CULTURE block.** Each field against AUTHORING § The CULTURE block:
@@ -132,7 +134,16 @@ Two readers is the minimum, so that a disagreement is visible. Four is better fo
 
 ### English-only reader
 
-**Gets:** `en.txt`. Asked: *Is this a short story worth reading? What happens, in three sentences? Where does it read as captions rather than prose? Does it end on an image or on a claim?* This is AUTHORING § The English has to stand alone, done by someone who did not write it.
+**Gets:** `en.txt`. Asked: _Is this a short story worth reading? What happens, in three sentences? Where does it read as captions rather than prose? Does it end on an image or on a claim?_ This is AUTHORING § The English has to stand alone, done by someone who did not write it.
+
+Also asked, because the first calibration found a reader's complaints that no question here reached (CALIBRATION.md § The panel against six stories, 2026-10-25):
+
+- _Where does it slow down, and what pulls you to the next page? What is the hook by the end of the first page?_
+- _Does it lose energy after the climax? Say where, and whether what follows earns its length._
+- _Which characters appear, do something, and leave without a resolution?_
+- _Which choice does the ending turn on, and does the text give its reason? Does it read as a stock gesture rather than this character's choice?_
+
+No AUTHORING rule states these four yet. A send-back on one cites this list.
 
 It is told that names appear in script with their reading in parentheses, as the translation sheet shows them, and are not to be counted as untranslated text. **Any other Japanese script in the English is a finding**, and the reader is asked to say where. The first audit found a few such words, two characters each, in the English lines of two of six stories, which a native editor would want to know about whether or not they were meant.
 
@@ -140,7 +151,9 @@ It is told that names appear in script with their reading in parentheses, as the
 
 **Gets:** the AFTERWORD, and the PRACTICE and PRESSURE lines, from the sheet; the three readers' two-sentence readings, the ending line each one picked, and each Japanese-only reader's answer to question 8. **Never gets:** the story, or the beats.
 
-Asked: *Does what the readers took from the story match the afterword: yes, partly, or no? Did they pick the intended ending, and if not what did they pick? Did the readers' "only in Japan" answers name the practice or the pressure, or something else?* Both failures are real and mean different things. If the readers disagree with the afterword, the story is not delivering it or the afterword is wrong, and the author has to say which. If the readers name something other than the practice and the pressure, the culture the draft delivers is not the culture the sheet planned, and one of the two has to move.
+Asked: _Does what the readers took from the story match the afterword: yes, partly, or no? Did they pick the intended ending, and if not what did they pick? Did the readers' "only in Japan" answers name the practice or the pressure, or something else?_ Then, without reference to the readers: _Read the afterword as prose. Quote nothing; name each stock phrase, each sentence that would fit any story, and each place it restates the climax in abstract nouns._ The afterword is the last page Rob reads and no other role reads it as writing. The panel shares the author's model family and may not see the author's own tics, so this check is untested and Rob's note on the afterword is what calibrates it.
+
+Both failures are real and mean different things. If the readers disagree with the afterword, the story is not delivering it or the afterword is wrong, and the author has to say which. If the readers name something other than the practice and the pressure, the culture the draft delivers is not the culture the sheet planned, and one of the two has to move.
 
 ## Send-backs and escalation
 
