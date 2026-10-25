@@ -2929,7 +2929,11 @@ def suite_table(br, rep, base):
               "chichi-no-hasami": 30,
               "shiroi-bangou": 47,
               "nanatsu-no-mado": 34,
-              "chouritsu-no-hokori": 42}
+              "chouritsu-no-hokori": 42,
+              # 号令 (31) recorded 2026-10-24, first measurement, 21 authored
+              # pages. Unchanged by the title change from the all-kana
+              # working title; nothing overflows.
+              "ichi-ni-san-shi": 31}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
