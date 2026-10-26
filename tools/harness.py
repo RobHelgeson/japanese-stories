@@ -674,6 +674,42 @@ window.H = (() => {
     return bad;
   }
 
+  // ---- headings ------------------------------------------------------------
+  // Asked of the DOM on every text screen, not of blockPlan: the regression was
+  // a header and the sentence after it sharing one <p>, and only the rendered
+  // paragraph can say whether they still do. `want` is the engine's own count,
+  // so the walk checks that every heading the rule finds reaches the page.
+  function headings() {
+    let want = 0;
+    for (const page of DATA.pages) for (const s of page) if (Paginator.kindOf(s) === "heading") want++;
+    const shared = [], stranded = [], texts = [], weights = new Set();
+    let found = 0, carried = 0, a = Paginator.first(), seen = 0;
+    while (a && seen < 600) {
+      const s = Paginator.screenAt(a);
+      Track.goTo(a, false);
+      if (s.kind === "text") {
+        const ps = box().querySelectorAll("p");
+        // A screen that opens on a heading partway through its page is where
+        // keep-with-next moved a break, or where one fell there anyway.
+        if (s.from > 0 && !s.head && ps.length && ps[0].classList.contains("heading")) carried++;
+        ps.forEach((p, k) => {
+          if (!p.classList.contains("heading")) return;
+          found++;
+          texts.push(surface(p));
+          weights.add(getComputedStyle(p).fontWeight);
+          const n = p.querySelectorAll(".s").length;
+          if (n !== 1) shared.push({ page: a.page + 1, sub: a.sub, sentences: n, text: surface(p) });
+          if (k === ps.length - 1 && ps.length > 1 && s.to < DATA.pages[a.page].length) {
+            stranded.push({ page: a.page + 1, sub: a.sub, text: surface(p) });
+          }
+        });
+      }
+      seen++;
+      a = Paginator.next(a);
+    }
+    return { want, found, carried, texts, shared, stranded, weights: [...weights].sort() };
+  }
+
   // ---- the paint cache ---------------------------------------------------
   // A cell at either end of the story has no neighbour to hold, and the
   // rubber-band exposes part of it. Whether it was ever cleared is a question
@@ -1820,7 +1856,7 @@ window.H = (() => {
     return out;
   }
 
-  return { walk, atoms, paintcache, gestures, sheet, enRuby, pitch, highlight, selection, marks, snap, binding, invariants, sleep,
+  return { walk, atoms, headings, paintcache, gestures, sheet, enRuby, pitch, highlight, selection, marks, snap, binding, invariants, sleep,
            setPrefs: (p) => { Prefs.setAll(p); }, flush: () => Store.flush() };
 })();
 1
@@ -2942,7 +2978,11 @@ def suite_table(br, rep, base):
               "shitakiri-suzume": 31,
               # 六時五十分 (15) recorded 2026-10-25, first measurement, in the same
               # commit as the story; tight=0 and nothing overflows.
-              "rokuji-gojuppun": 15}
+              # 15->16 on 2026-10-26: each entry's header now takes a column of
+              # its own instead of running into the first sentence, and page 4,
+              # the coach's long entry, fills a second screen. WebKit already
+              # gave that page two screens before the change.
+              "rokuji-gojuppun": 16}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
@@ -3557,6 +3597,75 @@ def suite_title_kana(br, rep, base):
                 "<" not in surface and "<" not in kana and "｜" not in kana, {"t": surface, "k": kana})
 
 
+def suite_headings(br, rep, base):
+    """An unpunctuated line of 全角-spaced fields is a heading block of its own.
+
+    六時五十分 opens every notebook entry with a bare 日付　夜　名前 line, and
+    with 改行 off it shared a <p> with the sentence after it:
+    十二月二十九日　夜　松田監督が、 — the diarist's name read as Coach Matsuda.
+
+    The count runs over the whole corpus because the rule is a heuristic over
+    punctuation, and a heuristic that starts firing on some other story's poem
+    or sign should say so here rather than quietly bolding it. The counts are
+    measured, like the screen table: a new story with headings fails naming its
+    number, which is the prompt to look at it before recording it.
+
+    A count alone is not enough, and the first version of this suite proved it:
+    its rule took the climax's broken-off 監督へ。青山の足が for a header, and
+    the record said 19 and passed. So two lines are named outright, one each side
+    of the rule.
+    """
+    expect = {"rokuji-gojuppun": 18}
+    is_heading = "十二月二十九日　夜　松田"
+    not_heading = "監督へ。青山の足が"
+    br.emulate(*PHONE[1:])
+    for slug in SLUGS:
+        br.goto(f"{base}/{slug}.html")
+        br.eval(LIB)
+        n = br.eval("(() => { let n = 0; for (const p of DATA.pages) for (const s of p)"
+                    " if (Paginator.kindOf(s) === 'heading') n++; return n; })()")
+        want = expect.get(slug, 0)
+        rep.add("headings", f"{slug}/count-matches-the-record", n == want, {"got": n, "want": want})
+
+    slug = "rokuji-gojuppun"
+    br.goto(f"{base}/{slug}.html")
+    br.eval(LIB)
+    # 32px as well as 28 because 28 never strands a heading even with
+    # keep-with-next removed; 32 strands one in each writing mode, so it is the
+    # size at which the no-screen-ends-on-a-heading check can fail.
+    cells = [(wm, lb, fs) for wm in ("vertical", "horizontal")
+             for lb, fs in ((False, 28), (False, 32), (True, 28))]
+    for wm, lb, fs in cells:
+        apply_prefs(br, wm, lb, fs)
+        r = br.eval("H.headings()")
+        cell = f"{'縦書き' if wm == 'vertical' else '横書き'}-{'改行' if lb else 'flowing'}-{fs}px"
+        rep.add("headings", f"{cell}/every-heading-reaches-the-page",
+                r["want"] == expect[slug] and r["found"] == r["want"],
+                {"want": r["want"], "found": r["found"]})
+        rep.add("headings", f"{cell}/a-heading-shares-its-paragraph-with-nothing",
+                not r["shared"], r["shared"][:4])
+        rep.add("headings", f"{cell}/the-first-entry-header-is-one",
+                is_heading in r["texts"], r["texts"][:3])
+        rep.add("headings", f"{cell}/the-broken-off-note-is-not-one",
+                not_heading not in r["texts"], [t for t in r["texts"] if "。" in t])
+        if lb:
+            # 改行 on was never broken, so it is held where it was: unweighted,
+            # and paginated with no keep-with-next.
+            rep.add("headings", f"{cell}/is-left-at-normal-weight",
+                    r["weights"] == ["400"], r["weights"])
+        else:
+            rep.add("headings", f"{cell}/is-bold",
+                    all(int(w) >= 600 for w in r["weights"]), r["weights"])
+            rep.add("headings", f"{cell}/no-screen-ends-on-a-heading",
+                    not r["stranded"], r["stranded"][:4])
+            if fs == 32:
+                # The check above can only fail where a heading sits at a
+                # break. If the layout drifts so that none does at 32px, it
+                # passes having tested nothing; this says so instead.
+                rep.add("headings", f"{cell}/a-heading-really-was-carried-to-the-next-screen",
+                        r["carried"] > 0, {"carried": r["carried"]})
+
+
 def suite_persistence(br, rep, base):
     br.emulate(*PHONE[1:])
     a, b = "tokei-no-oto", "maigo-no-tegami"
@@ -3696,6 +3805,8 @@ def main():
             suite_en_ruby(br, rep, base)
             print("\n===== 題名の読み =====")
             suite_title_kana(br, rep, base)
+            print("\n===== 見出し =====")
+            suite_headings(br, rep, base)
             print("\n===== persistence =====")
             suite_persistence(br, rep, base)
             print("\n===== degradation =====")
