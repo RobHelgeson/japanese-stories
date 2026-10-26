@@ -360,7 +360,17 @@
          correct Japanese typography was the wrong thing to do. */
       body.flowing.horizontal .page p { text-indent: 1em; }
       body.flowing.horizontal .page p.dialogue,
-      body.flowing.horizontal .page p.cont { text-indent: 0; }
+      body.flowing.horizontal .page p.cont,
+      body.flowing.horizontal .page p.heading { text-indent: 0; }
+      /* A heading is an unpunctuated line of 全角-spaced fields (六時五十分's
+         日付　夜　名前) that blockPlan has already given a block of its own. Being its own column is
+         not enough to read as a heading among paragraphs that are single
+         columns too, so it takes weight. Weight only: a half-column of space
+         before a mid-page heading pushed 六時五十分 page 3 onto a second screen
+         at 28px, and Hiragino Mincho's W6 keeps the W3 advance, so bold costs
+         no room. 改行 on is left alone in both modes, where every sentence is
+         already its own line. */
+      body.flowing .page p.heading { font-weight: bold; }
 
       /* ---- ruby and 傍点 -------------------------------------------------- */
       /* Ruby is always laid out and only its opacity changes. NOTHING below may
