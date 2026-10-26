@@ -878,21 +878,38 @@
           return c === "「" || c === "『";
         }
 
+        // A heading is a line of fields set apart by 全角 spaces with no
+        // punctuation anywhere in it: 六時五十分's notebook entries open with
+        // 日付　夜　名前 and nothing else. A merged narration block runs one
+        // straight into the sentence after it — 十二月二十九日　夜　松田監督が、
+        // reads as Coach Matsuda — so the mark it lacks has to come from layout.
+        // "Ends unpunctuated" alone is not the test: the climax's broken-off
+        // 監督へ。青山の足が ends that way too, and it is a sentence cut short.
+        const PUNCT = /[。、．，！？!?」』）)…‥―—]/;
+
+        function kindOf(sent) {
+          if (isDialogue(sent)) return "dialogue";
+          let text = "";
+          for (const tok of sent.toks) text += tok.t;
+          return text.indexOf("　") > 0 && !PUNCT.test(text) ? "heading" : "narration";
+        }
+
         // Each quoted utterance is its own paragraph; narration runs merge.
         // Grouping a run of 「 lines into one block would erase the speaker
         // alternation that is the only attribution 終電 has — 40 of its 41 quoted
-        // lines carry none, and six of its pages are one unbroken run.
+        // lines carry none, and six of its pages are one unbroken run. A heading
+        // stands alone on both sides, so the narration after it opens a new block.
         function blockPlan(sents) {
           const kinds = [], owner = [];
           let block = -1, prevNarration = false;
           for (let i = 0; i < sents.length; i++) {
-            const d = isDialogue(sents[i]);
-            if (d || !prevNarration) {
+            const kind = kindOf(sents[i]);
+            if (kind !== "narration" || !prevNarration) {
               block++;
-              kinds.push(d ? "dialogue" : "narration");
+              kinds.push(kind);
             }
             owner.push(block);
-            prevNarration = !d;
+            prevNarration = kind === "narration";
           }
           return { kinds: kinds, owner: owner };
         }
@@ -966,7 +983,7 @@
           if (!flow) {
             for (let k = from; k < to; k++) {
               const p = document.createElement("p");
-              p.className = isDialogue(sents[k]) ? "dialogue" : "narration";
+              p.className = kindOf(sents[k]);
               p.append(sentenceEl(sents[k], lo(k), hi(k)));
               frag.append(p);
             }
@@ -1112,6 +1129,9 @@
               if (fitsText(i, s, mid, t, -1)) { end = mid; lo = mid + 1; }
               else hi = mid - 1;
             }
+            // A heading belongs to the entry it opens, so a screen does not end
+            // on one unless headings are all the screen holds.
+            while (flowing && end - 1 > s && kindOf(sents[end - 1]) === "heading") end--;
             if (end) {
               runs.push({ from: s, to: end, head: t, tail: -1, tight: false });
               s = end;
@@ -1313,7 +1333,7 @@
           invalidate, screensOf, screenAt, screenCount, textCount,
           clamp, next, prev, first, last, final, isFirst, isLast, isAfter,
           sameAddress, screenLabel, countLabel, renderScreen, addressFromProgress,
-          warm, total,
+          warm, total, kindOf,
         };
       })();
 
