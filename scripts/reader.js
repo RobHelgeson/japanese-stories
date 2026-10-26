@@ -675,8 +675,13 @@
         // that is what can protrude past the last line box, never the pitch of a
         // line: ruby (0.44em) and 傍点 (0.5em) sit inside the half-leading at
         // every line-height this design permits — the whole argument for the 1.94
-        // floor — so the allowance is a rounding guard of one pixel, and it grows
-        // only if someone drops --lh below that floor. Half a line advance, the
+        // floor — so the allowance is a rounding guard of one pixel, at every
+        // line-height. It used to grow below the floor by whatever of the 0.5em
+        // the half-leading did not cover, and .after sits there at 1.7: that
+        // licensed 2.4px, and 狐に貸した隅's あとがき laid a ruby line 2px past
+        // its box in landscape. Nothing was clipped at that size, but the
+        // never-scroll walk fails anything over a pixel, and the paginator and
+        // the harness have to hold the same number. Half a line advance, the
         // number this replaces, licensed 1.0em in 縦書き and 1.3em in 横書き:
         // enough to lay a broken-横書き page two paragraph margins over the box
         // and let the clip shave the line beneath them, and enough to swallow a
@@ -698,12 +703,9 @@
         function boxSlack(el) {
           const cs = getComputedStyle(el);
           const fs = parseFloat(cs.fontSize) || 16;
-          let advance = parseFloat(cs.lineHeight);
-          if (!(advance > 0)) advance = fs * 1.2;
-          const ink = Math.max(1, (0.5 - (advance / fs - 1) / 2) * fs);
           return cs.writingMode.indexOf("vertical") === 0
-            ? { w: ink, h: fs }
-            : { w: fs, h: ink };
+            ? { w: 1, h: fs }
+            : { w: fs, h: 1 };
         }
 
         function overflows(el, slack) {
