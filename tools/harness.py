@@ -2982,7 +2982,10 @@ def suite_table(br, rep, base):
               # its own instead of running into the first sentence, and page 4,
               # the coach's long entry, fills a second screen. WebKit already
               # gave that page two screens before the change.
-              "rokuji-gojuppun": 16}
+              "rokuji-gojuppun": 16,
+              # 八月の絵日記 (29) recorded 2026-10-30, first measurement, in the
+              # same commit as the story; tight=0 and nothing overflows.
+              "hachigatsu-no-enikki": 29}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
@@ -3615,7 +3618,10 @@ def suite_headings(br, rep, base):
     the record said 19 and passed. So two lines are named outright, one each side
     of the rule.
     """
-    expect = {"rokuji-gojuppun": 18}
+    # 八月の絵日記 (11) recorded 2026-10-30, first measurement, in the same
+    # commit as the story; checked against the text before recording: every
+    # entry header and no other line.
+    expect = {"rokuji-gojuppun": 18, "hachigatsu-no-enikki": 11}
     is_heading = "十二月二十九日　夜　松田"
     not_heading = "監督へ。青山の足が"
     br.emulate(*PHONE[1:])

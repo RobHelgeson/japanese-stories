@@ -38,11 +38,15 @@ He says so when he wants more, usually at Gate 1. Nothing in `brief.py` carries 
 
 **Gets:** title, level, register, PREMISE, WANT, NEED. **Never gets:** CLIMAX, BEATS, AFTERWORD, SHAPE, any other story.
 
-Asked: _Write three different endings for this story, one scene each, most likely first. Then say in a sentence what you expect it to be about._
+Asked: _Write three different endings for this story, one scene each, most likely first. For each, say in a sentence what the twist is: the thing the story keeps back and then reveals. Then say in a sentence what you expect it to be about._
 
-This is the spoiler-free form of "do not write the obvious climax" (AUTHORING § Gate 2). A story composed front to back arrives at the ending it was always going to arrive at, and an agent that has only the premise will find that ending. If one of the three matches the sheet's CLIMAX in mechanism — not in detail — the climax is the obvious one, and the sheet is rebuilt from a new climax, not patched.
+The guesser checks the first half of the reveal rule (AUTHORING § Gate 2, reveal, not puzzle): **the twist cannot be guessed before it is revealed.** A story composed front to back arrives at the twist it was always going to arrive at, and an agent that has only the premise will find it. If one of the three matches the sheet's twist in mechanism — not in detail — it is guessable, and the sheet is rebuilt from a new climax, not patched.
 
-**The guesser also reports whether it was handed the answer.** Asked last: _Did anything you were given state, or all but state, how the story ends?_ The first audit showed why. On three of four sheets the input partly gave the ending away, mostly through the NEED line, and a guess made against a leaked input proves nothing in either direction. A yes or a partly voids the test and sends the sheet back at once to have the leaking line rewritten, and the critic does not weigh a guess made against it. The fix belongs to the author: NEED is the flaw and never its resolution (AUTHORING § Gate 2, want and need).
+What makes a twist unguessable is what it is, never how obliquely it is told. This role used to be read as "rebuild any climax a reader could predict", and the cheapest way to pass that was an ending the reader had to infer. A twist that survives the guesser only because the text never says it fails the second half: once the characters understand it, one of them states it plainly. The guesser sees only the sheet and cannot check that half. The draft-stage readers and the reconciler do (below).
+
+**The guesser also reports whether it was handed the answer.** Asked last: _Did anything you were given state, or all but state, what happens at the end: the events, or how the twist works? A theme or the shape of the character's flaw does not count. If yes or partly, name the line and the words._ The first audit showed why. On three of four sheets the input partly gave the ending away, mostly through the NEED line, and a guess made against a leaked input proves nothing in either direction. A yes or a partly voids the test and sends the sheet back at once to have the leaking line rewritten, and the critic does not weigh a guess made against it. The fix belongs to the author: NEED is the flaw and never its resolution (AUTHORING § Gate 2, want and need).
+
+**A theme signal is not a leak.** Until 2026-10-30 the question asked only whether the input gave away "how the story ends", and a guesser answered partly on three successive rewrites of one NEED line, each time for the shape of the theme. Any honest flaw line signals the theme's shape, so that reading failed every sheet on a line the author cannot fix. Where a guesser still answers partly, the critic rules on it: a leak of events or mechanism voids the guess, a leak of theme alone does not.
 
 ### Locator
 
@@ -64,7 +68,7 @@ The three words are defined in the prompt, because the first audit showed the tr
 - **CHANGES.** Names, foods, objects and places change. The cause and the cost of the beat do not.
 - **BREAKS.** The cause or the cost of the beat is gone, **or the move can keep it only by inventing an equivalent institution, custom or obligation** that the new place does not have.
 
-**The climax and the turn have to break, and the need has to stay unsaid.** The first audit used "breaks" to mean only "no longer exists", and zero of about 35 beats across four sheets did, the two strongest-culture stories among them. That is the wrong bar. The cause of a story (a debt, a pride, a promise) rarely disappears in another country. What Japan supplies is the institution that makes it binding and the pressure that keeps it unsaid, and that is what a move has to invent to keep the beat. A beat that merely changes is the cost of any move and proves nothing. So the climax and the turn each have to be BREAKS in this sense, and if the character would simply say the need aloud in the moved version, a Japanese pressure was not what held it, whatever the sheet names. Either failure sends the sheet back as garnish. The transplanter is also asked to name the PRESSURE that is lost, which checks that the pressure written on the sheet is the one doing the work.
+**The climax and the turn have to break, and the silence has to lift.** The first audit used "breaks" to mean only "no longer exists", and zero of about 35 beats across four sheets did, the two strongest-culture stories among them. That is the wrong bar. The cause of a story (a debt, a pride, a promise) rarely disappears in another country. What Japan supplies is the institution that makes it binding and the pressure that keeps it unsaid, and that is what a move has to invent to keep the beat. A beat that merely changes is the cost of any move and proves nothing. So the climax and the turn each have to be BREAKS in this sense, and in the moved version, with the pressure gone, the character has to be able to say the need aloud. If they would keep it back there too, something other than a Japanese pressure was holding it, whatever the sheet names. Either failure sends the sheet back as garnish. (This read the other way round until 2026-10-30, which no culture-specific pressure could pass: a silence the pressure really holds lifts when the pressure does.) The transplanter is also asked to name the PRESSURE that is lost, which checks that the pressure written on the sheet is the one doing the work.
 
 ### Sheet critic
 
@@ -72,16 +76,17 @@ The three words are defined in the prompt, because the first audit showed the tr
 
 Asked, each answered PASS or SEND BACK with the rule, the beat, and one line of reason:
 
-- **Climax.** A specific scene rather than a representative one? Something in it that the premise did not predict — and did any guess land on it? A cost the character actually pays?
-- **Afterword.** A reading of this climax, or a statement of intent? Could it be written off the climax alone?
+- **Climax.** A specific scene rather than a representative one? Something in it that the premise did not predict — and did any guess land on the twist? A cost the character actually pays? Which line, in speech or in thought, states the twist, and does the character who says it understand it at that moment? A twist left for the reader to work out is a SEND BACK, except in `ghost-story` (AUTHORING § Craft, one turn).
+- **Afterword.** Does it spell out, plainly, the twist, the theme and moral, and why the story is built as it is: register, anchor, plants, the cultural pressure? Anything left as a reading for Rob to make, or written as a subtle reading of a scene, is a SEND BACK. Could it be written off the climax alone?
 - **Want and need.** Want visible and sayable in one clause? Need distinct from it? Does the character have to face the need to get the want, and most often give the want up to get it?
 - **Shape.** Declared, boundaries marked, and a story that fits it rather than a form being filled.
 - **Every beat.** Yes-but or no-and. Write the honest join to the next beat: そして / それから is a list of events, だから / しかし is causality, and an all-だから sheet is the straight line the rule exists to break.
 - **Plants.** Name each plant and its payoff. For each plant, what is it doing at the time, as a habit, scenery or an offhand line, that is not planting? A plant a reader would file as a plant is spent.
 - **Characters.** Name every character who appears and say what each is for and where each leaves the story. One used for a beat and then dropped, rather than resolved, is a SEND BACK. No AUTHORING rule states this yet; cite this line.
 - **Resolution choices.** Name the choice the ending turns on and the earlier beat that makes this character make it. A stock gesture with no such beat is a SEND BACK. Check the beats after the climax as well as the climax: say what each one adds and whether the sheet could end sooner.
-- **Ending.** Does the last page state what it means? A claim-ending is permitted only if it corrects a fact about a person (the guard recorded on 廊下の鏡) and never concludes.
-- **Dialogue.** Per scene: a secret each, misdirection, conflicting agendas.
+- **Ending.** Does any line state the moral or the lesson? That is the closing-thesis defect (AUTHORING § Writing rules). A character stating the twist is not. A claim-ending is permitted only if it corrects a fact about a person (the guard recorded on 廊下の鏡) and never concludes.
+- **Dialogue.** Do the characters hold something back from one another, and want different things in the scene? Does any line announce a feeling, or state the moral? Misdirection is a tool for the emotional questions that matter and not a per-scene requirement (AUTHORING § Craft, "Characters keep things back").
+- **Form.** If the story is told through anything other than speech and narration (letters, notes, a diary, messages), would these people really write this, here? What stops them speaking? The sheet has to give the in-world reason. A story that would work as conversation, poured into a written form, is a SEND BACK (AUTHORING § Register).
 - **The CULTURE block.** Each field against AUTHORING § The CULTURE block:
   - PRACTICE written as a procedure a Japanese reader would check step by step, and correct. Anything stated that you cannot confirm, flag; do not wave it through.
   - PRESSURE named in Japanese, and the need unspeakable because of it. Would an American character say the need in one line?
@@ -129,6 +134,8 @@ Asked:
 6. Is there anything a Japanese reader would not accept as fact: an era, an institution, a procedure?
 7. Describe how each speaker talks: first person, how they address the others, politeness, endings. Do they sound like different people? Is anyone's speech wrong for their age, gender, region or era?
 8. What in this could only have happened in Japan? Quote it. What reads as an English idea in Japanese, or as written for a reader who does not live there?
+9. What was the twist, the thing the story kept back and then revealed? Quote the line that states it. Was it stated, or all but stated, before that line? If no line states it, say so and say how you arrived at it.
+10. How do the characters communicate: speech, letters, notes, a diary? Is that how these people would naturally communicate in this situation? If they write, what stops them speaking?
 
 Two readers is the minimum, so that a disagreement is visible. Four is better for a first story in a new register.
 
@@ -145,15 +152,17 @@ Also asked, because the first calibration found a reader's complaints that no qu
 
 No AUTHORING rule states these four yet. A send-back on one cites this list.
 
+And the reveal question the Japanese-only readers are asked, question 9: _What was the twist? Quote the line that states it. Was it stated, or all but stated, before that line? If no line states it, say so and say how you arrived at it._
+
 It is told that names appear in script with their reading in parentheses, as the translation sheet shows them, and are not to be counted as untranslated text. **Any other Japanese script in the English is a finding**, and the reader is asked to say where. The first audit found a few such words, two characters each, in the English lines of two of six stories, which a native editor would want to know about whether or not they were meant.
 
 ### Reconciler
 
-**Gets:** the AFTERWORD, and the PRACTICE and PRESSURE lines, from the sheet; the three readers' two-sentence readings, the ending line each one picked, and each Japanese-only reader's answer to question 8. **Never gets:** the story, or the beats.
+**Gets:** the AFTERWORD, the twist line of the CLIMAX, and the PRACTICE and PRESSURE lines, from the sheet; the three readers' two-sentence readings, the ending line each one picked, each reader's answer to the reveal question, and each Japanese-only reader's answers to questions 8 and 10. **Never gets:** the story, or the beats.
 
-Asked: _Does what the readers took from the story match the afterword: yes, partly, or no? Did they pick the intended ending, and if not what did they pick? Did the readers' "only in Japan" answers name the practice or the pressure, or something else?_ Then, without reference to the readers: _Read the afterword as prose. Quote nothing; name each stock phrase, each sentence that would fit any story, and each place it restates the climax in abstract nouns._ The afterword is the last page Rob reads and no other role reads it as writing. The panel shares the author's model family and may not see the author's own tics, so this check is untested and Rob's note on the afterword is what calibrates it.
+Asked: _Does what the readers took from the story match the afterword: yes, partly, or no? Did they pick the intended ending, and if not what did they pick? Did each reader name the sheet's twist, quote a line that states it, and find it unstated before that line? Did the readers' "only in Japan" answers name the practice or the pressure, or something else? Did any reader find the way the characters communicate unnatural?_ Then, without reference to the readers: _Read the afterword as prose. Does it state the twist, the theme and moral, and why the story is built as it is, plainly? Name anything it leaves as a reading for the reader to make. Quote nothing; name each stock phrase, each sentence that would fit any story, and each place it restates the climax in abstract nouns._ The afterword is the last page Rob reads and no other role reads it as writing. The panel shares the author's model family and may not see the author's own tics, so this check is untested and Rob's note on the afterword is what calibrates it.
 
-Both failures are real and mean different things. If the readers disagree with the afterword, the story is not delivering it or the afterword is wrong, and the author has to say which. If the readers name something other than the practice and the pressure, the culture the draft delivers is not the culture the sheet planned, and one of the two has to move.
+These failures are real and mean different things. If the readers disagree with the afterword, the story is not delivering it or the afterword is wrong, and the author has to say which. If a reader names the twist but no line that states it, the reveal was left to inference and the scene is rewritten so a character says it; if a reader found it stated earlier, it leaked, and the earlier line goes. In `ghost-story` no line is expected to state it (AUTHORING § Craft, one turn). If the readers name something other than the practice and the pressure, the culture the draft delivers is not the culture the sheet planned, and one of the two has to move.
 
 ## Send-backs and escalation
 
@@ -168,7 +177,7 @@ Both failures are real and mean different things. If the readers disagree with t
 CARD  <title>   L<level>  <register>  <pages>p   shape: <name>
 Domain      <noun phrase, at the Summaries ceiling>
 Gate 2      passed on round <n> of 3; sent back for: <rule names only>
-Draft       <n> Japanese-only reads, ending found <where intended | elsewhere>, naturalness <range>
+Draft       <n> Japanese-only reads, ending found <where intended | elsewhere>, twist stated <at the reveal | early | never>, naturalness <range>
 Nearest     <existing story> on <axis>; differs by <axis-level difference, no plot>
 Culture     <practice> run on <pressure>; transplant breaks the turn ✓; locator placed it ✓; readers named it ✓
 Your notes  responds to <title ★n>: held | not held
@@ -213,6 +222,6 @@ Stories that shipped before the CULTURE block are audited at **the draft stage o
 
 ## What the panel cannot do
 
-It cannot tell whether a story will move Rob. It can tell that the climax is not the one a stranger would guess, that the ending does not explain itself, that a Japanese reader would not trip on the facts, and that the story does what its afterword says. "Unexpected to a model" is not "unexpected to Rob."
+It cannot tell whether a story will move Rob. It can tell that the twist is not the one a stranger would guess and that readers find it stated where the sheet put it, that no line states the moral, that a Japanese reader would not trip on the facts, and that the story does what its afterword says. "Unexpected to a model" is not "unexpected to Rob."
 
 **Nor can it certify the culture is right.** The locator and transplanter find culture that is decoration, and the readers find English in Japanese dress, which are the failures the corpus actually has. An agent's account of a custom, though, can be confidently wrong in a way that reads fine, and a regional or era detail that is slightly off is the hardest thing for it to see. Two things narrow this and neither closes it. The author has to be able to write the PRACTICE as a procedure from a source, not from recall, and the critic flags what it cannot confirm. And a Japanese-only reader who says a procedure is wrong has found a fact error, which is a send-back whatever else passed. Rob's notes remain the only ground truth, and when one says a detail is wrong, add the check that would have caught it to the role that passed it.
