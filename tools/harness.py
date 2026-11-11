@@ -2965,7 +2965,10 @@ def suite_table(br, rep, base):
               "chichi-no-hasami": 30,
               "shiroi-bangou": 47,
               "nanatsu-no-mado": 34,
-              "chouritsu-no-hokori": 42,
+              # 調律の埃 re-measured 2026-11-10, 42->43: the known set grew
+              # (6667->6726) and 湿気 stopped being marked unknown, which
+              # changed how one page fills. No text edit.
+              "chouritsu-no-hokori": 43,
               # 号令 (31) recorded 2026-10-24, first measurement, 21 authored
               # pages. Unchanged by the title change from the all-kana
               # working title; nothing overflows.
@@ -2985,7 +2988,11 @@ def suite_table(br, rep, base):
               "rokuji-gojuppun": 16,
               # 八月の絵日記 (29) recorded 2026-10-30, first measurement, in the
               # same commit as the story; tight=0 and nothing overflows.
-              "hachigatsu-no-enikki": 29}
+              "hachigatsu-no-enikki": 29,
+              # 一番いい場所 (31) recorded 2026-11-10, first measurement, in the
+              # same commit as the story: 17 authored pages; tight=0 and
+              # nothing overflows.
+              "ichiban-ii-basho": 31}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")

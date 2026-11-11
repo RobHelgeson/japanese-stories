@@ -10,7 +10,7 @@
 // while the new one fills behind it.
 //
 // Generated into docs/ by offline.py. Edit scripts/sw.js, never docs/sw.js.
-const VERSION = "3d5b13ca2730";
+const VERSION = "efe6b088b586";
 const FILES = [
   "apple-touch-icon.png",
   "chichi-no-hasami.html",
@@ -21,6 +21,7 @@ const FILES = [
   "data/entotsu-no-kemuri.js",
   "data/hachigatsu-no-enikki.js",
   "data/ichi-ni-san-shi.js",
+  "data/ichiban-ii-basho.js",
   "data/ikanakatta-hito-no-chizu.js",
   "data/juugonichi-no-shichifuda.js",
   "data/kagi-to-cheen.js",
@@ -46,6 +47,7 @@ const FILES = [
   "entotsu-no-kemuri.html",
   "hachigatsu-no-enikki.html",
   "ichi-ni-san-shi.html",
+  "ichiban-ii-basho.html",
   "icon-192.png",
   "icon-512.png",
   "icon-maskable-512.png",
