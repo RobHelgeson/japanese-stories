@@ -10,7 +10,7 @@
 // while the new one fills behind it.
 //
 // Generated into docs/ by offline.py. Edit scripts/sw.js, never docs/sw.js.
-const VERSION = "efe6b088b586";
+const VERSION = "5ef5f0443488";
 const FILES = [
   "apple-touch-icon.png",
   "chichi-no-hasami.html",
