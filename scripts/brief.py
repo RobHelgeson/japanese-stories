@@ -56,15 +56,17 @@ def resolve(args):
     page_slack = take("page_slack", args.page_slack, None)
     tokens = pages * D["tokens_per_page"]
 
-    def rate(name, given, per100):
+    budget = stats.budgets(tokens)
+
+    def rate(name, given):
         if given is not None:
             src[name] = "explicit"
             return given
         src[name] = "derived"
-        return round(tokens * per100 / 100)
+        return budget[name]
 
-    new_words = rate("new_words", args.new_words, B["new_words_per_100_tokens"])
-    leech_seeds = rate("leech_seeds", args.leech_seeds, B["leech_seeds_per_100_tokens"])
+    new_words = rate("new_words", args.new_words)
+    leech_seeds = rate("leech_seeds", args.leech_seeds)
 
     repeats = take("repeats", args.repeats, B["min_repeated_share"])
     focus = [c.strip() for c in (args.grammar_focus or "").split(",") if c.strip()]
@@ -85,7 +87,7 @@ def resolve(args):
         "register": register,
         "new_words": new_words,
         "leech_seeds": leech_seeds,
-        "min_occurrences": max(2, round(tokens / 150)),
+        "min_occurrences": budget["min_occurrences"],
         "repeats": repeats,
         "grammar_focus": focus,
         "dialogue": dialogue,
@@ -123,19 +125,22 @@ def show(b, src):
     pool = leech_pool()
     spec = CORPUS["levels"][str(b["level"])]
 
+    def est(key):
+        """A derived budget is an estimate at pages x tokens_per_page; stats.py measures the draft."""
+        return b[key] if src[key] == "explicit" else f"~{b[key]}"
+
     rows = [
         ("level", b["level"], src["level"], spec["name"]),
         ("pages", f"{b['pages']} ±{tol_label}", src["pages"], f"{lo}-{hi} pages"),
         ("tokens", f"~{b['tokens']}", "derived", f"{b['pages']} × {D['tokens_per_page']}"),
         ("register", b["register"], src["register"],
          CORPUS["registers"][b["register"]].split(":")[0]),
-        ("new words", b["new_words"] if src["new_words"] == "explicit" else f"~{b['new_words']}",
-         src["new_words"],
+        ("new words", est("new_words"), src["new_words"],
          f"{B['new_words_per_100_tokens']} / 100 tokens"
-         + ("" if src["new_words"] == "explicit" else ", of the story's real length")),
-        ("  min occurrences", b["min_occurrences"], "derived",
-         f"max(2, {b['tokens']}/150)"),
-        ("leech seeds", b["leech_seeds"], src["leech_seeds"],
+         + ("" if src["new_words"] == "explicit" else " of the story's real length")),
+        ("  min occurrences", f"~{b['min_occurrences']}", "derived",
+         f"max(2, tokens/150) at the story's real length"),
+        ("leech seeds", est("leech_seeds"), src["leech_seeds"],
          f"{B['leech_seeds_per_100_tokens']} / 100 tokens"
          + (f"  (pool: {pool})" if pool else "  (pool: Anki unreachable)")),
         ("repeats", f"≥{b['repeats']:.0%}", src["repeats"], "repeated-word share"),
@@ -159,7 +164,7 @@ def show(b, src):
 def block(b, src):
     """The `brief` object for the story's corpus.json entry.
 
-    A derived new_words or leech_seeds is left out on purpose. It comes from
+    A derived new_words is left out on purpose. It comes from
     pages × tokens_per_page, an estimate made before a sentence exists, and
     stats.py reads a briefed count as a hard ceiling: written down, the 18-page
     briefs of the 2026-11-13 batch capped every story at 4 new words while the
@@ -167,10 +172,9 @@ def block(b, src):
     ceiling is the rate at the story's real length. Only a count Rob chose is
     persisted.
     """
-    out = {"pages": b["pages"], "register": b["register"]}
-    for key in ("new_words", "leech_seeds"):
-        if src[key] == "explicit":
-            out[key] = b[key]
+    out = {"pages": b["pages"], "register": b["register"], "leech_seeds": b["leech_seeds"]}
+    if src["new_words"] == "explicit":
+        out["new_words"] = b["new_words"]
     if b["page_slack"] is not None:
         out["page_slack"] = b["page_slack"]
     if b["grammar_focus"]:

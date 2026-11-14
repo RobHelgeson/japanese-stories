@@ -15,7 +15,7 @@
     "level": 3,
     "pages": 25,
     "page_tolerance": 0.1,
-    "tokens_per_page": 25,
+    "tokens_per_page": 35,
     "register": "random",
     "new_words": null,
     "leech_seeds": null,
@@ -453,7 +453,6 @@
         "pages": 18,
         "page_slack": 2,
         "register": "comic",
-        "new_words": 4,
         "leech_seeds": 5
       },
       "new_words": {
@@ -474,7 +473,6 @@
         "page_slack": 2,
         "_page_slack_reason": "Rob asked for 15 to 20 pages for this batch; the slack records that request, not a shape's uncertainty",
         "register": "quiet-realism",
-        "new_words": 4,
         "leech_seeds": 5
       },
       "new_words": {
@@ -495,7 +493,6 @@
         "page_slack": 2,
         "_page_slack": "Rob asked for 15 to 20 pages; the slack records that request",
         "register": "epistolary",
-        "new_words": 5,
         "leech_seeds": 5,
         "_brief": "Raised from 4 to 5 at draft revision round 1. The 4 came from brief.py's 20-tokens-per-page estimate; the draft runs 800 tokens, where the corpus rate allows 8. Both Japanese-only readers named 食事の付く方 as a paraphrase for the serviced wing, and the two wings under one roof are the story's subject, so 旅館部 is declared. The other flagged paraphrases (炊事場, 大浴場, 仲居, 組合員, 名札, 診療所) were reworded or cut rather than declared, because none recurs five times without reaching"
       },
@@ -515,7 +512,6 @@
         "pages": 18,
         "page_slack": 2,
         "register": "ghost-story",
-        "new_words": 4,
         "leech_seeds": 5
       },
       "_brief_reason": "page_slack 2 because Rob asked for 15 to 20 pages; every other parameter is the default. Batch 2026-11-13, story s2.",
@@ -611,7 +607,6 @@
         "pages": 18,
         "page_slack": 2,
         "register": "retrospective",
-        "new_words": 7,
         "leech_seeds": 5
       },
       "_gate": "Gate 2 passed on round 2 of 3. Round 1 sent the sheet back under PRACTICE and inside the culture at the level of fact (the planting rope's marks were made to count planters rather than hills, the one-and-a-half count was never said to be earned, the debt arithmetic did not add up, the plain's barley-field deadline was applied to a one-crop hill hamlet, and Osaka sourcing was cited as local), under plants and withhold, never confuse (the 一人半 line fell before the bargain it encodes, nothing gave the joke something to be about, and the textbook plant had no payoff), for the afterword (it misdated the teacher's visit and claimed an out-of-order telling the beats did not have), against Rob's 城の鐘 note on monotonic progression (a frame around a strict day-by-day chronology), for Characters and Rob's 猫を探す探偵 note (the brother vanished after the climax), and for ABSENT (the planting-season school closure, the village rest after planting and the seedling offering). The guesser reported no leak in either round; in round 2 it named the title phrase and the house's arithmetic, which the critic ruled anchor and theme, and no guess reached the school bargain. The locator placed it in a cold highland Japanese rice village at planting time and named the exchange unprompted. The transplanter broke the climax and the need-beat, named 恩 and お返し as the pressure lost, and found the family would say the plan at the table once it was gone. Round 2 passed with fixes applied before drafting: the climax's obstacle squared with the uneven division on the 16th, the evening meal squared with the reveal, the bride's dawns given a start, two unpaid words taken out of quoted lines, a reason to board in town, 糸's silence on the house's day made her own, an ambiguous afterword pronoun, and beat numbering. Five characters were renamed at drafting so that every name segments into known parts. Level 4 was taken as a stretch inside Rob's N3 ceiling: its constructions are N3 grammar, and Rob's notes on two earlier stories he read as a stretch support it. Draft stage: two Japanese-only readers and one English-only reader, two rounds. Draft round 1 was sent back by the reconciler under reveal, not puzzle (a marker that the mother's second 一人半 was not a joke, and a purpose clause on the bride's dawn work, which all three readers cited as clues) and because the readers named something other than the pressure (they took the bargain as labour cover and the silence as hierarchy or sulking, not as 恩 and お返し). With it went the evening tally (it did not add up on a first read), facts (the coda's machine seedlings, the planting water's depth), circumlocution where a native writer uses the term, translationese in the narrator's frame lines, flashbacks that read as dated captions against the afterword's own structure claim, energy after the climax, translation lines, names, the exchange's name in English script, the father left unresolved, and afterword sentences. The new-word budget was raised at that round so that the seedbed, the book and the full hand could be named rather than paraphrased; brief.py's per-page estimate had pinned it below the corpus rate. Draft round 2 passed, and its ship fixes were mechanical: an unattributed turn given to the mother, seedling boxes taken out of the scenes set in the year of the story, counters restructured away, the reason for the house's planting date made the seedlings' age, the lost days made a downpour, the aunt's-house and bedridden wording, object-fronted joins both Japanese-only readers heard as English cohesion, an aphorism in the coda, single translationese lines, the English tally and grandson, one clause on who 糸 is to 金蔵 and why she reads the book, the brother's long speech moved into the family's dialect, the sheet's WANT and TWIST synced and the premise refreshed, and afterword sentences (a need stated as a flaw, an ambiguous pronoun, an any-story moral clause, a stock phrase, and the ending told twice). Endings: in both rounds all three readers chose the last line, the narrator's name written once in the book, where intended; the English-only reader found the claim lines before it state the point, which the afterword owns as the correction of fact the ending rests on. Twist: in round 2 all three found it stated at the reveal, by the brother in speech on the bank with the bride's pledge quoted inside it. On the earlier lines the Japanese-only readers said hinted and not stated, and the English-only reader all but stated by the textbook scene; the reconciler ruled no leak, because every clue cited is planted setup and no earlier line states the bargain, the school or the ledger entry. The reconciler also ruled one objection non-blocking, raised by both Japanese-only readers, one as staged for the reader and one as social plausibility: whether an eldest son of that time would set out a private family arrangement, loud enough for the line, in front of four households. The staging is the sheet's own design, passed at Gate 2 (the sister is told in front of the lane, and the telling is the humiliation); the text gives the motive, since the bride of a house in debt has just walked out of the line before the group and her pledge not to put the group out is the lane's business as much as the sister's; and both readers took the reveal fully and stated it correctly. It is a plausibility objection, not a procedure error of the kind PANEL makes binding, and a different reveal setting would have been a creative rewrite with no round left for it. It is recorded here so that Rob's rating can calibrate it. Both Japanese-only readers named the practice in both rounds (the exchange's book, the full-hand reckoning, the half sent by another house, the snow-figure rule, the planting holiday, the offering). In round 2 all three put the house's debt to the exchange at the centre of the twist, one Japanese-only reader said the brother gives the reason the secret was kept, and the English-only reader named the inward half, that the sister must not owe her brother's bride, without either word for the pressure. Both Japanese-only readers found the speech natural for this household and hamlet, with the book doing real work in the plot. Naturalness rose by a step between rounds, the two Japanese-only readers agreeing each time. Left as flagged: the claim lines before the ending, the English-only reader's remaining dated-captions note on the April to June stretch, voices that blur for one reader (糸 with ナツ, the father with 実), ナツ's さん for the bride, ひも against the rope's proper name, horse days valued at one hand, the old man on the 16th read as having no function, and the father's line at the meal found a little tidy.",
