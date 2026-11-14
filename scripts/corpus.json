@@ -15,7 +15,7 @@
     "level": 3,
     "pages": 25,
     "page_tolerance": 0.1,
-    "tokens_per_page": 20,
+    "tokens_per_page": 25,
     "register": "random",
     "new_words": null,
     "leech_seeds": null,

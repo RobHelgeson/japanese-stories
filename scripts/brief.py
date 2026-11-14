@@ -129,8 +129,10 @@ def show(b, src):
         ("tokens", f"~{b['tokens']}", "derived", f"{b['pages']} × {D['tokens_per_page']}"),
         ("register", b["register"], src["register"],
          CORPUS["registers"][b["register"]].split(":")[0]),
-        ("new words", b["new_words"], src["new_words"],
-         f"{B['new_words_per_100_tokens']} / 100 tokens"),
+        ("new words", b["new_words"] if src["new_words"] == "explicit" else f"~{b['new_words']}",
+         src["new_words"],
+         f"{B['new_words_per_100_tokens']} / 100 tokens"
+         + ("" if src["new_words"] == "explicit" else ", of the story's real length")),
         ("  min occurrences", b["min_occurrences"], "derived",
          f"max(2, {b['tokens']}/150)"),
         ("leech seeds", b["leech_seeds"], src["leech_seeds"],
@@ -154,10 +156,21 @@ def show(b, src):
     print(RULE)
 
 
-def block(b):
-    """The `brief` object for the story's corpus.json entry."""
-    out = {"pages": b["pages"], "register": b["register"], "new_words": b["new_words"],
-           "leech_seeds": b["leech_seeds"]}
+def block(b, src):
+    """The `brief` object for the story's corpus.json entry.
+
+    A derived new_words or leech_seeds is left out on purpose. It comes from
+    pages × tokens_per_page, an estimate made before a sentence exists, and
+    stats.py reads a briefed count as a hard ceiling: written down, the 18-page
+    briefs of the 2026-11-13 batch capped every story at 4 new words while the
+    drafts ran 750 to 1,130 tokens, where the rate allows 7 to 11. Absent, the
+    ceiling is the rate at the story's real length. Only a count Rob chose is
+    persisted.
+    """
+    out = {"pages": b["pages"], "register": b["register"]}
+    for key in ("new_words", "leech_seeds"):
+        if src[key] == "explicit":
+            out[key] = b[key]
     if b["page_slack"] is not None:
         out["page_slack"] = b["page_slack"]
     if b["grammar_focus"]:
@@ -190,7 +203,7 @@ def main():
         raise SystemExit("\n".join(f"brief: {m}" for m in bad))
 
     if args.json:
-        print(json.dumps(block(b), ensure_ascii=False, indent=2))
+        print(json.dumps(block(b, src), ensure_ascii=False, indent=2))
         return
 
     show(b, src)

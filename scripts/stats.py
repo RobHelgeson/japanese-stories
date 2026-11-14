@@ -416,10 +416,14 @@ def check_brief(a, story):
             off = 100 * (a["pages"] - want) / want
             fails.append(f"{a['pages']} pages, briefed {want} ({lo}-{hi}), {off:+.0f}%")
 
+    declared = len(story.get("new_words") or {})
     if brief.get("new_words") is not None:
-        declared = len(story.get("new_words") or {})
         if declared > brief["new_words"]:
             fails.append(f"{declared} new words declared, briefed {brief['new_words']}")
+    elif brief:
+        allowed = budgets(a["tokens"])["new_words"]
+        if declared > allowed:
+            fails.append(f"{declared} new words declared, the rate allows {allowed} at {a['tokens']} tokens")
 
     missing = [c for c in brief.get("grammar_focus", []) if not a["grammar"].get(c)]
     if missing:
