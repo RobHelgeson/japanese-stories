@@ -2992,7 +2992,17 @@ def suite_table(br, rep, base):
               # 一番いい場所 (31) recorded 2026-11-10, first measurement, in the
               # same commit as the story: 17 authored pages; tight=0 and
               # nothing overflows.
-              "ichiban-ii-basho": 31}
+              "ichiban-ii-basho": 31,
+              # 素麺とビール (40) recorded 2026-11-14, first measurement, one
+              # commit after the story (its own commit left it unrecorded): 20
+              # authored pages; tight=0 and nothing overflows. Measured after
+              # its page-1 two-sentence line was split in two, which left the
+              # count unchanged.
+              "soumen-to-biiru": 40,
+              # 吉田さんの順番 (40) recorded 2026-11-14, first measurement, in
+              # the same commit as the story: 19 authored pages; tight=0 and
+              # nothing overflows.
+              "yoshida-san-no-junban": 40}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")

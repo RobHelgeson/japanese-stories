@@ -10,7 +10,7 @@
 // while the new one fills behind it.
 //
 // Generated into docs/ by offline.py. Edit scripts/sw.js, never docs/sw.js.
-const VERSION = "eb7b3a9b01eb";
+const VERSION = "697495b3b9b4";
 const FILES = [
   "apple-touch-icon.png",
   "chichi-no-hasami.html",
@@ -44,6 +44,7 @@ const FILES = [
   "data/sumi-no-ryou.js",
   "data/suupu-o-nokosu-kyaku.js",
   "data/tokei-no-oto.js",
+  "data/yoshida-san-no-junban.js",
   "endai-no-shougi.html",
   "entotsu-no-kemuri.html",
   "hachigatsu-no-enikki.html",
@@ -83,7 +84,8 @@ const FILES = [
   "versions/neko-o-sagasu-tantei.v1.html",
   "versions/shiro-no-kane.v1.html",
   "versions/shuden.v1.html",
-  "versions/tokei-no-oto.v1.html"
+  "versions/tokei-no-oto.v1.html",
+  "yoshida-san-no-junban.html"
 ];
 const PREFIX = "japanese-stories-";
 const CACHE = PREFIX + VERSION;
