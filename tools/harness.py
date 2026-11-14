@@ -3002,7 +3002,11 @@ def suite_table(br, rep, base):
               # 吉田さんの順番 (40) recorded 2026-11-14, first measurement, in
               # the same commit as the story: 19 authored pages; tight=0 and
               # nothing overflows.
-              "yoshida-san-no-junban": 40}
+              "yoshida-san-no-junban": 40,
+              # 湯あたり (41) recorded 2026-11-14, first measurement, in the
+              # same commit as the story: 20 authored pages; tight=0 and
+              # nothing overflows.
+              "yuatari": 41}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
