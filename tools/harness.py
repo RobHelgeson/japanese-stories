@@ -3010,7 +3010,11 @@ def suite_table(br, rep, base):
               # 一人半 (45) recorded 2026-11-14, first measurement, in the
               # same commit as the story: 20 authored pages; tight=0 and
               # nothing overflows.
-              "hitori-han": 45}
+              "hitori-han": 45,
+              # 拍子木 (41) recorded 2026-11-14, first measurement, in the
+              # same commit as the story: 19 authored pages; tight=0 and
+              # nothing overflows.
+              "hyoushigi": 41}
     br.emulate(*PHONE[1:])
     table = {}
     print("\n===== screen counts @ 28px 縦書き 改行-off, 390x844 (device emulation) =====")
