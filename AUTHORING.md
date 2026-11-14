@@ -42,7 +42,7 @@ Print the table, **then stop and ask.** Do not draft until the brief is confirme
 | `page_slack`    | none — `page_tolerance`  | `stats.py` brief check — ±N pages, absolute       |
 | `topic`         | none — propose 2-3       | Gate 2                                            |
 | `register`      | random from `registers`  | Gate 2                                            |
-| `new_words`     | 1.0 per 100 tokens       | `stats.py` brief check                            |
+| `new_words`     | 1.0 per 100 tokens       | `stats.py` brief check — at the story's real length unless briefed explicitly |
 | `repeats`       | ≥40% repeated-word share | `stats.py` target                                 |
 | `leech_seeds`   | 1.5 per 100 tokens       | `stats.py` brief check                            |
 | `grammar_focus` | none                     | `stats.py` brief check — all must be present      |
